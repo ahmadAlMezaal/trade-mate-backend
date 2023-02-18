@@ -1,0 +1,61 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+input CreateUserInput {
+  _id: ID
+  email: String!
+  firstName: String!
+  lastName: String!
+  location: String
+  password: String!
+}
+
+input DeleteUserInput {
+  _id: ID!
+}
+
+input FindUserInput {
+  _id: ID
+  email: String
+  firstName: String
+  lastName: String
+}
+
+type Mutation {
+  createUser(input: CreateUserInput!): User!
+  deleteUser(input: DeleteUserInput!): Boolean!
+  updateUser(input: UpdateUserInput!): User!
+}
+
+type Query {
+  user(input: FindUserInput!): User!
+  users: [User!]!
+}
+
+input UpdateUserInput {
+  _id: ID
+  email: String
+  firstName: String
+  lastName: String
+  location: String
+}
+
+type User {
+  _id: ID!
+
+  """Email address of the user"""
+  email: String!
+
+  """User's first name"""
+  firstName: String!
+
+  """User's last name"""
+  lastName: String!
+
+  """User's last name"""
+  location: String!
+
+  """Password for the user"""
+  password: String!
+}

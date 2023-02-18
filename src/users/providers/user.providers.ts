@@ -1,0 +1,29 @@
+import { ConfigService } from '@nestjs/config';
+import { MongoClient, Db, ServerApiVersion, Collection } from 'mongodb';
+import { User } from 'src/users/entities/user.entity';
+
+export const userProviders = [
+    {
+
+        inject: [ConfigService],
+        provide: 'USERS_COLLECTION',
+        useFactory: async (configService: ConfigService): Promise<Db> => {
+            try {
+                const client = await MongoClient.connect(
+                    configService.get<string>('database.MONGODB_URI') as string,
+                    {
+                        serverApi: ServerApiVersion.v1,
+                    }
+                );
+                const db = client.db(configService.get<string>('DATABASE'))
+                const usersCollection = db.collection('users') as Collection<User>;
+                await usersCollection.createIndex({ email: 1, }, { unique: true });
+                return db;
+            } catch (error) {
+                console.log('error connecting to MongoDB: ', error);
+                throw error;
+            }
+        }
+
+    }
+];

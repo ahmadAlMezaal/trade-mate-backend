@@ -1,0 +1,48 @@
+import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
+import { UsersService } from './users.service';
+import { User } from './entities/user.entity';
+import { CreateUserInput } from './dto/createUser.input';
+import { DeleteUserInput, UpdateUserInput } from './dto/updateUser.input';
+import { FindUserInput } from './dto/findOne.input';
+import { PaginationInput } from 'src/common/input/pagination.input';
+
+@Resolver(() => User)
+export class UsersResolver {
+    constructor(private readonly usersService: UsersService) { }
+
+    @Mutation(() => User)
+    createUser(@Args('input') createUserInput: CreateUserInput) {
+        return this.usersService.create(createUserInput);
+    }
+
+    // @Query(() => [User], { name: 'users' })
+    // findAll(paginationQuery: PaginationArgs): Promise<User[]> {
+    //     return this.usersService.findAll();
+    // }
+
+    // @Query(() => [User], { name: 'users' })
+    // findAll(@Args('input') paginationQuery?: PaginationInput) {
+    //     return this.usersService.findAll(paginationQuery);
+    // }
+
+    @Query(() => [User], { name: 'users' })
+    // @Args('input') paginationQuery?: PaginationInput
+    findAll() {
+        return this.usersService.findAll();
+    }
+
+    @Query(() => User, { name: 'user' })
+    async findOne(@Args('input') input: FindUserInput): Promise<User> {
+        return this.usersService.findOne(input);
+    }
+
+    @Mutation(() => User, { name: 'updateUser' })
+    updateUser(@Args('input') updateUserInput: UpdateUserInput) {
+        return this.usersService.update(updateUserInput);
+    }
+
+    @Mutation(() => Boolean, { name: 'deleteUser' })
+    async removeUser(@Args('input') input: DeleteUserInput) {
+        return await this.usersService.remove(input);
+    }
+}
