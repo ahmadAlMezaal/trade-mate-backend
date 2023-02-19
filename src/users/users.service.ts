@@ -1,10 +1,10 @@
 import { HttpException, HttpStatus, Inject, Injectable, NotFoundException } from '@nestjs/common';
-import { Collection, Db, MongoClient, ObjectId } from 'mongodb';
-import { PaginationInput } from 'src/common/input/pagination.input';
+import { Collection, Db, ObjectId } from 'mongodb';
 import { CreateUserInput } from './dto/createUser.input';
 import { FindUserInput } from './dto/findOne.input';
 import { DeleteUserInput, UpdateUserInput } from './dto/updateUser.input';
 import { User } from './entities/user.entity';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
@@ -16,15 +16,20 @@ export class UsersService {
     }
 
     async create(createUserInput: CreateUserInput): Promise<User> {
-        try {
-            const { insertedId } = await this.collection.insertOne({ ...createUserInput });
-            if (!insertedId) {
-                throw new NotFoundException('Unable to insert records');
-            }
-            return { ...createUserInput, _id: insertedId };
-        } catch {
-            throw new HttpException('Internal Server Error', HttpStatus.INTERNAL_SERVER_ERROR);
+        const user = await this.collection.findOne({ email: createUserInput.email });
+        if (user) {
+            throw new HttpException({ message: 'Email already taken Error' }, HttpStatus.UNPROCESSABLE_ENTITY, { cause: new Error('Email already taken Error') });
         }
+
+        const saltOrRounds = 10;
+        const password = createUserInput.password;
+        createUserInput.password = await bcrypt.hash(password, saltOrRounds);
+        const { insertedId } = await this.collection.insertOne({ ...createUserInput });
+        if (!insertedId) {
+            throw new NotFoundException('Unable to insert records');
+        }
+        return { ...createUserInput, _id: insertedId };
+
     }
 
     //TODO Config this for pagination, follow this tutorial: https://javascript.plainenglish.io/graphql-nodejs-mongodb-made-easy-with-nestjs-and-mongoose-29f9c0ea7e1d

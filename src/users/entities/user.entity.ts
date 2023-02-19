@@ -10,7 +10,6 @@ export class User {
   @Field(() => String, { description: 'Email address of the user' })
   email: string;
 
-  @Field(() => String, { description: 'Password for the user' })
   password: string;
 
   @Field(() => String, { description: "User's first name" })
@@ -21,5 +20,8 @@ export class User {
 
   @Field(() => String, { description: "User's last name" })
   location: string;
+
+  @Field(() => String, { description: 'User role' })
+  role: string;
 
 }

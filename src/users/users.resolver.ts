@@ -10,23 +10,18 @@ import { PaginationInput } from 'src/common/input/pagination.input';
 export class UsersResolver {
     constructor(private readonly usersService: UsersService) { }
 
-    @Mutation(() => User)
+    @Mutation(() => User, { name: 'createUser' })
     createUser(@Args('input') createUserInput: CreateUserInput) {
         return this.usersService.create(createUserInput);
     }
 
-    // @Query(() => [User], { name: 'users' })
-    // findAll(paginationQuery: PaginationArgs): Promise<User[]> {
-    //     return this.usersService.findAll();
-    // }
-
+    //TODO: add this for pagination
     // @Query(() => [User], { name: 'users' })
     // findAll(@Args('input') paginationQuery?: PaginationInput) {
     //     return this.usersService.findAll(paginationQuery);
     // }
 
     @Query(() => [User], { name: 'users' })
-    // @Args('input') paginationQuery?: PaginationInput
     findAll() {
         return this.usersService.findAll();
     }

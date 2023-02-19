@@ -10,7 +10,7 @@ import { join } from 'path';
         imports: [
             GraphQLModule.forRoot<ApolloDriverConfig>(
                 {
-                    include: [UsersModule],
+                    // include: [UsersModule],
                     driver: ApolloDriver,
                     autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
                     debug: true,

@@ -9,6 +9,9 @@ input CreateUserInput {
   lastName: String!
   location: String
   password: String!
+
+  """User role"""
+  role: String! = "36"
 }
 
 input DeleteUserInput {
@@ -22,9 +25,18 @@ input FindUserInput {
   lastName: String
 }
 
+input LoginInput {
+  """email of the user"""
+  email: String!
+
+  """password of the user"""
+  password: String!
+}
+
 type Mutation {
   createUser(input: CreateUserInput!): User!
   deleteUser(input: DeleteUserInput!): Boolean!
+  login(input: LoginInput!): User!
   updateUser(input: UpdateUserInput!): User!
 }
 
@@ -56,6 +68,6 @@ type User {
   """User's last name"""
   location: String!
 
-  """Password for the user"""
-  password: String!
+  """User role"""
+  role: String!
 }

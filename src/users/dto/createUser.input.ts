@@ -5,6 +5,11 @@ import { Transform } from 'class-transformer';
 import { IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validator';
 import { ObjectId } from 'mongodb';
 
+export enum Role {
+  ADMIN = 105,
+  TRADER = 36
+}
+
 @InputType()
 export class CreateUserInput {
 
@@ -38,5 +43,8 @@ export class CreateUserInput {
   @Optional()
   @IsString()
   location: string;
+
+  @Field(() => String, { description: 'User role', defaultValue: Role.TRADER })
+  role: string;
 
 }
