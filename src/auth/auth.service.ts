@@ -4,6 +4,7 @@ import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { User } from 'src/users/entities/user.entity';
+import { ObjectId } from 'mongodb';
 
 @Injectable()
 export class AuthService {
@@ -12,7 +13,7 @@ export class AuthService {
         private jwtService: JwtService
     ) { }
 
-    async validateUser(email: string, pass: string): Promise<any> {
+    public async validateUser(email: string, pass: string): Promise<any> {
         const user = await this.usersService.findOne({ email });
         if (!user) {
             throw new NotFoundException('User not found!');
@@ -25,10 +26,14 @@ export class AuthService {
         return null;
     }
 
-    async login(user: User): Promise<{ user: User, accessToken: string }> {
-        const payload = { email: user.email, sub: user._id };
+    public generateToken(email: string, sub: ObjectId) {
+        const payload = { email, sub };
+        return this.jwtService.signAsync(payload)
+    }
+
+    public async login(user: User): Promise<{ user: User, accessToken: string }> {
         return {
-            accessToken: this.jwtService.sign(payload),
+            accessToken: await this.generateToken(user.email, user._id),
             user,
         };
     }

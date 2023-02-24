@@ -2,7 +2,7 @@
 import { Optional } from '@nestjs/common';
 import { Field, ID, InputType } from '@nestjs/graphql';
 import { Transform } from 'class-transformer';
-import { IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsOptional, IsString, MinLength } from 'class-validator';
 import { ObjectId } from 'mongodb';
 
 export enum Role {
@@ -14,37 +14,39 @@ export enum Role {
 export class CreateUserInput {
 
   @Field(() => ID, { nullable: true })
+  @IsOptional()
   _id?: ObjectId;
 
-  @Field()
+  @Field(() => String)
   @IsEmail()
   @IsNotEmpty()
   @Transform(email => email.value.toLowerCase())
   email: string;
 
-  @Field()
+  @Field(() => String)
   @IsString()
   @IsNotEmpty()
   password: string;
 
-  @Field()
+  @Field(() => String)
   @IsString()
   @IsNotEmpty()
   @MinLength(2)
   firstName: string;
 
-  @Field()
+  @Field(() => String)
   @IsString()
   @IsNotEmpty()
   @MinLength(2)
   lastName: string;
 
-  @Field({ nullable: true })
-  @Optional()
+  @Field(() => String, { nullable: true })
+  @IsOptional()
   @IsString()
   location: string;
 
-  @Field(() => String, { description: 'User role', defaultValue: Role.TRADER })
+  @Field(() => String, { description: 'User role', defaultValue: Role.TRADER, nullable: true })
+  @IsOptional()
   role: string;
 
 }

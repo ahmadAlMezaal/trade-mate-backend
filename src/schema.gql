@@ -11,7 +11,7 @@ input CreateUserInput {
   password: String!
 
   """User role"""
-  role: String! = "36"
+  role: String = "36"
 }
 
 input DeleteUserInput {
@@ -42,6 +42,7 @@ type Mutation {
   createUser(input: CreateUserInput!): User!
   deleteUser(input: DeleteUserInput!): Boolean!
   login(input: LoginInput!): LoginResponse
+  signup(input: CreateUserInput!): LoginResponse
   updateUser(input: UpdateUserInput!): User!
 }
 
