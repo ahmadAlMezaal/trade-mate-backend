@@ -1,20 +1,25 @@
 import { UseGuards } from '@nestjs/common';
-import { Resolver, Mutation, Args, Context } from '@nestjs/graphql';
+import { Resolver, Mutation, Args, Context, Query } from '@nestjs/graphql';
 import { LoginInput } from 'src/users/dto/login.input';
-import { User } from 'src/users/entities/user.entity';
 import { AuthService } from './auth.service';
-import { LocalAuthGuard } from './guards/local.guard';
-import { CreateUserInput } from 'src/users/dto/createUser.input';
+import { GqlAuthGuard } from './guards/gql.guard';
+import { LoginResponse } from './entities/auth.entity';
+import { User } from 'src/users/entities/user.entity';
+import { CurrentUser } from 'src/common/decorators/currentUser.decorator';
+import { UsersService } from 'src/users/users.service';
 
 @Resolver('Auth')
 export class AuthResolver {
-    constructor(private readonly authService: AuthService) { }
 
-    @UseGuards(LocalAuthGuard)
-    @Mutation(() => User, { name: 'login' })
-    async login(@Args('input') loginInput: LoginInput): Promise<any> {
-        console.log('loginInput: ', loginInput);
-        return await this.authService.login(loginInput);
+    constructor(
+        private readonly authService: AuthService,
+        private readonly userService: UsersService
+    ) { }
+
+    @UseGuards(GqlAuthGuard)
+    @Mutation(() => LoginResponse, { name: 'login', nullable: true })
+    login(@Args('input') _input: LoginInput, @Context() context: any): Promise<LoginResponse> {
+        return this.authService.login(context.req.user);
     }
 
     // @Mutation(() => Boolean)
@@ -22,5 +27,18 @@ export class AuthResolver {
     //     await this.authService.logout(context.req.user);
     //     context.req.logout();
     //     return true;
+    // }
+
+    @Query(() => User, { name: 'me' })
+    @UseGuards(GqlAuthGuard)
+    async me(@Context() ctx: any) {
+        const user = ctx.req.user;
+        return await this.userService.findOne({ _id: user._id });
+    }
+
+    // @Query(() => User)
+    // @UseGuards(GqlAuthGuard)
+    // me(@CurrentUser() user: User): any {
+    //     return user;
     // }
 }

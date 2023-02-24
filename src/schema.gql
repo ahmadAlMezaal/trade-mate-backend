@@ -33,14 +33,20 @@ input LoginInput {
   password: String!
 }
 
+type LoginResponse {
+  accessToken: String!
+  user: User!
+}
+
 type Mutation {
   createUser(input: CreateUserInput!): User!
   deleteUser(input: DeleteUserInput!): Boolean!
-  login(input: LoginInput!): User!
+  login(input: LoginInput!): LoginResponse
   updateUser(input: UpdateUserInput!): User!
 }
 
 type Query {
+  me: User!
   user(input: FindUserInput!): User!
   users: [User!]!
 }

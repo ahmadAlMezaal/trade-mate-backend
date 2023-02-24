@@ -1,10 +1,9 @@
-import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
 import { UsersService } from './users.service';
 import { User } from './entities/user.entity';
 import { CreateUserInput } from './dto/createUser.input';
 import { DeleteUserInput, UpdateUserInput } from './dto/updateUser.input';
 import { FindUserInput } from './dto/findOne.input';
-import { PaginationInput } from 'src/common/input/pagination.input';
 
 @Resolver(() => User)
 export class UsersResolver {
