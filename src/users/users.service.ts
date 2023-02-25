@@ -45,7 +45,7 @@ export class UsersService {
     async findOne(query: FindUserInput): Promise<User> {
         const user = await this.collection.findOne({ ...query });
         if (!user) {
-            throw new NotFoundException('User not found');
+            throw new NotFoundException('Account not found');
         }
         return user;
     }
@@ -63,7 +63,7 @@ export class UsersService {
             },
         )
         if (!value) {
-            throw new NotFoundException('User not found');
+            throw new NotFoundException('Account not found');
         }
         return value;
     }
