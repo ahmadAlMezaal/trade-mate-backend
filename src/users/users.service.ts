@@ -3,7 +3,7 @@ import { Collection, Db, ObjectId } from 'mongodb';
 import { CreateUserInput } from './dto/createUser.input';
 import { FindUserInput } from './dto/findOne.input';
 import { DeleteUserInput, UpdateUserInput } from './dto/updateUser.input';
-import { User } from './entities/user.entity';
+import { User } from './schemas/user.schema';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -50,11 +50,11 @@ export class UsersService {
         return user;
     }
 
-    async update(updateUserInput: UpdateUserInput) {
+    async update(queryObj: Object, updateUserInput: UpdateUserInput) {
         const { _id, ...restUpdateUserInput } = updateUserInput
         const { value } = await this.collection.findOneAndUpdate(
             {
-                _id: new ObjectId(_id)
+                ...queryObj
             },
             {
                 $set: {

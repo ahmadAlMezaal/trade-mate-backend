@@ -10,7 +10,11 @@ export class User {
   @Field(() => String, { description: 'Email address of the user' })
   email: string;
 
+  @Field(() => String, { description: "User's password" })
   password: string;
+
+  @Field(() => String, { description: 'To show if the user veirifed their email or not', defaultValue: false })
+  isVerified: boolean;
 
   @Field(() => String, { description: "User's first name" })
   firstName: string;
@@ -18,10 +22,16 @@ export class User {
   @Field(() => String, { description: "User's last name" })
   lastName: string;
 
-  @Field(() => String, { description: "User's last name" })
+  @Field(() => String, { description: "User's location" })
   location: string;
 
   @Field(() => String, { description: 'User role' })
   role: string;
+
+  @Field(() => String, { description: 'Verification code on registration', nullable: true })
+  verificationCode?: number;
+
+  @Field(() => String, { description: 'Code used whenever the user wants to reset their password', nullable: true })
+  forgotPasswordCode?: number;
 
 }

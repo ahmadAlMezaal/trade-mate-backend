@@ -1,6 +1,5 @@
 import { ConfigService } from '@nestjs/config';
 import { MongoClient, Db, ServerApiVersion, Collection } from 'mongodb';
-import { User } from 'src/users/entities/user.entity';
 
 export const databaseProviders = [
     {

@@ -7,12 +7,18 @@ export class FindUserInput {
     @Field(() => ID, { nullable: true })
     _id?: ObjectId;
 
-    @Field({ nullable: true })
+    @Field(() => String, { nullable: true })
     email?: string;
 
-    @Field({ nullable: true })
+    @Field(() => String, { nullable: true })
     firstName?: string;
 
-    @Field({ nullable: true })
+    @Field(() => String, { nullable: true })
     lastName?: string;
+
+    @Field(() => Number, { nullable: true })
+    verificationCode?: number;
+
+    @Field(() => Number, { nullable: true })
+    forgotPasswordCode?: number;
 }

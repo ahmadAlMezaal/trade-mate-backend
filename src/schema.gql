@@ -6,11 +6,10 @@ input CreateUserInput {
   _id: ID
   email: String!
   firstName: String!
+  isVerified: Boolean = false
   lastName: String!
   location: String
   password: String!
-
-  """User role"""
   role: String = "36"
 }
 
@@ -22,7 +21,18 @@ input FindUserInput {
   _id: ID
   email: String
   firstName: String
+  forgotPasswordCode: Float
   lastName: String
+  verificationCode: Float
+}
+
+input ForgotPasswordInput {
+  email: String!
+}
+
+type ForgotPasswordResponse {
+  code: String!
+  message: String!
 }
 
 input LoginInput {
@@ -41,9 +51,10 @@ type LoginResponse {
 type Mutation {
   createUser(input: CreateUserInput!): User!
   deleteUser(input: DeleteUserInput!): Boolean!
-  login(input: LoginInput!): LoginResponse
-  signup(input: CreateUserInput!): LoginResponse
-  updateUser(input: UpdateUserInput!): User!
+  forgotPassword(input: ForgotPasswordInput!): ForgotPasswordResponse!
+  login(input: LoginInput!): LoginResponse!
+  resetPassword(input: ResetPasswordInput!): ResetPasswordResponse!
+  signup(input: CreateUserInput!): LoginResponse!
 }
 
 type Query {
@@ -52,12 +63,13 @@ type Query {
   users: [User!]!
 }
 
-input UpdateUserInput {
-  _id: ID
-  email: String
-  firstName: String
-  lastName: String
-  location: String
+input ResetPasswordInput {
+  email: String!
+  password: String!
+}
+
+type ResetPasswordResponse {
+  message: String!
 }
 
 type User {
@@ -69,12 +81,24 @@ type User {
   """User's first name"""
   firstName: String!
 
+  """Code used whenever the user wants to reset their password"""
+  forgotPasswordCode: String
+
+  """To show if the user veirifed their email or not"""
+  isVerified: String!
+
   """User's last name"""
   lastName: String!
 
-  """User's last name"""
+  """User's location"""
   location: String!
+
+  """User's password"""
+  password: String!
 
   """User role"""
   role: String!
+
+  """Verification code on registration"""
+  verificationCode: String
 }

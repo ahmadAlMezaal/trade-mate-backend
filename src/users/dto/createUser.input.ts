@@ -23,6 +23,10 @@ export class CreateUserInput {
   @Transform(email => email.value.toLowerCase())
   email: string;
 
+  @Field(() => Boolean, { defaultValue: false, nullable: true })
+  @IsOptional()
+  isVerified: boolean;
+
   @Field(() => String)
   @IsString()
   @IsNotEmpty()
@@ -45,7 +49,7 @@ export class CreateUserInput {
   @IsString()
   location: string;
 
-  @Field(() => String, { description: 'User role', defaultValue: Role.TRADER, nullable: true })
+  @Field(() => String, { defaultValue: Role.TRADER, nullable: true })
   @IsOptional()
   role: string;
 

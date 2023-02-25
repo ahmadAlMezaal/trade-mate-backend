@@ -2,13 +2,13 @@
 import { Optional } from '@nestjs/common';
 import { Field, ID, InputType } from '@nestjs/graphql';
 import { Transform } from 'class-transformer';
-import { IsEmail, IsInt, IsNotEmpty, IsOptional, IsString, MinLength } from 'class-validator';
+import { IsBoolean, IsEmail, IsInt, IsNotEmpty, IsOptional, IsString, MinLength } from 'class-validator';
 import { ObjectId } from 'mongodb';
 
 @InputType()
 export class BaseUserInput {
 
-  @Field(type => ID, { nullable: true })
+  @Field(() => ID, { nullable: true })
   _id?: ObjectId;
 
   @Field({ nullable: true })
@@ -16,6 +16,8 @@ export class BaseUserInput {
   @Transform(email => email.value.toLowerCase())
   email?: string;
 
+  @Field({ nullable: true })
+  password?: string;
 }
 
 @InputType()
@@ -35,6 +37,14 @@ export class UpdateUserInput extends BaseUserInput {
   @Field({ nullable: true })
   @IsString()
   location?: string;
+
+  @Field(() => Number, { nullable: true })
+  @IsBoolean()
+  verificationCode?: number;
+
+  @Field(() => Number, { nullable: true })
+  @IsBoolean()
+  forgotPasswordCode?: number;
 
 }
 
