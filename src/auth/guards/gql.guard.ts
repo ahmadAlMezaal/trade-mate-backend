@@ -27,7 +27,6 @@ export class GqlAuthGuard extends AuthGuard('local') {
     //     if (err || !user) {
     //         throw err || new UnauthorizedException();
     //     }
-    //     console.log('userrrrr: ', user);
     //     return user; // return the authenticated user object
     // }
 

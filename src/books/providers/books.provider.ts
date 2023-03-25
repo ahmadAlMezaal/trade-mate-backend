@@ -1,11 +1,12 @@
 import { ConfigService } from '@nestjs/config';
 import { MongoClient, Db, ServerApiVersion, Collection } from 'mongodb';
+import { Book } from '../entities/book.schema';
 
-export const databaseProviders = [
+export const booksProviders = [
     {
 
         inject: [ConfigService],
-        provide: 'DATABASE_CONNECTION',
+        provide: 'BOOKS_COLLECTION',
         useFactory: async (configService: ConfigService): Promise<Db> => {
             try {
                 const client = await MongoClient.connect(
@@ -14,13 +15,15 @@ export const databaseProviders = [
                         serverApi: ServerApiVersion.v1,
                     }
                 );
-                console.log('Successfully connected to MongoDB'.toUpperCase());
-                return client.db(configService.get<string>('DATABASE'));
+                const db = client.db(configService.get<string>('DATABASE'))
+                const usersCollection = db.collection('books') as Collection<Book>;
+                await usersCollection.createIndex({ name: 1, }, { unique: true });
+                return db;
             } catch (error) {
                 console.log('error connecting to MongoDB: ', error);
                 throw error;
             }
         }
-    },
-    //TODO: Try adding rest of the models here
+
+    }
 ];

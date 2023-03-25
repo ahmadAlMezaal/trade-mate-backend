@@ -10,8 +10,8 @@ import { ResetPasswordInput } from './dto/resetPassword.input';
 @Injectable()
 export class AuthService {
     constructor(
-        private usersService: UsersService,
-        private jwtService: JwtService
+        private readonly usersService: UsersService,
+        private readonly jwtService: JwtService
     ) { }
 
     public async validateUser(email: string, pass: string): Promise<any> {
@@ -27,9 +27,9 @@ export class AuthService {
         return null;
     }
 
-    public generateToken(email: string, sub: ObjectId) {
+    public async generateToken(email: string, sub: ObjectId) {
         const payload = { email, sub };
-        return this.jwtService.signAsync(payload)
+        return await this.jwtService.signAsync(payload)
     }
 
     public async login(user: User): Promise<{ user: User, accessToken: string }> {

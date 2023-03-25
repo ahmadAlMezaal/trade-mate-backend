@@ -1,5 +1,3 @@
-
-import { Optional } from '@nestjs/common';
 import { Field, ID, InputType } from '@nestjs/graphql';
 import { Transform } from 'class-transformer';
 import { IsEmail, IsNotEmpty, IsOptional, IsString, MinLength } from 'class-validator';

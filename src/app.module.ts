@@ -7,6 +7,8 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { AppIdentifierMiddleware } from './common/middlewares/appIdentifier.middleware';
 import { APP_INTERCEPTOR } from '@nestjs/core';
+import { BooksModule } from './books/books.module';
+import { PostModule } from './post/post.module';
 
 @Module(
     {
@@ -17,7 +19,13 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
                 useClass: AppIdentifierMiddleware,
             }
         ],
-        imports: [CommonModule, UsersModule, AuthModule],
+        imports: [
+            CommonModule,
+            UsersModule,
+            AuthModule,
+            BooksModule,
+            PostModule
+        ],
         controllers: [AppController],
     }
 )
