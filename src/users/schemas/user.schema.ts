@@ -26,7 +26,6 @@ export class User {
   @Field(() => String, { description: "User's location" })
   location: string;
 
-  //? When adding [Book] instead of [String], the query will not be reached 
   @Field(() => [Book], { description: "Books bookmarked by the user", defaultValue: [], nullable: true })
   bookmarkedBooks?: Book[];
 
