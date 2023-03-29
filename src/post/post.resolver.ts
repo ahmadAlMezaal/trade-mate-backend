@@ -35,7 +35,7 @@ export class PostResolver {
     }
 
     @Query(() => [Post], { name: 'posts' })
-    async getAllPosts() {
+    async getAllPosts(): Promise<Post[]> {
         return await this.postService.findAll();
     }
 

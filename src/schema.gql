@@ -19,6 +19,23 @@ type Book {
   reviews: String
 }
 
+input BookInput {
+  _id: ID!
+
+  """The complete information about the book"""
+  bookInfo: String
+
+  """Category of the book"""
+  genre: String!
+
+  """description of the book"""
+  imageUrls: [String!]!
+
+  """official name of the book"""
+  name: String!
+  reviews: String
+}
+
 input CreateBookInput {
   """Description of the book"""
   description: String!
@@ -44,11 +61,14 @@ input CreatePostInput {
 
 input CreateUserInput {
   _id: ID
+
+  """Books bookmarked by the user"""
+  bookmarkedBooks: [BookInput!] = []
   email: String!
   firstName: String!
   isVerified: Boolean = false
   lastName: String!
-  location: String
+  location: String!
   password: String!
   role: String = "36"
 }
@@ -108,13 +128,13 @@ type Post {
   _id: ID!
 
   """The complete information about the book"""
-  bookInfo: String
+  bookInfo: Book
 
   """description of the post"""
   description: String!
 
   """Images of the book"""
-  imageUrls: String!
+  imageUrls: [String!]!
   postOwnerId: String!
 
   """Title of the post"""
@@ -126,6 +146,7 @@ type Query {
   me: User!
   post(id: Int!): Post!
   posts: [Post!]!
+  profile: User!
   user(input: FindUserInput!): User!
   users: [User!]!
 }
@@ -169,6 +190,9 @@ scalar Upload
 
 type User {
   _id: ID!
+
+  """Books bookmarked by the user"""
+  bookmarkedBooks: [Book!]
 
   """Email address of the user"""
   email: String!

@@ -1,7 +1,8 @@
-import { ObjectType, Field, Int, ID } from '@nestjs/graphql';
+import { ObjectType, Field, ID, InputType } from '@nestjs/graphql';
 import { ObjectId } from 'mongodb';
 
 @ObjectType()
+@InputType('BookInput')
 export class Book {
 
     @Field(() => ID)
@@ -20,7 +21,7 @@ export class Book {
     @Field(_type => String, { description: 'Category of the book' })
     genre: string;
 
-    @Field(() => String, { nullable: true, description: 'The complete information about the book' })
+    @Field(() => String, { description: 'The complete information about the book', nullable: true, })
     bookInfo: any;
 
 }

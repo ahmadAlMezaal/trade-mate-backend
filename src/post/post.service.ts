@@ -36,7 +36,6 @@ export class PostService {
 
     public async findAll() {
         // const tst = await this.collection.find({ _id: new ObjectId('640348d047014a48505931be') })
-        // console.log('tst: ', tst);
         return await this.collection.find({}).toArray();
     }
 

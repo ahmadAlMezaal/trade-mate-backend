@@ -1,4 +1,4 @@
-import { ObjectType, Field, Int, ID } from '@nestjs/graphql';
+import { ObjectType, Field, ID } from '@nestjs/graphql';
 import { ObjectId } from 'mongodb';
 import { Book } from 'src/books/entities/book.schema';
 
@@ -16,11 +16,11 @@ export class Post {
 
   // @Field(() => [GraphQLUpload], { description: 'Images of the book' })
   // imageUrls: Array<Express.Multer.File>;
-  @Field(() => String, { description: 'Images of the book' })
+  @Field(() => [String], { description: 'Images of the book' })
   imageUrls: string[];
 
 
-  @Field(() => String, { nullable: true, description: 'The complete information about the book' })
+  @Field(() => Book, { nullable: true, description: 'The complete information about the book' })
   bookInfo: Book;
 
   @Field(() => String)

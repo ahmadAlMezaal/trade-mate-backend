@@ -1,7 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Collection, Db } from 'mongodb';
 import { User } from 'src/users/schemas/user.schema';
-import { BooksResolver } from './books.resolver';
 import { CreateBookInput } from './dto/createBook.input';
 import { FindBookInput } from './dto/findBook.input';
 import { UpdateBookInput } from './dto/updateBook.input';

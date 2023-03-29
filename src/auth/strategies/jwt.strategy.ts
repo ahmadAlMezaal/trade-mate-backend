@@ -24,10 +24,4 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         }
         return user;
     }
-
-    //TODO: Explore what does this do
-    // handleRequest(err: any, user: any) {
-    //     if (user) return user;
-    //     return null;
-    // }
 }
