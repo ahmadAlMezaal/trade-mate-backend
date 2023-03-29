@@ -2,13 +2,73 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type Book {
+  _id: ID!
+
+  """The complete information about the book"""
+  bookInfo: String
+
+  """Category of the book"""
+  genre: String!
+
+  """description of the book"""
+  imageUrls: [String!]!
+
+  """official name of the book"""
+  name: String!
+  reviews: String
+}
+
+input BookInput {
+  _id: ID!
+
+  """The complete information about the book"""
+  bookInfo: String
+
+  """Category of the book"""
+  genre: String!
+
+  """description of the book"""
+  imageUrls: [String!]!
+
+  """official name of the book"""
+  name: String!
+  reviews: String
+}
+
+input CreateBookInput {
+  """Description of the book"""
+  description: String!
+
+  """Genre of the book"""
+  genre: String!
+  imageUrls: [String!]!
+
+  """Official name of the book"""
+  name: String!
+}
+
+input CreatePostInput {
+  _id: ID!
+
+  """Description of the book"""
+  description: String!
+  imageUrls: Upload
+
+  """Title of the post"""
+  title: String!
+}
+
 input CreateUserInput {
   _id: ID
+
+  """Books bookmarked by the user"""
+  bookmarkedBooks: [BookInput!] = []
   email: String!
   firstName: String!
   isVerified: Boolean = false
   lastName: String!
-  location: String
+  location: String!
   password: String!
   role: String = "36"
 }
@@ -49,16 +109,44 @@ type LoginResponse {
 }
 
 type Mutation {
+  addBook(createBookInput: CreateBookInput!): Book!
+  addPost(imageUrls: Upload!, input: CreatePostInput!): Post!
   createUser(input: CreateUserInput!): User!
   deleteUser(input: DeleteUserInput!): Boolean!
   forgotPassword(input: ForgotPasswordInput!): ForgotPasswordResponse!
   login(input: LoginInput!): LoginResponse!
+  removeBook(id: Int!): Book!
+  removePost(id: Int!): Post!
   resetPassword(input: ResetPasswordInput!): ResetPasswordResponse!
   signup(input: CreateUserInput!): LoginResponse!
+  updateBook(updateBookInput: UpdateBookInput!): Book!
+  updatePost(updatePostInput: UpdatePostInput!): Post!
+  uploadFile(file: Upload!): Boolean!
+}
+
+type Post {
+  _id: ID!
+
+  """The complete information about the book"""
+  bookInfo: Book
+
+  """description of the post"""
+  description: String!
+
+  """Images of the book"""
+  imageUrls: [String!]!
+  postOwnerId: String!
+
+  """Title of the post"""
+  title: String!
 }
 
 type Query {
+  books: [Book!]!
   me: User!
+  post(id: Int!): Post!
+  posts: [Post!]!
+  profile: User!
   user(input: FindUserInput!): User!
   users: [User!]!
 }
@@ -72,8 +160,39 @@ type ResetPasswordResponse {
   message: String!
 }
 
+input UpdateBookInput {
+  """Description of the book"""
+  description: String
+
+  """Genre of the book"""
+  genre: String
+  id: Int!
+  imageUrls: [String!]
+
+  """Official name of the book"""
+  name: String
+}
+
+input UpdatePostInput {
+  _id: ID
+
+  """Description of the book"""
+  description: String
+  id: Int!
+  imageUrls: Upload
+
+  """Title of the post"""
+  title: String
+}
+
+"""The `Upload` scalar type represents a file upload."""
+scalar Upload
+
 type User {
   _id: ID!
+
+  """Books bookmarked by the user"""
+  bookmarkedBooks: [Book!]
 
   """Email address of the user"""
   email: String!

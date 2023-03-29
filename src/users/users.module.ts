@@ -8,6 +8,7 @@ import { ConfigModule } from '@nestjs/config';
 
 @Module(
     {
+        //TODO: Try to make the ConfigModule in CommonModule
         imports: [ConfigModule, CommonModule],
         providers: [
             UsersResolver,

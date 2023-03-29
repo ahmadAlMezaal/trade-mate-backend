@@ -1,11 +1,11 @@
 import { ConfigService } from '@nestjs/config';
-import { MongoClient, Db, ServerApiVersion, Collection } from 'mongodb';
+import { MongoClient, Db, ServerApiVersion } from 'mongodb';
 
-export const databaseProviders = [
+export const postsProviders = [
     {
 
         inject: [ConfigService],
-        provide: 'DATABASE_CONNECTION',
+        provide: 'POSTS_COLLECTION',
         useFactory: async (configService: ConfigService): Promise<Db> => {
             try {
                 const client = await MongoClient.connect(
@@ -14,13 +14,13 @@ export const databaseProviders = [
                         serverApi: ServerApiVersion.v1,
                     }
                 );
-                console.log('Successfully connected to MongoDB'.toUpperCase());
-                return client.db(configService.get<string>('DATABASE'));
+                const db = client.db(configService.get<string>('DATABASE'))
+                return db;
             } catch (error) {
                 console.log('error connecting to MongoDB: ', error);
                 throw error;
             }
         }
-    },
-    //TODO: Try adding rest of the models here
+
+    }
 ];

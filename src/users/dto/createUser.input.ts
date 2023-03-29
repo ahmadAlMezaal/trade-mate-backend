@@ -1,9 +1,8 @@
-
-import { Optional } from '@nestjs/common';
-import { Field, ID, InputType } from '@nestjs/graphql';
+import { Field, InputType, ID } from '@nestjs/graphql';
 import { Transform } from 'class-transformer';
 import { IsEmail, IsNotEmpty, IsOptional, IsString, MinLength } from 'class-validator';
 import { ObjectId } from 'mongodb';
+import { Book } from 'src/books/entities/book.schema';
 
 export enum Role {
   ADMIN = 105,
@@ -44,13 +43,16 @@ export class CreateUserInput {
   @MinLength(2)
   lastName: string;
 
-  @Field(() => String, { nullable: true })
-  @IsOptional()
+  @Field(() => String)
+  @IsNotEmpty()
   @IsString()
   location: string;
+
+  @Field(() => [Book], { description: "Books bookmarked by the user", defaultValue: [], nullable: true })
+  @IsOptional()
+  bookmarkedBooks?: Book[];
 
   @Field(() => String, { defaultValue: Role.TRADER, nullable: true })
   @IsOptional()
   role: string;
-
 }

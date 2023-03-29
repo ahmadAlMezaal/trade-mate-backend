@@ -45,12 +45,10 @@ export class UpdateUserInput extends BaseUserInput {
   @Field(() => Number, { nullable: true })
   @IsBoolean()
   forgotPasswordCode?: number;
-
 }
 
 @InputType()
 export class DeleteUserInput {
   @Field(() => ID)
   _id: ObjectId;
-
 }
