@@ -1,12 +1,11 @@
 import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
 import { BooksService } from './books.service';
 import { Book } from './entities/book.schema';
-import { CreateBookInput } from './dto/createBook.input';
 import { UpdateBookInput } from './dto/updateBook.input';
-import { Req, UseGuards } from '@nestjs/common';
+import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/guards/jwtAuth.guard';
-import { User } from 'src/users/schemas/user.schema';
-import { CurrentUser } from 'src/common/decorators/currentUser.decorator';
+import { FindBookInput } from './dto/findBook.input';
+import { IBook } from 'src/types/models';
 
 @Resolver(() => Book)
 export class BooksResolver {
@@ -14,9 +13,9 @@ export class BooksResolver {
     constructor(private readonly booksService: BooksService) { }
 
     @UseGuards(JwtAuthGuard)
-    @Mutation(() => Book, { name: 'addBook' })
-    createBook(@Args('createBookInput') createBookInput: CreateBookInput, @CurrentUser() user: User): Promise<Book> {
-        return this.booksService.create(createBookInput, user);
+    @Query(() => [Book], { name: 'searchBook' })
+    async searchBook(@Args('input') input: FindBookInput): Promise<IBook[]> {
+        return await this.booksService.queryBook(input);
     }
 
     @Query(() => [Book], { name: 'books' })

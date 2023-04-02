@@ -3,49 +3,63 @@
 # ------------------------------------------------------
 
 type Book {
-  _id: ID!
+  """Authors of the book"""
+  authors: [String!]
 
-  """The complete information about the book"""
-  bookInfo: String
+  """Description of the book"""
+  description: String
 
-  """Category of the book"""
-  genre: String!
+  """Categories of the book"""
+  genres: [String!]!
 
   """description of the book"""
-  imageUrls: [String!]!
+  imageUrls: [String!]
 
-  """official name of the book"""
-  name: String!
-  reviews: String
+  """The language of the book"""
+  language: String
+
+  """The language of the book"""
+  pdfLink: String
+  providerId: String!
+
+  """Official subtitle of the book"""
+  subtitle: String
+
+  """Official name of the book"""
+  title: String!
+
+  """The total page count of the book"""
+  totalPageCount: Float!
 }
 
 input BookInput {
-  _id: ID!
+  """Authors of the book"""
+  authors: [String!] = []
 
-  """The complete information about the book"""
-  bookInfo: String
+  """Description of the book"""
+  description: String
 
-  """Category of the book"""
-  genre: String!
+  """Categories of the book"""
+  genres: [String!]! = []
 
   """description of the book"""
-  imageUrls: [String!]!
+  imageUrls: [String!] = []
 
-  """official name of the book"""
-  name: String!
-  reviews: String
-}
+  """The language of the book"""
+  language: String
 
-input CreateBookInput {
-  """Description of the book"""
-  description: String!
+  """The language of the book"""
+  pdfLink: String
+  providerId: String!
 
-  """Genre of the book"""
-  genre: String!
-  imageUrls: [String!]!
+  """Official subtitle of the book"""
+  subtitle: String
 
   """Official name of the book"""
-  name: String!
+  title: String!
+
+  """The total page count of the book"""
+  totalPageCount: Float!
 }
 
 input CreatePostInput {
@@ -75,6 +89,11 @@ input CreateUserInput {
 
 input DeleteUserInput {
   _id: ID!
+}
+
+input FindBookInput {
+  _id: ID
+  name: String
 }
 
 input FindUserInput {
@@ -109,7 +128,6 @@ type LoginResponse {
 }
 
 type Mutation {
-  addBook(createBookInput: CreateBookInput!): Book!
   addPost(imageUrls: Upload!, input: CreatePostInput!): Post!
   createUser(input: CreateUserInput!): User!
   deleteUser(input: DeleteUserInput!): Boolean!
@@ -147,6 +165,7 @@ type Query {
   post(id: Int!): Post!
   posts: [Post!]!
   profile: User!
+  searchBook(input: FindBookInput!): [Book!]!
   user(input: FindUserInput!): User!
   users: [User!]!
 }
@@ -167,7 +186,7 @@ input UpdateBookInput {
   """Genre of the book"""
   genre: String
   id: Int!
-  imageUrls: [String!]
+  imageUrls: String
 
   """Official name of the book"""
   name: String

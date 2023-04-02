@@ -12,12 +12,13 @@ export class CreateBookInput {
   @IsNotEmpty()
   description: string;
 
-  @Field(() => [String])
+  // @Field(() => [String])
+  @Field(() => String)
   @IsString()
   @IsNotEmpty()
   imageUrls: string[];
 
-  @Field(_type => String, { description: 'Genre of the book' })
+  @Field(() => String, { description: 'Genre of the book' })
   genre: string;
 
   // @Field(() => String, { description: 'The ID of the trader' })
