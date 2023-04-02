@@ -33,13 +33,23 @@ export class BooksService {
             const books: IBook[] = [];
             if (response.data && response.data.totalItems > 0) {
                 const totalBooks = response.data.items.slice(0, 3) as IGoogleBook[]
-
                 for (const book of totalBooks) {
                     const bookInfo = book.volumeInfo;
-                    const genres = bookInfo?.categories ? [...bookInfo.categories] : [];
-                    const imageUrls = bookInfo.imageLinks?.smallThumbnail || bookInfo.imageLinks?.thumbnail ?
-                        [bookInfo.imageLinks?.smallThumbnail, bookInfo.imageLinks?.thumbnail] :
-                        []
+                    let genres = [];
+
+                    const imageUrls = {
+                        smallThumbnail: 'https://books.google.com/books/content?id=1234&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api',
+                        thumbnail: 'https://books.google.com/books/content?id=1234&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api'
+                    };
+                    if (book.volumeInfo.imageLinks?.smallThumbnail) {
+                        imageUrls.smallThumbnail = book.volumeInfo.imageLinks.smallThumbnail.replace(/^http:\/\//i, 'https://')
+                    }
+                    if (book.volumeInfo.imageLinks?.thumbnail) {
+                        imageUrls.thumbnail = book.volumeInfo.imageLinks.thumbnail.replace(/^http:\/\//i, 'https://')
+                    }
+                    if (bookInfo?.categories) {
+                        genres = [...bookInfo.categories];
+                    }
                     const bookObj: IBook = {
                         authors: bookInfo?.authors ?? [],
                         description: bookInfo.description,

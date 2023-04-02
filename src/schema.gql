@@ -13,7 +13,7 @@ type Book {
   genres: [String!]!
 
   """description of the book"""
-  imageUrls: [String!]
+  imageUrls: ImageUrls
 
   """The language of the book"""
   language: String
@@ -43,7 +43,7 @@ input BookInput {
   genres: [String!]! = []
 
   """description of the book"""
-  imageUrls: [String!] = []
+  imageUrls: ImageUrlsInput = {}
 
   """The language of the book"""
   language: String
@@ -112,6 +112,16 @@ input ForgotPasswordInput {
 type ForgotPasswordResponse {
   code: String!
   message: String!
+}
+
+type ImageUrls {
+  smallThumbnail: String!
+  thumbnail: String!
+}
+
+input ImageUrlsInput {
+  smallThumbnail: String!
+  thumbnail: String!
 }
 
 input LoginInput {

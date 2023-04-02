@@ -1,6 +1,18 @@
 import { ObjectType, Field, InputType } from '@nestjs/graphql';
 
 @ObjectType()
+@InputType('ImageUrlsInput')
+class ImageUrls {
+
+    @Field(() => String)
+    thumbnail: string;
+
+    @Field(() => String)
+    smallThumbnail: string;
+
+}
+
+@ObjectType()
 @InputType('BookInput')
 export class Book {
 
@@ -19,8 +31,8 @@ export class Book {
     @Field(() => String, { description: 'Description of the book', nullable: true })
     description: string;
 
-    @Field(() => [String], { description: 'description of the book', defaultValue: [], nullable: true })
-    imageUrls: string[];
+    @Field(() => ImageUrls, { description: 'description of the book', defaultValue: [], nullable: true })
+    imageUrls: ImageUrls;
 
     @Field(() => Number, { description: 'The total page count of the book' })
     totalPageCount: number

@@ -83,7 +83,10 @@ export interface IBook {
     subtitle: string;
     authors: string[];
     description: string;
-    imageUrls: string[];
+    imageUrls?: {
+        smallThumbnail?: string;
+        thumbnail?: string
+    };
     totalPageCount: number
     genres: string[];
     language: string;
