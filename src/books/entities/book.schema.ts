@@ -1,27 +1,48 @@
-import { ObjectType, Field, ID, InputType } from '@nestjs/graphql';
-import { ObjectId } from 'mongodb';
+import { ObjectType, Field, InputType } from '@nestjs/graphql';
+
+@ObjectType()
+@InputType('ImageUrlsInput')
+class ImageUrls {
+
+    @Field(() => String)
+    thumbnail: string;
+
+    @Field(() => String)
+    smallThumbnail: string;
+
+}
 
 @ObjectType()
 @InputType('BookInput')
 export class Book {
 
-    @Field(() => ID)
-    _id?: ObjectId;
+    @Field(() => String)
+    providerId: string;
 
-    @Field(() => String, { description: 'official name of the book' })
-    name: string;
+    @Field(() => String, { description: 'Official name of the book' })
+    title: string;
 
-    @Field(() => [String], { description: 'description of the book' })
-    imageUrls: string[];
+    @Field(() => String, { description: 'Official subtitle of the book', nullable: true })
+    subtitle?: string;
 
-    //TODO: Need to create a data type
-    @Field({ nullable: true })
-    reviews: string;
+    @Field(() => [String], { description: 'Authors of the book', defaultValue: [], nullable: true })
+    authors: string[];
 
-    @Field(_type => String, { description: 'Category of the book' })
-    genre: string;
+    @Field(() => String, { description: 'Description of the book', nullable: true })
+    description: string;
 
-    @Field(() => String, { description: 'The complete information about the book', nullable: true, })
-    bookInfo: any;
+    @Field(() => ImageUrls, { description: 'description of the book', defaultValue: [], nullable: true })
+    imageUrls: ImageUrls;
 
+    @Field(() => Number, { description: 'The total page count of the book' })
+    totalPageCount: number
+
+    @Field(_type => [String], { description: 'Categories of the book', defaultValue: [] })
+    genres: string;
+
+    @Field(_type => String, { description: 'The language of the book', nullable: true })
+    language?: string;
+
+    @Field(_type => String, { description: 'The language of the book', nullable: true })
+    pdfLink?: string;
 }

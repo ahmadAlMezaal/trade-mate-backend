@@ -11,7 +11,7 @@ export const loadSecrets = async () => {
     }
     const client = new AWS.SecretsManager(input);
     try {
-        let secrets;
+        let secrets: any;
         const data = await client.getSecretValue({ SecretId: secretName }).promise();
         if ('SecretString' in data) {
             secrets = JSON.parse(data.SecretString);
@@ -28,11 +28,11 @@ export const loadSecrets = async () => {
     }
 }
 
-const configuration = () => {
+export const configuration = () => {
     return {
-        port: process.env.PORT || 3000,
+        port: process.env.PORT,
         database: {
-            MONGODB_URI: process.env.MONO_DB_CONNECTION_STRING || 'mongodb://localhost/nest'
+            MONGODB_URI: process.env.MONO_DB_CONNECTION_STRING
         },
         jwt: {
             secret: process.env.JWT_SECRET,
@@ -41,4 +41,3 @@ const configuration = () => {
     }
 }
 
-export default configuration;
