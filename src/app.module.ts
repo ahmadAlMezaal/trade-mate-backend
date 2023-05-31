@@ -36,5 +36,4 @@ export class AppModule implements NestModule {
             .apply(AppIdentifierMiddleware)
             .forRoutes({ path: '*', method: RequestMethod.ALL });
     }
-
 }
