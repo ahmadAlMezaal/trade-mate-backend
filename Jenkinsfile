@@ -1,11 +1,6 @@
 pipeline {
     agent any
 
-    // environment { 
-    //     VAR1 = 'value1'
-    //     VAR2 = 'value2'
-    // }
-
     stages {
         stage('Fetch from GitHub') {
             steps {
