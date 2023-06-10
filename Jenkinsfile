@@ -21,20 +21,20 @@ pipeline {
             }
         }
         
-        stage('Test') {
+        stage('Testing the App') {
             steps {
                 sh 'curl http://localhost:3000/health'
             }
         }
 
-        // stage('Deploy') {
-        //     steps {
-        //         withCredentials([sshUserPrivateKey(credentialsId: 'aws', keyFileVariable: 'AWS_SSH_KEY')]) {
-        //             sh """
-        //                 ssh -i ${AWS_SSH_KEY} ubuntu@your_aws_ip 'bash -s' < deploy.sh
-        //             """
-        //         }
-        //     }
-        // }
+       stage('Deploy') {
+        steps {
+            withCredentials([sshUserPrivateKey(credentialsId: 'AWS_INSTANCE_SSH', keyFileVariable: 'SSH_KEY')]) {
+                sh """
+                    ssh -i ${SSH_KEY} ubuntu@35.170.191.71 'cd book-trader-backend/ && git pull && yarn install && pm2 restart book-trader-backend'
+                """
+                }
+            }
+        }
     }
 }
