@@ -30,6 +30,7 @@ pipeline {
                 sh 'curl http://localhost:3000/health'
             }
         }
+        
         // stage('Deploy') {
         //     steps {
         //         withCredentials([sshUserPrivateKey(credentialsId: 'aws', keyFileVariable: 'AWS_SSH_KEY')]) {
