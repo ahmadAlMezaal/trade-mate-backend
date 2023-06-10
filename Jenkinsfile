@@ -2,11 +2,6 @@ pipeline {
     agent any
 
     stages {
-        stage('Fetch from GitHub') {
-            steps {
-                git 'https://github.com/AhmadMazaal/book-trader-backend.git'
-            }
-        }
         stage('Clear Cache and Install Dependencies') {
             steps {
                 sh 'yarn cache clean'
