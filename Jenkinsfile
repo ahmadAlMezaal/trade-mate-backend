@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     stages {
-        stage('Clear Cache and Install Dependencies') {
+        stage('Install Dependencies') {
             steps {
                 sh 'yarn install'
             }
