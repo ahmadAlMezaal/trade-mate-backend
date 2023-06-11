@@ -31,7 +31,7 @@ pipeline {
         steps {
             withCredentials([sshUserPrivateKey(credentialsId: 'AWS_INSTANCE_SSH', keyFileVariable: 'SSH_KEY')]) {
                 sh """
-                    ssh -i ${SSH_KEY} ubuntu@35.170.191.71 'cd book-trader-backend/ && git pull && yarn install && pm2 restart book-trader-backend'
+                    ssh -i ${SSH_KEY} ubuntu@44.201.190.109 'cd book-trader-backend/ && git pull && yarn install && pm2 restart book-trader-backend'
                 """
                 }
             }
