@@ -2,22 +2,22 @@ pipeline {
     agent any
 
     stages {
-        stage('Install Dependencies') {
+        stage('Clear Cache and Install Dependencies') {
             steps {
+                sh 'yarn cache clean'
                 sh 'yarn install'
             }
         }
 
+        stage('Build') {
+            steps {
+                sh 'yarn run build'
+            }
+        }
+        
         stage('Run') {
             steps {
-                script {
-                    def processExists = sh(script: 'pm2 id book-trader-backend', returnStdout: true).trim().isNumber()
-                    if (processExists) {
-                        sh 'pm2 restart book-trader-backend'
-                    } else {
-                        sh 'pm2 start "yarn start:dev" --name "book-trader-backend" --interpreter bash'
-                    }
-                }
+                sh 'node dist/main.js'
             }
         }
         
@@ -27,14 +27,14 @@ pipeline {
             }
         }
 
-       stage('Deploy') {
-        steps {
-            withCredentials([sshUserPrivateKey(credentialsId: 'AWS_INSTANCE_SSH', keyFileVariable: 'SSH_KEY')]) {
-                sh """
-                    ssh -i ${SSH_KEY} ubuntu@44.201.190.109 'cd book-trader-backend/ && git pull && yarn install && pm2 restart book-trader-backend'
-                """
+        stage('Deploy') {
+            steps {
+                withCredentials([sshUserPrivateKey(credentialsId: 'AWS_INSTANCE_SSH', keyFileVariable: 'SSH_KEY')]) {
+                    sh """
+                        ssh -i ${SSH_KEY} ubuntu@44.201.190.109 'cd book-trader-backend/ && git pull && yarn install && pm2 restart book-trader-backend'
+                    """
+                    }
                 }
             }
         }
-    }
 }
