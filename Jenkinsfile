@@ -4,10 +4,10 @@ pipeline {
     stages {
         stage('Clear Cache and Install Dependencies') {
             steps {
-                sh 'yarn cache clean'
                 sh 'yarn install'
             }
         }
+
         stage('Run') {
             steps {
                 script {
