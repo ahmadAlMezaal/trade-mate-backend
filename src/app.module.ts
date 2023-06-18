@@ -9,16 +9,13 @@ import { AppIdentifierMiddleware } from './common/middlewares/appIdentifier.midd
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { BooksModule } from './books/books.module';
 import { PostModule } from './post/post.module';
+// @ts-ignore
+import { GraphQLUpload, graphqlUploadExpress } from "graphql-upload"
+import { GraphQLModule } from '@nestjs/graphql';
+
 
 @Module(
     {
-        providers: [
-            AppService,
-            {
-                provide: APP_INTERCEPTOR,
-                useClass: AppIdentifierMiddleware,
-            }
-        ],
         imports: [
             CommonModule,
             UsersModule,
@@ -26,14 +23,25 @@ import { PostModule } from './post/post.module';
             BooksModule,
             PostModule
         ],
+        providers: [
+            AppService,
+            {
+                provide: APP_INTERCEPTOR,
+                useClass: AppIdentifierMiddleware,
+            }
+
+        ],
         controllers: [AppController],
     }
 )
 
 export class AppModule implements NestModule {
     configure(consumer: MiddlewareConsumer) {
-        consumer
-            .apply(AppIdentifierMiddleware)
-            .forRoutes({ path: '*', method: RequestMethod.ALL });
+        // consumer.apply(graphqlUploadExpress()).forRoutes("graphql")
+
+        // consumer
+        //     .apply(AppIdentifierMiddleware)
+        //     .forRoutes({ path: '*', method: RequestMethod.ALL });
+        // consumer.apply(graphqlUploadExpress()).forRoutes("graphql")
     }
 }

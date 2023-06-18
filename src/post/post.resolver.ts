@@ -9,23 +9,29 @@ import { User } from 'src/users/schemas/user.schema';
 import { CurrentUser } from 'src/common/decorators/currentUser.decorator';
 import { ObjectId } from 'mongodb';
 // import * as GraphQLUpload from 'graphql-upload/GraphQLUpload.js';
-import { FileUpload } from 'src/types/models';
-import * as GraphQLUpload from 'graphql-upload/GraphQLUpload.js';
+// import { FileUpload } from 'src/types/models';
+// import * as GraphQLUpload from 'graphql-upload/GraphQLUpload.js';
 // import { GraphQLUpload } from "apollo-server-express";
+// @ts-ignore
+// import { FileUpload, GraphQLUpload } from "graphql-upload"
+import { GraphQLUpload, FileUpload } from 'graphql-upload';
+
 
 @Resolver(() => Post)
 export class PostResolver {
     constructor(private readonly postService: PostService) { }
 
+    //* https://stackoverflow.com/questions/75744174/how-to-upload-images-in-nestjs-with-graphql
     @Mutation(() => Boolean)
     async uploadFile(
-        @Args({ name: 'file', type: () => GraphQLUpload }) file: Promise<FileUpload>,
-        // @Args({ name: 'file', type: () => GraphQLUpload }) { createReadStream, filename }: FileUpload
+        @Args({ name: 'file', type: () => GraphQLUpload }) { createReadStream, filename }: FileUpload,
     ) {
-        console.log('file: ', file);
-        const { createReadStream, filename } = await file;
-        console.log('createReadStream: ', createReadStream);
-        console.log('filename: ', filename);
+        try {
+            console.log('createReadStream: ', createReadStream);
+            console.log('filename: ', filename);
+        } catch (error) {
+            console.log('error: ', error);
+        }
     }
 
     @Mutation(() => Post, { name: 'addPost' })
