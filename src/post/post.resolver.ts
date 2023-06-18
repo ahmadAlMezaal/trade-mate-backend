@@ -8,9 +8,10 @@ import { JwtAuthGuard } from 'src/auth/guards/jwtAuth.guard';
 import { User } from 'src/users/schemas/user.schema';
 import { CurrentUser } from 'src/common/decorators/currentUser.decorator';
 import { ObjectId } from 'mongodb';
-import * as GraphQLUpload from 'graphql-upload/GraphQLUpload.js';
+// import * as GraphQLUpload from 'graphql-upload/GraphQLUpload.js';
 import { FileUpload } from 'src/types/models';
-
+import * as GraphQLUpload from 'graphql-upload/GraphQLUpload.js';
+// import { GraphQLUpload } from "apollo-server-express";
 
 @Resolver(() => Post)
 export class PostResolver {
@@ -18,19 +19,24 @@ export class PostResolver {
 
     @Mutation(() => Boolean)
     async uploadFile(
-        @Args({ name: 'file', type: () => GraphQLUpload }) { createReadStream, filename }: FileUpload
+        @Args({ name: 'file', type: () => GraphQLUpload }) file: Promise<FileUpload>,
+        // @Args({ name: 'file', type: () => GraphQLUpload }) { createReadStream, filename }: FileUpload
     ) {
-        /** now you have the file as a stream **/
+        console.log('file: ', file);
+        const { createReadStream, filename } = await file;
+        console.log('createReadStream: ', createReadStream);
+        console.log('filename: ', filename);
     }
+
     @Mutation(() => Post, { name: 'addPost' })
     @UseGuards(JwtAuthGuard)
     async createPost(
         @Args('input') createPostInput: CreatePostInput,
         // @Args({ name: 'imageUrls', type: () => [GraphQLUpload] }) imageUrls: Array<Express.Multer.File>,
-        @Args({ name: 'imageUrls', type: () => GraphQLUpload }) imageUrls: FileUpload,
+        // @Args({ name: 'imageUrls', type: () => GraphQLUpload }) imageUrls: FileUpload,
         @CurrentUser() user: User
     ): Promise<ObjectId> {
-        console.log('images: ', imageUrls);
+        // console.log('images: ', imageUrls);
         return await this.postService.create(createPostInput, user);
     }
 

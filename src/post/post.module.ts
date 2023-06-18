@@ -5,6 +5,7 @@ import { PostService } from './post.service';
 import { PostResolver } from './post.resolver';
 import { postsProviders } from './providers/post.provider';
 import { BooksModule } from 'src/books/books.module';
+// import { Upload } from 'src/scalars/upload.scalar';
 
 @Module(
     {

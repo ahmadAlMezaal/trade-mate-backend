@@ -1,7 +1,7 @@
 import { InputType, Int, Field, ID } from '@nestjs/graphql';
 import { IsNotEmpty, IsString } from 'class-validator';
 import { ObjectId } from 'mongodb';
-import * as GraphQLUpload from 'graphql-upload/GraphQLUpload.js';
+// import * as GraphQLUpload from 'graphql-upload/GraphQLUpload.js';
 import { FileUpload } from 'src/types/models';
 
 @InputType()
@@ -22,7 +22,7 @@ export class CreatePostInput {
 
   // @Field(() => [GraphQLUpload])
   // imageUrls: Array<Express.Multer.File>;
-  @Field(() => GraphQLUpload, { nullable: true })
+  // @Field(() => GraphQLUpload, { nullable: true })
   imageUrls?: Promise<FileUpload>;
 
   // @Field(() => String, { description: 'ID of the book' })
