@@ -3,34 +3,40 @@ import { PostService } from './post.service';
 import { Post } from './entities/post.schema';
 import { CreatePostInput } from './dto/createPost.input';
 import { UpdatePostInput } from './dto/update-post.input';
-import { UseGuards } from '@nestjs/common';
+import { InternalServerErrorException, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/guards/jwtAuth.guard';
 import { User } from 'src/users/schemas/user.schema';
 import { CurrentUser } from 'src/common/decorators/currentUser.decorator';
 import { ObjectId } from 'mongodb';
-import * as GraphQLUpload from 'graphql-upload/GraphQLUpload.js';
-import { FileUpload } from 'src/types/models';
-
+import { GraphQLUpload, FileUpload } from 'graphql-upload';
+import { AwsService } from 'src/aws/aws.service';
 
 @Resolver(() => Post)
 export class PostResolver {
-    constructor(private readonly postService: PostService) { }
+    constructor(
+        private readonly postService: PostService,
+        private readonly awsService: AwsService,
+    ) { }
 
+    //* https://stackoverflow.com/questions/75744174/how-to-upload-images-in-nestjs-with-graphql
     @Mutation(() => Boolean)
     async uploadFile(
-        @Args({ name: 'file', type: () => GraphQLUpload }) { createReadStream, filename }: FileUpload
+        @Args({ name: 'file', type: () => GraphQLUpload }) { createReadStream, filename }: FileUpload,
     ) {
-        /** now you have the file as a stream **/
+        try {
+            await this.awsService.uploadFile(createReadStream, filename);
+            return true;
+        } catch (error) {
+            throw new InternalServerErrorException('Error uploading file');
+        }
     }
+
     @Mutation(() => Post, { name: 'addPost' })
     @UseGuards(JwtAuthGuard)
     async createPost(
         @Args('input') createPostInput: CreatePostInput,
-        // @Args({ name: 'imageUrls', type: () => [GraphQLUpload] }) imageUrls: Array<Express.Multer.File>,
-        @Args({ name: 'imageUrls', type: () => GraphQLUpload }) imageUrls: FileUpload,
         @CurrentUser() user: User
     ): Promise<ObjectId> {
-        console.log('images: ', imageUrls);
         return await this.postService.create(createPostInput, user);
     }
 

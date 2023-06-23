@@ -1,29 +1,29 @@
 import * as dotenv from 'dotenv';
-const AWS = require('aws-sdk');
+import { SecretsManagerClient, GetSecretValueCommand } from "@aws-sdk/client-secrets-manager";
+
+const fetchSecrets = async () => {
+    const secretsManager = new SecretsManagerClient(
+        {
+            region: process.env.AWS_REGION,
+            credentials: {
+                accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+                secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
+            }
+        }
+    );
+    const command = new GetSecretValueCommand({ SecretId: process.env.AWS_SECRETS_ARN });
+    const response = await secretsManager.send(command);
+    return { ...JSON.parse(response.SecretString) }
+};
 
 export const loadSecrets = async () => {
-    const secretName = "book-trader-backend";
     dotenv.config();
-    const input = {
-        region: process.env.AWS_REGION,
-        accessKeyId: process.env.AWS_KEY_ID,
-        secretAccessKey: process.env.AWS_ACCESS_SECRET,
-    }
-    const client = new AWS.SecretsManager(input);
     try {
-        let secrets: any;
-        const data = await client.getSecretValue({ SecretId: secretName }).promise();
-        if ('SecretString' in data) {
-            secrets = JSON.parse(data.SecretString);
-        } else {
-            const decodedBinarySecret = Buffer.from(data.SecretBinary, 'base64');
-            secrets = decodedBinarySecret;
-        }
+        const secrets = await fetchSecrets();
         for (const [key, value] of Object.entries(secrets)) {
             (process.env[key] as any) = value;
         }
     } catch (error) {
-        //? For a list of exceptions thrown, see:  https://docs.aws.amazon.com/secretsmanager/latest/apireference/API_GetSecretValue.html
         throw error;
     }
 }
@@ -37,7 +37,12 @@ export const configuration = () => {
         jwt: {
             secret: process.env.JWT_SECRET,
             expiration: process.env.JWT_EXPIRATION
+        },
+        aws: {
+            region: process.env.AWS_REGION,
+            keyId: process.env.AWS_ACCESS_KEY_ID,
+            secret: process.env.AWS_SECRET_ACCESS_KEY,
+            bucketName: process.env.AWS_BUCKET_NAME,
         }
     }
-}
-
+};

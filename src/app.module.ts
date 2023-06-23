@@ -12,19 +12,19 @@ import { PostModule } from './post/post.module';
 
 @Module(
     {
-        providers: [
-            AppService,
-            {
-                provide: APP_INTERCEPTOR,
-                useClass: AppIdentifierMiddleware,
-            }
-        ],
         imports: [
             CommonModule,
             UsersModule,
             AuthModule,
             BooksModule,
-            PostModule
+            PostModule,
+        ],
+        providers: [
+            AppService,
+            {
+                provide: APP_INTERCEPTOR,
+                useClass: AppIdentifierMiddleware,
+            },
         ],
         controllers: [AppController],
     }
