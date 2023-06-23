@@ -24,9 +24,9 @@ export class PostResolver {
         @Args({ name: 'file', type: () => GraphQLUpload }) { createReadStream, filename }: FileUpload,
     ) {
         try {
-            return await this.awsService.uploadFile(createReadStream, filename)
+            await this.awsService.uploadFile(createReadStream, filename);
+            return true;
         } catch (error) {
-            console.log('error: ', error);
             throw new InternalServerErrorException('Error uploading file');
         }
     }

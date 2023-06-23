@@ -1,7 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { loadSecrets } from './config/configuration';
-// @ts-ignore
 import { graphqlUploadExpress } from 'graphql-upload';
 
 
