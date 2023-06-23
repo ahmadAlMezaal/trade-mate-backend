@@ -3,23 +3,20 @@ import { PostService } from './post.service';
 import { Post } from './entities/post.schema';
 import { CreatePostInput } from './dto/createPost.input';
 import { UpdatePostInput } from './dto/update-post.input';
-import { UseGuards } from '@nestjs/common';
+import { InternalServerErrorException, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/guards/jwtAuth.guard';
 import { User } from 'src/users/schemas/user.schema';
 import { CurrentUser } from 'src/common/decorators/currentUser.decorator';
 import { ObjectId } from 'mongodb';
-// import * as GraphQLUpload from 'graphql-upload/GraphQLUpload.js';
-// import { FileUpload } from 'src/types/models';
-// import * as GraphQLUpload from 'graphql-upload/GraphQLUpload.js';
-// import { GraphQLUpload } from "apollo-server-express";
-// @ts-ignore
-// import { FileUpload, GraphQLUpload } from "graphql-upload"
 import { GraphQLUpload, FileUpload } from 'graphql-upload';
-
+import { AwsService } from 'src/aws/aws.service';
 
 @Resolver(() => Post)
 export class PostResolver {
-    constructor(private readonly postService: PostService) { }
+    constructor(
+        private readonly postService: PostService,
+        private readonly awsService: AwsService,
+    ) { }
 
     //* https://stackoverflow.com/questions/75744174/how-to-upload-images-in-nestjs-with-graphql
     @Mutation(() => Boolean)
@@ -27,10 +24,10 @@ export class PostResolver {
         @Args({ name: 'file', type: () => GraphQLUpload }) { createReadStream, filename }: FileUpload,
     ) {
         try {
-            console.log('createReadStream: ', createReadStream);
-            console.log('filename: ', filename);
+            return await this.awsService.uploadFile(createReadStream, filename)
         } catch (error) {
             console.log('error: ', error);
+            throw new InternalServerErrorException('Error uploading file');
         }
     }
 
@@ -38,11 +35,8 @@ export class PostResolver {
     @UseGuards(JwtAuthGuard)
     async createPost(
         @Args('input') createPostInput: CreatePostInput,
-        // @Args({ name: 'imageUrls', type: () => [GraphQLUpload] }) imageUrls: Array<Express.Multer.File>,
-        // @Args({ name: 'imageUrls', type: () => GraphQLUpload }) imageUrls: FileUpload,
         @CurrentUser() user: User
     ): Promise<ObjectId> {
-        // console.log('images: ', imageUrls);
         return await this.postService.create(createPostInput, user);
     }
 
