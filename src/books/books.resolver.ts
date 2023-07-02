@@ -1,11 +1,11 @@
 import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
 import { BooksService } from './books.service';
-import { Book } from './entities/book.schema';
 import { UpdateBookInput } from './dto/updateBook.input';
 import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/guards/jwtAuth.guard';
 import { FindBookInput } from './dto/findBook.input';
 import { IBook } from 'src/types/models';
+import { Book } from './entities/book.schema';
 
 @Resolver(() => Book)
 export class BooksResolver {

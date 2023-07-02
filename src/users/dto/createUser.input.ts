@@ -2,7 +2,7 @@ import { Field, InputType, ID } from '@nestjs/graphql';
 import { Transform } from 'class-transformer';
 import { IsEmail, IsNotEmpty, IsOptional, IsString, MinLength } from 'class-validator';
 import { ObjectId } from 'mongodb';
-import { Book } from 'src/books/entities/book.schema';
+import { Post } from 'src/post/entities/post.schema';
 
 export enum Role {
   ADMIN = 105,
@@ -47,10 +47,6 @@ export class CreateUserInput {
   @IsNotEmpty()
   @IsString()
   location: string;
-
-  @Field(() => [Book], { description: "Books bookmarked by the user", defaultValue: [], nullable: true })
-  @IsOptional()
-  bookmarkedBooks?: Book[];
 
   @Field(() => String, { defaultValue: Role.TRADER, nullable: true })
   @IsOptional()

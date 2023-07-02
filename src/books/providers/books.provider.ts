@@ -16,8 +16,8 @@ export const booksProviders = [
                     }
                 );
                 const db = client.db(configService.get<string>('DATABASE'))
-                const usersCollection = db.collection('books') as Collection<Book>;
-                await usersCollection.createIndex({ name: 1, }, { unique: true });
+                const booksCollection = db.collection('books') as Collection<Book>;
+                await booksCollection.createIndex({ name: 1, }, { unique: true });
                 return db;
             } catch (error) {
                 console.log('error connecting to MongoDB: ', error);

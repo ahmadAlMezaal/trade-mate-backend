@@ -2,15 +2,16 @@ import { Field, InputType, ObjectType } from "@nestjs/graphql";
 import { ImageUrls } from "./imageUrls.input";
 
 @ObjectType()
-export class Book {
+@InputType('BookInput')
+export class BookInput {
 
     @Field(() => String)
     providerId: string;
 
-    @Field(() => String, { description: 'Official name of the book' })
+    @Field(() => String)
     title: string;
 
-    @Field(() => String, { description: 'Official subtitle of the book', nullable: true })
+    @Field(() => String)
     subtitle?: string;
 
     @Field(() => [String], { description: 'Authors of the book', defaultValue: [], nullable: true })

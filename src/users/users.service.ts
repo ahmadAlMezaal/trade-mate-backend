@@ -3,7 +3,7 @@ import { Collection, Db, ObjectId } from 'mongodb';
 import { CreateUserInput } from './dto/createUser.input';
 import { FindUserInput } from './dto/findOne.input';
 import { DeleteUserInput, UpdateUserInput } from './dto/updateUser.input';
-import { User } from './schemas/user.schema';
+import { User } from './entities/user.schema';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -15,7 +15,7 @@ export class UsersService {
         return this.db.collection<User>('users');
     }
 
-    async create(createUserInput: CreateUserInput): Promise<User> {
+    public async create(createUserInput: CreateUserInput): Promise<User> {
         const user = await this.collection.findOne({ email: createUserInput.email });
         if (user) {
             throw new HttpException({ message: 'Email already taken Error' }, HttpStatus.UNPROCESSABLE_ENTITY, { cause: new Error('Email already taken Error') });
@@ -38,11 +38,11 @@ export class UsersService {
     //     return this.collection.find().skip(offset).limit(limit);
     // }
 
-    async findAll(): Promise<User[]> {
+    public async findAll(): Promise<User[]> {
         return await this.collection.find().toArray();
     }
 
-    async findOne(query: FindUserInput): Promise<User> {
+    public async findOne(query: FindUserInput): Promise<User> {
         const user = await this.collection.findOne({ ...query });
         if (!user) {
             throw new NotFoundException('Account not found');
@@ -50,7 +50,7 @@ export class UsersService {
         return user;
     }
 
-    async update(queryObj: Object, updateUserInput: UpdateUserInput) {
+    public async update(queryObj: Partial<User>, updateUserInput: UpdateUserInput) {
         const { _id, ...restUpdateUserInput } = updateUserInput
         const { value } = await this.collection.findOneAndUpdate(
             {
@@ -61,6 +61,10 @@ export class UsersService {
                     ...restUpdateUserInput
                 }
             },
+            {
+                upsert: false,
+                returnDocument: 'after'
+            }
         )
         if (!value) {
             throw new NotFoundException('Account not found');
@@ -68,9 +72,26 @@ export class UsersService {
         return value;
     }
 
-    async remove(input: DeleteUserInput): Promise<boolean> {
+    public async remove(input: DeleteUserInput): Promise<boolean> {
         const { _id } = input;
         const response = await this.collection.deleteOne({ _id: new ObjectId(_id) });
         return response.deletedCount === 1;
     }
+
+    public async updateBookmarkedPosts(user: User, postIdStr: string) {
+        const postId = new ObjectId(postIdStr);
+        const bookmarkedPostIds = [...user.bookmarkedPostIds];
+        const index = bookmarkedPostIds.findIndex((id) => id.equals(postId));
+
+        if (index !== -1) {
+            bookmarkedPostIds.splice(index, 1);
+        } else {
+            bookmarkedPostIds.push(postId);
+        }
+
+        const updatedUser = await this.update({ _id: user._id }, { bookmarkedPostIds });
+        return { bookmarkedPostIds: updatedUser.bookmarkedPostIds };
+
+    }
+
 }

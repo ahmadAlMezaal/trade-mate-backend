@@ -2,7 +2,7 @@
 import { Optional } from '@nestjs/common';
 import { Field, ID, InputType } from '@nestjs/graphql';
 import { Transform } from 'class-transformer';
-import { IsBoolean, IsEmail, IsInt, IsNotEmpty, IsOptional, IsString, MinLength } from 'class-validator';
+import { IsArray, IsBoolean, IsEmail, IsInt, IsNotEmpty, IsOptional, IsString, MinLength } from 'class-validator';
 import { ObjectId } from 'mongodb';
 
 @InputType()
@@ -45,6 +45,10 @@ export class UpdateUserInput extends BaseUserInput {
   @Field(() => Number, { nullable: true })
   @IsBoolean()
   forgotPasswordCode?: number;
+
+  @Field(() => [ObjectId], { nullable: true })
+  @IsArray()
+  bookmarkedPostIds?: ObjectId[];
 }
 
 @InputType()

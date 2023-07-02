@@ -1,6 +1,5 @@
 import { ObjectType, Field, ID } from '@nestjs/graphql';
 import { ObjectId } from 'mongodb';
-import { Book } from 'src/books/entities/book.schema';
 
 @ObjectType()
 export class User {
@@ -26,8 +25,8 @@ export class User {
   @Field(() => String, { description: "User's location" })
   location: string;
 
-  @Field(() => [Book], { description: "Books bookmarked by the user", defaultValue: [], nullable: true })
-  bookmarkedBooks?: Book[];
+  @Field(() => [ID], { description: "IDs of posts bookmarked by the user", defaultValue: [] })
+  bookmarkedPostIds?: ObjectId[];
 
   @Field(() => String, { description: 'User role' })
   role: string;
