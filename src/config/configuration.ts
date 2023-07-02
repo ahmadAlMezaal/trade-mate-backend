@@ -27,7 +27,7 @@ export const loadSecrets = async () => {
     } catch (error) {
         throw error;
     }
-}
+};
 
 export const configuration = () => {
     return {
@@ -46,5 +46,4 @@ export const configuration = () => {
             bucketName: process.env.AWS_BUCKET_NAME,
         }
     }
-}
-
+};

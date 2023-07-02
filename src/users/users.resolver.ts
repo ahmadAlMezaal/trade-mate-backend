@@ -8,7 +8,6 @@ import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/guards/jwtAuth.guard';
 import { CurrentUser } from 'src/common/decorators/currentUser.decorator';
 import { PostService } from 'src/post/post.service';
-import { IUser } from './entities/user.entity';
 import { ObjectId } from 'mongodb';
 import { Post } from 'src/post/entities/post.schema';
 
@@ -40,7 +39,6 @@ export class UsersResolver {
         } catch (error) {
             console.log('error: ', error);
         }
-
     }
 
     @Mutation(() => User, { name: 'createUser' })
