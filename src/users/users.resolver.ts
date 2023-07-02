@@ -1,22 +1,44 @@
 import { Resolver, Query, Mutation, Args, Context } from '@nestjs/graphql';
 import { UsersService } from './users.service';
-import { User } from './schemas/user.schema';
+import { User } from './entities/user.schema';
 import { CreateUserInput } from './dto/createUser.input';
 import { DeleteUserInput, UpdateUserInput } from './dto/updateUser.input';
 import { FindUserInput } from './dto/findOne.input';
 import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/guards/jwtAuth.guard';
-import { AuthGuard } from '@nestjs/passport';
 import { CurrentUser } from 'src/common/decorators/currentUser.decorator';
+import { PostService } from 'src/post/post.service';
+import { ObjectId } from 'mongodb';
+import { Post } from 'src/post/entities/post.schema';
 
 @Resolver(() => User)
 export class UsersResolver {
-    constructor(private readonly userService: UsersService) { }
+    constructor(
+        private readonly userService: UsersService,
+        private readonly postService: PostService
+    ) { }
 
     @Query(() => User, { name: 'profile' })
     @UseGuards(JwtAuthGuard)
     public me(@CurrentUser() user: User): User {
         return user
+    }
+
+    @Query(() => [Post], { name: 'bookmarks' })
+    @UseGuards(JwtAuthGuard)
+    public async getBookmarkedPosts(@CurrentUser() user: User) {
+        const ids: ObjectId[] = user.bookmarkedPostIds.map(_id => new ObjectId(_id))
+        return this.postService.getPostsByIds(ids);
+    }
+
+    @Mutation(() => User, { name: 'updateUserBookmarks' })
+    @UseGuards(JwtAuthGuard)
+    public async updateUserBookmarks(@CurrentUser() user: User, @Args('postId') postId: string) {
+        try {
+            return this.userService.updateBookmarkedPosts(user, postId);
+        } catch (error) {
+            console.log('error: ', error);
+        }
     }
 
     @Mutation(() => User, { name: 'createUser' })

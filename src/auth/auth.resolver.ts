@@ -4,7 +4,7 @@ import { LoginInput } from 'src/users/dto/login.input';
 import { AuthService } from './auth.service';
 import { GqlAuthGuard } from './guards/gql.guard';
 import { LoginResponse } from './schemas/auth.schema';
-import { User } from 'src/users/schemas/user.schema';
+import { User } from 'src/users/entities/user.schema';
 import { UsersService } from 'src/users/users.service';
 import { CreateUserInput } from 'src/users/dto/createUser.input';
 import { ForgotPasswordInput } from './dto/forgotPassword.input';

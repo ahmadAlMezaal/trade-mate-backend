@@ -1,3 +1,4 @@
+import { ImageUrls } from 'src/books/entities/imageUrls.input';
 import { Stream } from 'stream';
 
 export interface FileUpload {
@@ -83,10 +84,7 @@ export interface IBook {
     subtitle: string;
     authors: string[];
     description: string;
-    imageUrls?: {
-        smallThumbnail?: string;
-        thumbnail?: string
-    };
+    imageUrls: ImageUrls;
     totalPageCount: number
     genres: string[];
     language: string;

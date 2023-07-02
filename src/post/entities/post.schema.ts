@@ -14,15 +14,12 @@ export class Post {
   @Field(() => String, { description: 'description of the post' })
   description: string;
 
-  // @Field(() => [GraphQLUpload], { description: 'Images of the book' })
-  // imageUrls: Array<Express.Multer.File>;
   @Field(() => [String], { description: 'Images of the book' })
   imageUrls: string[];
-
 
   @Field(() => Book, { nullable: true, description: 'The complete information about the book' })
   bookInfo: Book;
 
-  @Field(() => String)
+  @Field(() => ID)
   postOwnerId: ObjectId;
 }

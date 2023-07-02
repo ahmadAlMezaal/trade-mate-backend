@@ -38,7 +38,11 @@ export class AwsService {
         };
 
         const command = new PutObjectCommand(params);
-        return this.s3.send(command);
+        const result = await this.s3.send(command);
+        if (result) {
+            return `https://s3.amazonaws.com/${params.Bucket}/${params.Key}`;
+        }
+        return null;
     }
 
 }

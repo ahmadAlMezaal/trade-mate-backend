@@ -3,7 +3,7 @@ import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestj
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { User } from 'src/users/schemas/user.schema';
+import { User } from 'src/users/entities/user.schema';
 import { ObjectId } from 'mongodb';
 import { ResetPasswordInput } from './dto/resetPassword.input';
 

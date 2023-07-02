@@ -1,6 +1,7 @@
 import * as dotenv from 'dotenv';
 import { SecretsManagerClient, GetSecretValueCommand } from "@aws-sdk/client-secrets-manager";
 
+
 const fetchSecrets = async () => {
     const secretsManager = new SecretsManagerClient(
         {
@@ -26,7 +27,7 @@ export const loadSecrets = async () => {
     } catch (error) {
         throw error;
     }
-}
+};
 
 export const configuration = () => {
     return {

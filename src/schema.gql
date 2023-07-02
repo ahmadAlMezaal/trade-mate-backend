@@ -32,51 +32,8 @@ type Book {
   totalPageCount: Float!
 }
 
-input BookInput {
-  """Authors of the book"""
-  authors: [String!] = []
-
-  """Description of the book"""
-  description: String
-
-  """Categories of the book"""
-  genres: [String!]! = []
-
-  """description of the book"""
-  imageUrls: ImageUrlsInput = {}
-
-  """The language of the book"""
-  language: String
-
-  """The language of the book"""
-  pdfLink: String
-  providerId: String!
-
-  """Official subtitle of the book"""
-  subtitle: String
-
-  """Official name of the book"""
-  title: String!
-
-  """The total page count of the book"""
-  totalPageCount: Float!
-}
-
-input CreatePostInput {
-  _id: ID!
-
-  """Description of the book"""
-  description: String!
-
-  """Title of the post"""
-  title: String!
-}
-
 input CreateUserInput {
   _id: ID
-
-  """Books bookmarked by the user"""
-  bookmarkedBooks: [BookInput!] = []
   email: String!
   firstName: String!
   isVerified: Boolean = false
@@ -137,7 +94,7 @@ type LoginResponse {
 }
 
 type Mutation {
-  addPost(input: CreatePostInput!): Post!
+  addPost(bookId: String!, description: String!, file: Upload!, title: String!): Boolean!
   createUser(input: CreateUserInput!): User!
   deleteUser(input: DeleteUserInput!): Boolean!
   forgotPassword(input: ForgotPasswordInput!): ForgotPasswordResponse!
@@ -147,8 +104,7 @@ type Mutation {
   resetPassword(input: ResetPasswordInput!): ResetPasswordResponse!
   signup(input: CreateUserInput!): LoginResponse!
   updateBook(updateBookInput: UpdateBookInput!): Book!
-  updatePost(updatePostInput: UpdatePostInput!): Post!
-  uploadFile(file: Upload!): Boolean!
+  updateUserBookmarks(postId: String!): User!
 }
 
 type Post {
@@ -162,13 +118,14 @@ type Post {
 
   """Images of the book"""
   imageUrls: [String!]!
-  postOwnerId: String!
+  postOwnerId: ID!
 
   """Title of the post"""
   title: String!
 }
 
 type Query {
+  bookmarks: [Post!]!
   books: [Book!]!
   me: User!
   post(id: Int!): Post!
@@ -201,25 +158,14 @@ input UpdateBookInput {
   name: String
 }
 
-input UpdatePostInput {
-  _id: ID
-
-  """Description of the book"""
-  description: String
-  id: Int!
-
-  """Title of the post"""
-  title: String
-}
-
 """The `Upload` scalar type represents a file upload."""
 scalar Upload
 
 type User {
   _id: ID!
 
-  """Books bookmarked by the user"""
-  bookmarkedBooks: [Book!]
+  """IDs of posts bookmarked by the user"""
+  bookmarkedPostIds: [ID!]!
 
   """Email address of the user"""
   email: String!
