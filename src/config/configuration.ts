@@ -20,16 +20,7 @@ const fetchSecrets = async () => {
 export const loadSecrets = async () => {
     dotenv.config();
     try {
-        // const secrets = await fetchSecrets();
-        const secrets = {
-            MONO_DB_CONNECTION_STRING: 'mongodb+srv://ahmadhmazaal:pCuiz9E88gGhPaY@books-db.ymmjdn3.mongodb.net/?retryWrites=true&w=majority',
-            DATABASE: 'Books-db',
-            JWT_SECRET: 'asdfksfgksdfdkmgewrkmkwlewasdfsdgjdffjpofd423423423kprfsdg4395234ef:ashfdehrghe2343ry34rersa_123hsdf$£!@&$£!@$%!£SADASHDIADHFDFadmkfksfdg',
-            JWT_EXPIRATION: '1d',
-            BOOK_TRADER_IDENTIFIER: 'c2d9eae0-187f-4d94-8d65-45ee36adceca',
-            PORT: '3000',
-            GOOGLE_API_KEY: 'AIzaSyBRX1_dCToBhGuKEFVfs3_Ap26kZIrZD4s'
-        };
+        const secrets = await fetchSecrets();
         for (const [key, value] of Object.entries(secrets)) {
             (process.env[key] as any) = value;
         }

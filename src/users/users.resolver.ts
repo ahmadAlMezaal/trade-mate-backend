@@ -28,7 +28,6 @@ export class UsersResolver {
     @Query(() => [Post], { name: 'bookmarks' })
     @UseGuards(JwtAuthGuard)
     public async getBookmarkedPosts(@CurrentUser() user: User) {
-        console.log('reached here');
         const ids: ObjectId[] = user.bookmarkedPostIds.map(_id => new ObjectId(_id))
         return this.postService.getPostsByIds(ids);
     }

@@ -1,7 +1,6 @@
 import { ObjectType, Field, ID } from '@nestjs/graphql';
 import { ObjectId } from 'mongodb';
 import { Book } from 'src/books/entities/book.schema';
-// import { BookInput } from 'src/books/entities/book.input';
 
 @ObjectType()
 export class Post {
