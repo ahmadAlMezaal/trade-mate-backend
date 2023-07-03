@@ -22,4 +22,10 @@ export class Post {
 
   @Field(() => ID)
   postOwnerId: ObjectId;
+
+  @Field(() => Date, { description: 'The date when the post was created' })
+  createdAt?: Date;
+
+  @Field(() => Date, { description: 'The last date when the post was updated' })
+  updatedAt?: Date;
 }

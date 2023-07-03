@@ -43,6 +43,11 @@ input CreateUserInput {
   role: String = "36"
 }
 
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
 input DeleteUserInput {
   _id: ID!
 }
@@ -100,7 +105,6 @@ type Mutation {
   forgotPassword(input: ForgotPasswordInput!): ForgotPasswordResponse!
   login(input: LoginInput!): LoginResponse!
   removeBook(id: Int!): Book!
-  removePost(id: Int!): Post!
   resetPassword(input: ResetPasswordInput!): ResetPasswordResponse!
   signup(input: CreateUserInput!): LoginResponse!
   updateBook(updateBookInput: UpdateBookInput!): Book!
@@ -113,6 +117,9 @@ type Post {
   """The complete information about the book"""
   bookInfo: Book
 
+  """The date when the post was created"""
+  createdAt: DateTime!
+
   """description of the post"""
   description: String!
 
@@ -122,6 +129,9 @@ type Post {
 
   """Title of the post"""
   title: String!
+
+  """The last date when the post was updated"""
+  updatedAt: DateTime!
 }
 
 type Query {
@@ -167,6 +177,9 @@ type User {
   """IDs of posts bookmarked by the user"""
   bookmarkedPostIds: [ID!]!
 
+  """The date when the user was created"""
+  createdAt: DateTime!
+
   """Email address of the user"""
   email: String!
 
@@ -190,6 +203,9 @@ type User {
 
   """User role"""
   role: String!
+
+  """The last date when the user was updated"""
+  updatedAt: DateTime!
 
   """Verification code on registration"""
   verificationCode: String

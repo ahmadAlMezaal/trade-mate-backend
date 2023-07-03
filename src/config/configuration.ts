@@ -14,7 +14,7 @@ const fetchSecrets = async () => {
     );
     const command = new GetSecretValueCommand({ SecretId: process.env.AWS_SECRETS_ARN });
     const response = await secretsManager.send(command);
-    return { ...JSON.parse(response.SecretString) }
+    return { ...JSON.parse(response.SecretString) };
 };
 
 export const loadSecrets = async () => {

@@ -14,7 +14,6 @@ export class PostResolver {
         private readonly postService: PostService,
     ) { }
 
-    //* https://stackoverflow.com/questions/75744174/how-to-upload-images-in-nestjs-with-graphql
     @Mutation(() => Boolean, { name: 'addPost' })
     @UseGuards(JwtAuthGuard)
     async addPost(
@@ -42,8 +41,4 @@ export class PostResolver {
         return this.postService.findOne({ _id: new ObjectId(_id) });
     }
 
-    @Mutation(() => Post)
-    removePost(@Args('id', { type: () => Int }) id: number) {
-        return this.postService.remove(id);
-    }
 }

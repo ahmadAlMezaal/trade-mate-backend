@@ -7,4 +7,6 @@ export class IPost {
     imageUrls: string[];
     bookInfo: Book;
     postOwnerId: string;
+    createdAt?: Date;
+    updatedAt?: Date;
 }

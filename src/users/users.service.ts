@@ -24,7 +24,7 @@ export class UsersService {
         const saltOrRounds = 10;
         const password = createUserInput.password;
         createUserInput.password = await bcrypt.hash(password, saltOrRounds);
-        const { insertedId } = await this.collection.insertOne({ ...createUserInput });
+        const { insertedId } = await this.collection.insertOne({ ...createUserInput, createdAt: new Date(), updatedAt: new Date() });
         if (!insertedId) {
             throw new NotFoundException('Unable to insert records');
         }
@@ -58,7 +58,8 @@ export class UsersService {
             },
             {
                 $set: {
-                    ...restUpdateUserInput
+                    ...restUpdateUserInput,
+                    updatedAt: new Date()
                 }
             },
             {

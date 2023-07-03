@@ -23,7 +23,6 @@ export class PostService {
 
     private async createOne(createPostInput: CreatePostInput, userId: ObjectId): Promise<any> {
         const { title, description, imageUrls, bookId } = createPostInput;
-        console.log('createPostInput: ', createPostInput);
         const bookInfo = await this.bookService.getBookByProviderId(bookId);
         const postId = await this.collection.insertOne(
             {
@@ -32,6 +31,8 @@ export class PostService {
                 description,
                 imageUrls,
                 postOwnerId: userId,
+                createdAt: new Date(),
+                updatedAt: new Date(),
             }
         );
         return { _id: postId.insertedId };
@@ -44,7 +45,7 @@ export class PostService {
     }
 
     public async findAll(): Promise<Post[]> {
-        return await this.collection.find({}).toArray();
+        return await this.collection.find({}).sort({ createdAt: -1 }).toArray();
     }
 
     public async getPostsByIds(_ids: ObjectId[]) {
@@ -53,9 +54,5 @@ export class PostService {
 
     public async findOne(params: Partial<Post>) {
         return await this.collection.findOne({ ...params });
-    }
-
-    remove(id: number) {
-        return `This action removes a #${id} post`;
     }
 }
