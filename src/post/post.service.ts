@@ -31,8 +31,6 @@ export class PostService {
             ]
         );
 
-        console.log('desiredBookInfo: ', desiredBookInfo);
-
         const postId = await this.collection.insertOne(
             {
                 title: `Trade ${offeredBookInfo.title} for ${desiredBookInfo.title}`,
