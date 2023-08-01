@@ -7,6 +7,7 @@ import { User } from 'src/users/entities/user.schema';
 import { CurrentUser } from 'src/common/decorators/currentUser.decorator';
 import { GraphQLUpload, FileUpload } from 'graphql-upload';
 import { ObjectId } from 'mongodb';
+import { ProductCondition } from 'src/types/enums';
 
 @Resolver(() => Post)
 export class PostResolver {
@@ -17,14 +18,15 @@ export class PostResolver {
     @Mutation(() => Boolean, { name: 'addPost' })
     @UseGuards(JwtAuthGuard)
     async addPost(
-        @Args({ name: 'file', type: () => GraphQLUpload }) fileUpload: FileUpload,
-        @Args('title', { type: () => String }) title: string,
-        @Args('bookId', { type: () => String }) bookId: string,
+        @Args('availableBookId', { type: () => String }) availableBookId: string,
+        @Args('desiredBookId', { type: () => String }) desiredBookId: string,
+        @Args('file', { type: () => GraphQLUpload }) fileUpload: FileUpload,
+        @Args('productCondition', { type: () => String }) productCondition: ProductCondition,
         @Args('description', { type: () => String }) description: string,
         @CurrentUser() user: User
     ) {
         try {
-            await this.postService.addPost(user, fileUpload, title, description, bookId);
+            await this.postService.addPost(user, availableBookId, desiredBookId, fileUpload, productCondition, description);
             return true;
         } catch (error) {
             throw new InternalServerErrorException('Error uploading file');

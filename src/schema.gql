@@ -99,7 +99,7 @@ type LoginResponse {
 }
 
 type Mutation {
-  addPost(bookId: String!, description: String!, file: Upload!, title: String!): Boolean!
+  addPost(availableBookId: String!, description: String!, desiredBookId: String!, file: Upload!, productCondition: String!): Boolean!
   createUser(input: CreateUserInput!): User!
   deleteUser(input: DeleteUserInput!): Boolean!
   forgotPassword(input: ForgotPasswordInput!): ForgotPasswordResponse!
@@ -114,18 +114,24 @@ type Mutation {
 type Post {
   _id: ID!
 
-  """The complete information about the book"""
-  bookInfo: Book
-
   """The date when the post was created"""
   createdAt: DateTime!
 
   """description of the post"""
   description: String!
 
+  """Contains information about the requested book."""
+  desiredBookInfo: Book!
+
   """Images of the book"""
   imageUrls: [String!]!
+
+  """Contains information about the book that the user is offering."""
+  offeredBookInfo: Book!
   postOwnerId: ID!
+
+  """The language of the book"""
+  productCondition: String!
 
   """Title of the post"""
   title: String!

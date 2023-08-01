@@ -6,6 +6,7 @@ import { CreatePostInput } from './dto/createPost.input';
 import { Post } from './entities/post.schema';
 import { AwsService } from 'src/aws/aws.service';
 import { FileUpload } from 'graphql-upload';
+import { ProductCondition } from 'src/types/enums';
 
 @Injectable()
 export class PostService {
@@ -22,15 +23,25 @@ export class PostService {
     }
 
     private async createOne(createPostInput: CreatePostInput, userId: ObjectId): Promise<any> {
-        const { title, description, imageUrls, bookId } = createPostInput;
-        const bookInfo = await this.bookService.getBookByProviderId(bookId);
+        const { description, imageUrls, availableBookId, desiredBookId, productCondition } = createPostInput;
+        const [offeredBookInfo, desiredBookInfo] = await Promise.all(
+            [
+                this.bookService.getBookByProviderId(availableBookId),
+                this.bookService.getBookByProviderId(desiredBookId)
+            ]
+        );
+
+        console.log('desiredBookInfo: ', desiredBookInfo);
+
         const postId = await this.collection.insertOne(
             {
-                title,
-                bookInfo,
+                title: `Trade ${offeredBookInfo.title} for ${desiredBookInfo.title}`,
+                offeredBookInfo,
+                desiredBookInfo,
                 description,
                 imageUrls,
                 postOwnerId: userId,
+                productCondition,
                 createdAt: new Date(),
                 updatedAt: new Date(),
             }
@@ -38,9 +49,15 @@ export class PostService {
         return { _id: postId.insertedId };
     }
 
-    public async addPost(user: User, fileUpload: FileUpload, title: string, description: string, bookId: string) {
+    public async addPost(user: User, availableBookId: string, desiredBookId: string, fileUpload: FileUpload, productCondition: ProductCondition, description: string) {
         const imageUrl = await this.awsService.uploadFile(fileUpload.createReadStream, fileUpload.filename);
-        const newPostInfo: CreatePostInput = { title, description, imageUrls: [imageUrl], bookId }
+        const newPostInfo: CreatePostInput = {
+            description,
+            imageUrls: [imageUrl],
+            productCondition,
+            availableBookId,
+            desiredBookId
+        }
         this.createOne(newPostInfo, user._id)
     }
 

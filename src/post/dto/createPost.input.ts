@@ -1,7 +1,8 @@
 import { InputType, Field, ID } from '@nestjs/graphql';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { GraphQLUpload } from 'graphql-upload';
 import { ObjectId } from 'mongodb';
+import { ProductCondition } from 'src/types/enums';
 
 @InputType()
 export class CreatePostInput {
@@ -11,8 +12,8 @@ export class CreatePostInput {
 
     @Field(() => String, { description: 'Title of the post' })
     @IsString()
-    @IsNotEmpty()
-    title: string;
+    @IsOptional()
+    title?: string;
 
     @Field(() => String, { description: 'Description of the book' })
     @IsString()
@@ -21,10 +22,20 @@ export class CreatePostInput {
 
     imageUrls?: string[];
 
-    @Field(() => String, { description: 'ID of the book' })
+    @Field(() => String, { description: 'ID of the available book' })
     @IsString()
     @IsNotEmpty()
-    bookId: string;
+    availableBookId: string;
+
+    @Field(() => String, { description: 'ID of the desired book' })
+    @IsString()
+    @IsNotEmpty()
+    desiredBookId: string;
+
+    @Field(() => String, { description: 'Condition of the product' })
+    @IsEnum(ProductCondition)
+    @IsNotEmpty()
+    productCondition: ProductCondition;
 }
 
 @InputType()
