@@ -78,10 +78,7 @@ export class BooksService {
         try {
             const response = await axios.get(route);
             if (response.data) {
-                const tst = this.formatBook(response.data);
-                console.log('tst: ', tst)
-                return tst;
-
+                return this.formatBook(response.data);
             }
             return null;
         } catch (error) {

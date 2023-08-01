@@ -1,4 +1,4 @@
-import { Field, InputType, ObjectType } from "@nestjs/graphql";
+import { Field, ObjectType } from "@nestjs/graphql";
 import { ImageUrls } from "./imageUrls.input";
 
 @ObjectType()
@@ -33,4 +33,5 @@ export class Book {
 
     @Field(_type => String, { description: 'The language of the book', nullable: true })
     pdfLink?: string;
+
 }
