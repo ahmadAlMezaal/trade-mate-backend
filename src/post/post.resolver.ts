@@ -15,8 +15,8 @@ export class PostResolver {
         private readonly postService: PostService,
     ) { }
 
-    @Mutation(() => Boolean, { name: 'addPost' })
     @UseGuards(JwtAuthGuard)
+    @Mutation(() => Boolean, { name: 'addPost' })
     async addPost(
         @Args('availableBookId', { type: () => String }) availableBookId: string,
         @Args('desiredBookId', { type: () => String }) desiredBookId: string,
@@ -36,6 +36,12 @@ export class PostResolver {
     @Query(() => [Post], { name: 'posts' })
     async getAllPosts(): Promise<Post[]> {
         return await this.postService.findAll();
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Query(() => [Post], { name: 'feed' })
+    async getFeed(@CurrentUser() user: User): Promise<Post[]> {
+        return await this.postService.fetchFeed(user._id);
     }
 
     @Query(() => Post, { name: 'post' })

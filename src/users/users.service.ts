@@ -1,6 +1,6 @@
-import { HttpException, HttpStatus, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { Collection, Db, ObjectId } from 'mongodb';
-import { CreateUserInput } from './dto/createUser.input';
+import { CreateUserInput, Role } from './dto/createUser.input';
 import { FindUserInput } from './dto/findOne.input';
 import { DeleteUserInput, UpdateUserInput } from './dto/updateUser.input';
 import { User } from './entities/user.schema';
@@ -16,19 +16,38 @@ export class UsersService {
     }
 
     public async create(createUserInput: CreateUserInput): Promise<User> {
-        const user = await this.collection.findOne({ email: createUserInput.email });
+        const user = await this.collection.findOne({ email: createUserInput.email.toLowerCase() });
         if (user) {
-            throw new HttpException({ message: 'Email already taken Error' }, HttpStatus.UNPROCESSABLE_ENTITY, { cause: new Error('Email already taken Error') });
+            throw new HttpException(
+                { message: 'Email already taken Error' },
+                HttpStatus.UNPROCESSABLE_ENTITY,
+                { cause: new Error('Email already taken Error') });
         }
 
         const saltOrRounds = 10;
         const password = createUserInput.password;
         createUserInput.password = await bcrypt.hash(password, saltOrRounds);
-        const { insertedId } = await this.collection.insertOne({ ...createUserInput, createdAt: new Date(), updatedAt: new Date() });
-        if (!insertedId) {
-            throw new NotFoundException('Unable to insert records');
+
+        const defaults: Partial<User> = {
+            bookmarkedPostIds: [],
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            isVerified: false,
+            role: Role.TRADER,
+            profilePhoto: 'https://spng.pngfind.com/pngs/s/676-6764065_default-profile-picture-transparent-hd-png-download.png',
         }
-        return { ...createUserInput, _id: insertedId };
+
+        const userObj: User = { ...createUserInput, ...defaults, email: createUserInput.email.toLowerCase() };
+
+        const { insertedId } = await this.collection.insertOne({ ...userObj });
+
+        if (!insertedId) {
+            throw new InternalServerErrorException('Error creating account');
+        }
+        const returnedUser = { ...userObj, _id: insertedId };
+        delete returnedUser.password;
+
+        return { ...returnedUser };
 
     }
 
@@ -81,6 +100,7 @@ export class UsersService {
 
     public async updateBookmarkedPosts(user: User, postIdStr: string) {
         const postId = new ObjectId(postIdStr);
+
         const bookmarkedPostIds = [...user.bookmarkedPostIds];
         const index = bookmarkedPostIds.findIndex((id) => id.equals(postId));
 
@@ -92,7 +112,6 @@ export class UsersService {
 
         const updatedUser = await this.update({ _id: user._id }, { bookmarkedPostIds });
         return { bookmarkedPostIds: updatedUser.bookmarkedPostIds };
-
     }
 
 }

@@ -1,5 +1,6 @@
 import { ObjectType, Field, ID } from '@nestjs/graphql';
 import { ObjectId } from 'mongodb';
+import { Role } from '../dto/createUser.input';
 
 @ObjectType()
 export class User {
@@ -14,7 +15,7 @@ export class User {
   password: string;
 
   @Field(() => String, { description: 'To show if the user veirifed their email or not', defaultValue: false })
-  isVerified: boolean;
+  isVerified?: boolean;
 
   @Field(() => String, { description: "User's first name" })
   firstName: string;
@@ -25,11 +26,14 @@ export class User {
   @Field(() => String, { description: "User's location" })
   location: string;
 
+  @Field(() => String, { description: "User's profile picture" })
+  profilePhoto?: string;
+
   @Field(() => [ID], { description: "IDs of posts bookmarked by the user", defaultValue: [] })
   bookmarkedPostIds?: ObjectId[];
 
-  @Field(() => String, { description: 'User role' })
-  role: string;
+  @Field(() => String, { description: 'User role', defaultValue: Role.TRADER })
+  role?: Role;
 
   @Field(() => String, { description: 'Verification code on registration', nullable: true })
   verificationCode?: number;
