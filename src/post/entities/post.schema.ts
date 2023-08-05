@@ -1,7 +1,7 @@
 import { ObjectType, Field, ID } from '@nestjs/graphql';
 import { ObjectId } from 'mongodb';
 import { Book } from 'src/books/entities/book.schema';
-import { ProductCondition } from 'src/types/enums';
+import { PostStatus, ProductCondition } from 'src/types/enums';
 
 @ObjectType()
 export class Post {
@@ -36,7 +36,11 @@ export class Post {
     @Field(() => String, { description: 'The language of the book' })
     productCondition: ProductCondition;
 
-    @Field(() => Boolean, { description: 'Used for the admin to approve the listing', defaultValue: false })
-    isApproved?: boolean;
+    @Field(() => String, { description: 'Used for the admin to approve the listing' })
+    status?: PostStatus;
+
+    @Field(() => [ID], { description: 'IDs of the proposals received' })
+    proposalsIds?: ObjectId[];
+
 
 }

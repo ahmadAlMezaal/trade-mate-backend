@@ -32,6 +32,9 @@ export class User {
   @Field(() => [ID], { description: "IDs of posts bookmarked by the user", defaultValue: [] })
   bookmarkedPostIds?: ObjectId[];
 
+  @Field(() => [ID], { description: "IDs of the proposals sent", defaultValue: [] })
+  sentProposalsIds?: ObjectId[];
+
   @Field(() => String, { description: 'User role', defaultValue: Role.TRADER })
   role?: Role;
 

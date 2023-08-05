@@ -9,6 +9,8 @@ import { AppIdentifierMiddleware } from './common/middlewares/appIdentifier.midd
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { BooksModule } from './books/books.module';
 import { PostModule } from './post/post.module';
+import { ProposalModule } from './proposal/Proposal.module';
+import { SharedModule } from './shared/shared.module';
 
 @Module(
     {
@@ -18,6 +20,8 @@ import { PostModule } from './post/post.module';
             AuthModule,
             BooksModule,
             PostModule,
+            ProposalModule,
+            SharedModule,
         ],
         providers: [
             AppService,

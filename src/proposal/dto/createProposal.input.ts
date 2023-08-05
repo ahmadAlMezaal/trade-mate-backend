@@ -1,12 +1,12 @@
-import { InputType, Field, ID } from '@nestjs/graphql';
+import { InputType, Field } from '@nestjs/graphql';
 import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
-import { GraphQLUpload } from 'graphql-upload';
+import { Book } from 'src/books/entities/book.schema';
 import { ProductCondition } from 'src/types/enums';
 
 @InputType()
-export class CreatePostInput {
+export class CreateProposalInput {
 
-    @Field(() => String, { description: 'Title of the post' })
+    @Field(() => String, { description: 'Title of the post', nullable: true })
     @IsString()
     @IsOptional()
     title?: string;
@@ -14,34 +14,19 @@ export class CreatePostInput {
     @Field(() => String, { description: 'Description of the book' })
     @IsString()
     @IsNotEmpty()
-    description: string;
-
-    imageUrls?: string[];
+    additionalInfo: string;
 
     @Field(() => String, { description: 'ID of the available book' })
     @IsString()
     @IsNotEmpty()
-    availableBookId: string;
+    listingId: string;
 
-    @Field(() => String, { description: 'ID of the desired book' })
-    @IsString()
+    @Field(() => String, { description: 'Item submitted by the proposer' })
     @IsNotEmpty()
-    desiredBookId: string;
+    itemId: string;
 
     @Field(() => String, { description: 'Condition of the product' })
     @IsEnum(ProductCondition)
     @IsNotEmpty()
     productCondition: ProductCondition;
-}
-
-@InputType()
-export class FileUploadInput {
-    @Field(() => GraphQLUpload)
-    file: any;
-
-    @Field()
-    title: string;
-
-    @Field()
-    description: string;
 }
