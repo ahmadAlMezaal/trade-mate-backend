@@ -3,7 +3,7 @@ import { UsersService } from './users.service';
 import { User } from './entities/user.schema';
 import { CreateUserInput } from './dto/createUser.input';
 import { DeleteUserInput, UpdateUserInput } from './dto/updateUser.input';
-import { FindUserInput } from './dto/findOne.input';
+import { FindSingleUserInput, FindUserInput } from './dto/findOne.input';
 import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/guards/jwtAuth.guard';
 import { CurrentUser } from 'src/common/decorators/currentUser.decorator';
@@ -20,30 +20,28 @@ export class UsersResolver {
 
     @Query(() => User, { name: 'profile' })
     @UseGuards(JwtAuthGuard)
-    public me(@CurrentUser() user: User): User {
-        return user
+    public getLoggedInUser(@CurrentUser() user: User): User {
+        return user;
+    }
+
+    @Query(() => User, { name: 'info' })
+    @UseGuards(JwtAuthGuard)
+    public async getUserInfo(@Args('input') input: FindSingleUserInput) {
+        input._id = new ObjectId(input._id);
+        return this.userService.findOne(input);
     }
 
     @Query(() => [Post], { name: 'bookmarks' })
     @UseGuards(JwtAuthGuard)
     public async getBookmarkedPosts(@CurrentUser() user: User) {
-        const ids: ObjectId[] = user.bookmarkedPostIds.map(_id => new ObjectId(_id))
+        const ids: ObjectId[] = user.bookmarkedPostIds?.map(_id => new ObjectId(_id))
         return this.postService.getPostsByIds(ids);
     }
 
     @Mutation(() => User, { name: 'updateUserBookmarks' })
     @UseGuards(JwtAuthGuard)
     public async updateUserBookmarks(@CurrentUser() user: User, @Args('postId') postId: string) {
-        try {
-            return this.userService.updateBookmarkedPosts(user, postId);
-        } catch (error) {
-            console.log('error: ', error);
-        }
-    }
-
-    @Mutation(() => User, { name: 'createUser' })
-    createUser(@Args('input') createUserInput: CreateUserInput) {
-        return this.userService.create(createUserInput);
+        return await this.userService.updateBookmarkedPosts(user, postId);
     }
 
     @Query(() => [User], { name: 'users' })

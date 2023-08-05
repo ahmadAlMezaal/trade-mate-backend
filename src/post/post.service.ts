@@ -63,6 +63,14 @@ export class PostService {
         return await this.collection.find({}).sort({ createdAt: -1 }).toArray();
     }
 
+    public async fetchFeed(_id: ObjectId): Promise<Post[]> {
+        return await this.collection.find({ postOwnerId: { $ne: new ObjectId(_id) } }).sort({ createdAt: -1 }).toArray();
+    }
+
+    public async fetchUserListing(_id: ObjectId): Promise<Post[]> {
+        return await this.collection.find({ postOwnerId: _id }).sort({ createdAt: -1 }).toArray();
+    }
+
     public async getPostsByIds(_ids: ObjectId[]) {
         return await this.collection.find({ _id: { $in: _ids } }).toArray();
     }

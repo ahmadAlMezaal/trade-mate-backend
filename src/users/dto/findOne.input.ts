@@ -22,3 +22,14 @@ export class FindUserInput {
     @Field(() => Number, { nullable: true })
     forgotPasswordCode?: number;
 }
+
+@InputType()
+export class FindSingleUserInput {
+
+    @Field(() => ID, { nullable: true })
+    _id?: ObjectId;
+
+    @Field(() => String, { nullable: true })
+    email?: string;
+
+}

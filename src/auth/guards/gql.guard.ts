@@ -40,7 +40,6 @@ export class GqlAuthGuard extends AuthGuard('local') {
     //             return true;
     //         }
     //     } catch (error) {
-    //         console.log('eerrrrrr: ', error);
 
     //     }
 

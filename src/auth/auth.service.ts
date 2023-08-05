@@ -21,8 +21,8 @@ export class AuthService {
         }
         const doesPasswordMatch = await bcrypt.compare(pass, user.password);
         if (doesPasswordMatch) {
-            const { password, ...result } = user;
-            return result;
+            delete user.password
+            return user;
         }
         return null;
     }
@@ -60,7 +60,7 @@ export class AuthService {
         const saltOrRounds = 10;
         const newPassword = await bcrypt.hash(input.password, saltOrRounds);
 
-        const tst = await this.usersService.update({ _id: user._id }, { forgotPasswordCode: null, password: newPassword });
+        await this.usersService.update({ _id: user._id }, { forgotPasswordCode: null, password: newPassword });
 
         return { message: 'Password changed successfully!' }
     }

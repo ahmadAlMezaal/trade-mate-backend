@@ -33,14 +33,11 @@ type Book {
 }
 
 input CreateUserInput {
-  _id: ID
   email: String!
   firstName: String!
-  isVerified: Boolean = false
   lastName: String!
   location: String!
   password: String!
-  role: String = "36"
 }
 
 """
@@ -55,6 +52,11 @@ input DeleteUserInput {
 input FindBookInput {
   _id: ID
   name: String
+}
+
+input FindSingleUserInput {
+  _id: ID
+  email: String
 }
 
 input FindUserInput {
@@ -100,7 +102,6 @@ type LoginResponse {
 
 type Mutation {
   addPost(availableBookId: String!, description: String!, desiredBookId: String!, file: Upload!, productCondition: String!): Boolean!
-  createUser(input: CreateUserInput!): User!
   deleteUser(input: DeleteUserInput!): Boolean!
   forgotPassword(input: ForgotPasswordInput!): ForgotPasswordResponse!
   login(input: LoginInput!): LoginResponse!
@@ -126,6 +127,9 @@ type Post {
   """Images of the book"""
   imageUrls: [String!]!
 
+  """Used for the admin to approve the listing"""
+  isApproved: Boolean!
+
   """Contains information about the book that the user is offering."""
   offeredBookInfo: Book!
   postOwnerId: ID!
@@ -143,6 +147,8 @@ type Post {
 type Query {
   bookmarks: [Post!]!
   books: [Book!]!
+  feed: [Post!]!
+  info(input: FindSingleUserInput!): User!
   me: User!
   post(id: Int!): Post!
   posts: [Post!]!
@@ -206,6 +212,9 @@ type User {
 
   """User's password"""
   password: String!
+
+  """User's profile picture"""
+  profilePhoto: String!
 
   """User role"""
   role: String!
