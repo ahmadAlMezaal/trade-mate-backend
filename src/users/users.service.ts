@@ -100,7 +100,7 @@ export class UsersService {
         return value;
     }
 
-    public async pushProposalId(userId: string, proposalIdStr: string) {
+    public async addProposal(userId: string, proposalIdStr: string) {
         const _id = new ObjectId(userId);
         const proposalId = new ObjectId(proposalIdStr);
 

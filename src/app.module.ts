@@ -11,6 +11,7 @@ import { BooksModule } from './books/books.module';
 import { PostModule } from './post/post.module';
 import { ProposalModule } from './proposal/Proposal.module';
 import { SharedModule } from './shared/shared.module';
+import { NotificationsModule } from './notifications/notifications.module';
 
 @Module(
     {
@@ -22,6 +23,7 @@ import { SharedModule } from './shared/shared.module';
             PostModule,
             ProposalModule,
             SharedModule,
+            NotificationsModule,
         ],
         providers: [
             AppService,

@@ -6,7 +6,7 @@ import { CreatePostInput } from './dto/createPost.input';
 import { Post } from './entities/post.schema';
 import { AwsService } from 'src/aws/aws.service';
 import { FileUpload } from 'graphql-upload';
-import { ProposalStatus, PostStatus, ProductCondition } from 'src/types/enums';
+import { PostStatus, ProductCondition } from 'src/types/enums';
 
 @Injectable()
 export class PostService {
@@ -21,7 +21,7 @@ export class PostService {
         return this.db.collection<Post>('posts');
     }
 
-    private async createOne(createPostInput: CreatePostInput, userId: ObjectId): Promise<any> {
+    private async createOne(createPostInput: CreatePostInput, userId: ObjectId): Promise<ObjectId> {
         const { description, imageUrls, availableBookId, desiredBookId, productCondition } = createPostInput;
         const [offeredBookInfo, desiredBookInfo] = await Promise.all(
             [
@@ -29,7 +29,12 @@ export class PostService {
                 this.bookService.getBookByProviderId(desiredBookId)
             ]
         );
-
+        const defaults: Partial<Post> = {
+            proposalsIds: [],
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            status: PostStatus.PENDING
+        }
         const postId = await this.collection.insertOne(
             {
                 title: `Trade ${offeredBookInfo.title} for ${desiredBookInfo.title}`,
@@ -39,11 +44,10 @@ export class PostService {
                 imageUrls,
                 postOwnerId: userId,
                 productCondition,
-                createdAt: new Date(),
-                updatedAt: new Date(),
+                ...defaults,
             }
         );
-        return { _id: postId.insertedId };
+        return postId.insertedId;
     }
 
     public async addPost(user: User, availableBookId: string, desiredBookId: string, fileUpload: FileUpload, productCondition: ProductCondition, description: string) {
@@ -56,11 +60,7 @@ export class PostService {
                 availableBookId,
                 desiredBookId
             };
-            const defaults: Partial<Post> = {
-                proposalsIds: [],
-                status: PostStatus.PENDING,
-            }
-            return await this.createOne({ ...newPostInfo, ...defaults }, user._id)
+            return await this.createOne(newPostInfo, user._id)
         } catch (error) {
             throw new InternalServerErrorException('Error uploading file');
         }
@@ -70,8 +70,8 @@ export class PostService {
         return await this.collection.find({}).sort({ createdAt: -1 }).toArray();
     }
 
-    public async fetchFeed(_id: ObjectId): Promise<Post[]> {
-        return await this.collection.find(
+    public fetchFeed(_id: ObjectId): Promise<Post[]> {
+        return this.collection.find(
             {
                 postOwnerId: { $ne: new ObjectId(_id) },
                 status: { $in: [PostStatus.OPEN, PostStatus.APPROVED] },

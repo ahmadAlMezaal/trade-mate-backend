@@ -16,7 +16,7 @@ export class PostResolver {
     ) { }
 
     @UseGuards(JwtAuthGuard)
-    @Mutation(() => Boolean, { name: 'addPost' })
+    @Mutation(() => String, { name: 'addPost' })
     async addPost(
         @Args('availableBookId', { type: () => String }) availableBookId: string,
         @Args('desiredBookId', { type: () => String }) desiredBookId: string,

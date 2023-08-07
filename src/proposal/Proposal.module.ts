@@ -7,10 +7,18 @@ import { BooksModule } from 'src/books/books.module';
 import { AwsModule } from 'src/aws/aws.module';
 import { PostModule } from 'src/post/post.module';
 import { UsersModule } from 'src/users/users.module';
+import { NotificationsModule } from 'src/notifications/notifications.module';
 
 @Module(
     {
-        imports: [CommonModule, BooksModule, AwsModule, PostModule, UsersModule],
+        imports: [
+            CommonModule,
+            BooksModule,
+            AwsModule,
+            PostModule,
+            UsersModule,
+            NotificationsModule,
+        ],
         providers: [...proposalProviders, ProposalResolver, ProposalService],
         exports: [...proposalProviders, ProposalService],
     }
