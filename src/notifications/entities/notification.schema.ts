@@ -4,7 +4,9 @@ import { Timestamps } from 'src/common/schemas/timestamps.schema';
 
 export enum NotificationType {
     PROPOSAL_RECEIVED = 'proposal_received',
-    ITEM_TRADED = 'item_traded'
+    ITEM_TRADED = 'item_traded',
+    PROPOSAL_ACCEPTED = 'proposal_accepted',
+    PROPOSAL_REJECTED = 'proposal_rejected',
 }
 
 export enum NotificationStatus {
@@ -33,8 +35,11 @@ export class Notification extends Timestamps {
     @Field(() => ID, { description: 'The user who initiated the action that triggered the notification (if applicable).', nullable: true })
     senderId?: ObjectId;
 
-    @Field(() => ID, { description: 'The identifier for the listing, or proposal related to the notification (if applicable)', nullable: true })
-    listingId?: ObjectId; // What should I call this?
+    @Field(() => ID, { description: 'The identifier for the listing (if applicable)', nullable: true })
+    listingId?: ObjectId;
+
+    @Field(() => ID, { description: 'The identifier for proposal (if applicable)', nullable: true })
+    proposalId?: ObjectId;
 
     @Field(() => String, { description: 'The status of the notification (e.g., "unread", "read").' })
     status?: NotificationStatus;

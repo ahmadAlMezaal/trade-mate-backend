@@ -11,6 +11,7 @@ import { UsersService } from 'src/users/users.service';
 import { NotificationsService } from 'src/notifications/notifications.service';
 import { getCollection } from 'src/helpers/db.helpers';
 import { Notification, NotificationType } from 'src/notifications/entities/notification.schema';
+import { ProposalStatus } from 'src/types/enums';
 
 @Injectable()
 export class ProposalService {
@@ -25,14 +26,12 @@ export class ProposalService {
         private readonly userService: UsersService,
         private readonly notificationService: NotificationsService,
     ) {
-        this.proposalCollection = getCollection<Proposal>(db, 'proposals');
+        this.proposalCollection = getCollection<Proposal>(this.db, 'proposals');
     }
 
     public async createOne(createOfferInput: CreateProposalInput, fileUpload: FileUpload, userId: ObjectId): Promise<string> {
-        const { additionalInfo, listingId, itemId, productCondition } = createOfferInput;
 
-        const imageUrl = await this.awsService.uploadFile(fileUpload.createReadStream, fileUpload.filename);
-        const item = await this.bookService.getBookByProviderId(itemId);
+        const { listingId } = createOfferInput;
 
         const [sender, post] = await Promise.all(
             [
@@ -49,20 +48,8 @@ export class ProposalService {
             throw new NotFoundException('Post not found');
         }
 
-        const proposal = await this.proposalCollection.insertOne(
-            {
-                productCondition,
-                additionalInfo,
-                item,
-                listingId: new ObjectId(listingId),
-                imageUrls: [imageUrl],
-                userId: userId,
-                createdAt: new Date(),
-                updatedAt: new Date(),
-            }
-        );
-
         const senderFullName = `${sender.firstName} ${sender.lastName}`;
+        const proposal = await this.insertOne(createOfferInput, fileUpload, userId)
 
         await Promise.all(
             [
@@ -70,14 +57,16 @@ export class ProposalService {
                 this.userService.addProposal(userId.toString(), proposal.insertedId.toString())
             ]
         )
+
         this.notificationService.sendPushNotification(
             {
                 listingId,
-                title: 'Proposal request received',
+                title: 'Proposal request',
                 message: `${senderFullName} has send you a proposal request`,
                 recipientId: post.postOwnerId.toString(),
                 senderId: userId.toString(),
                 type: NotificationType.PROPOSAL_RECEIVED,
+                proposalId: proposal.insertedId.toString(),
             }
         );
 
@@ -92,8 +81,86 @@ export class ProposalService {
         return this.proposalCollection.find({ ...params }).toArray();
     }
 
+    public async findOne(idStr: string): Promise<Proposal> {
+        const _id = new ObjectId(idStr);
+        const proposal = await this.proposalCollection.findOne({ _id });
+        if (!proposal) {
+            throw new NotFoundException('Proposal not found!');
+        }
+        return proposal;
+    }
 
-    public findOne(id: number) {
-        return `This action returns a #${id} offer`;
+    public async insertOne(createOfferInput: CreateProposalInput, fileUpload: FileUpload, userId: ObjectId) {
+        const { additionalInfo, listingId, itemId, productCondition } = createOfferInput;
+        const imageUrl = await this.awsService.uploadFile(fileUpload.createReadStream, fileUpload.filename);
+
+        const item = await this.bookService.getBookByProviderId(itemId);
+
+        const proposalDefautls: Partial<Proposal> = {
+            status: ProposalStatus.PENDING,
+            title: `Trade ${item.title}`,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+        };
+
+        const proposal = await this.proposalCollection.insertOne(
+            {
+                productCondition,
+                additionalInfo,
+                item,
+                listingId: new ObjectId(listingId),
+                imageUrls: [imageUrl],
+                userId,
+                ...proposalDefautls,
+            }
+        );
+
+        return proposal;
+
+    }
+
+    public async updateOne(queryObj: Partial<Proposal>, updateUserInput: UpdateProposalInput) {
+        const { value } = await this.proposalCollection.findOneAndUpdate(
+            { ...queryObj },
+            {
+                $set: {
+                    ...updateUserInput,
+                    updatedAt: new Date()
+                }
+            },
+            {
+                upsert: false,
+                returnDocument: 'after'
+            }
+        )
+        if (!value) {
+            throw new NotFoundException('Account not found');
+        }
+        return value;
+    }
+
+    public async updateProposalStatus(idStr: string, status: ProposalStatus, sender): Promise<Proposal> {
+        const _id = new ObjectId(idStr);
+
+        const proposal = await this.findOne(idStr);
+
+        let messageDecision = 'accepted';
+        let type = NotificationType.PROPOSAL_ACCEPTED;
+
+        if (proposal.status === ProposalStatus.REJECTED) {
+            messageDecision = 'rejected';
+            type = NotificationType.PROPOSAL_REJECTED;
+        }
+        this.notificationService.sendPushNotification(
+            {
+                title: 'Your proposal status',
+                message: `${sender.firstName} ${sender.lastName} has ${messageDecision} your proposal request`,
+                recipientId: proposal.userId.toString(),
+                senderId: sender._id.toString(),
+                proposalId: proposal._id.toString(),
+                type,
+            }
+        );
+        return this.updateOne({ _id }, { status });
     }
 }

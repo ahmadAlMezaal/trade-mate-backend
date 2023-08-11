@@ -89,8 +89,8 @@ export class PostService {
         return await this.collection.find({ _id: { $in: _ids } }).toArray();
     }
 
-    public async findOne(params: Partial<Post>) {
-        return await this.collection.findOne({ ...params });
+    public findOne(params: Partial<Post>) {
+        return this.collection.findOne({ ...params });
     }
 
     public async pushProposalId(listingIdStr: string, proposalIdStr: string) {

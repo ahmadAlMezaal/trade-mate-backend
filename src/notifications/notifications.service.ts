@@ -14,7 +14,7 @@ export class NotificationsService {
     }
 
     public async create(createNotificationInput: CreateNotificationInput): Promise<Notification> {
-        const { senderId, recipientId, message, type, listingId, title } = createNotificationInput;
+        const { senderId, recipientId, message, type, listingId, title, proposalId } = createNotificationInput;
 
         const defaults: Partial<Notification> = {
             createdAt: new Date(),
@@ -28,6 +28,7 @@ export class NotificationsService {
             recipientId: new ObjectId(recipientId),
             listingId: listingId ? new ObjectId(listingId) : null,
             senderId: senderId ? new ObjectId(senderId) : null,
+            proposalId: proposalId ? new ObjectId(proposalId) : null,
             type,
             ...defaults
         };

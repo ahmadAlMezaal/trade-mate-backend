@@ -127,6 +127,7 @@ type Mutation {
   sendProposal(createProposalInput: CreateProposalInput!, file: Upload!): String!
   signup(input: CreateUserInput!): LoginResponse!
   updateBook(updateBookInput: UpdateBookInput!): Book!
+  updateProposalStatus(_id: String!, status: String!): Proposal!
   updateUserBookmarks(postId: String!): User!
 }
 
@@ -137,13 +138,14 @@ type Notification {
   """The date when the entity was created"""
   createdAt: DateTime!
 
-  """
-  The identifier for the listing, or proposal related to the notification (if applicable)
-  """
+  """The identifier for the listing (if applicable)"""
   listingId: ID
 
   """The body of the message."""
   message: String!
+
+  """The identifier for proposal (if applicable)"""
+  proposalId: ID
 
   """The user who should receive the notification."""
   recipientId: ID!
@@ -238,13 +240,13 @@ type Query {
   books: [Book!]!
   feed: [Post!]!
   info(input: FindSingleUserInput!): User!
+  listing(_id: String!): Post!
   me: User!
   notification(id: Int!): Notification!
   notifications: [Notification!]!
-  offer(id: Int!): Proposal!
-  post(id: Int!): Post!
   posts: [Post!]!
   profile: User!
+  proposal(_id: String!): Proposal!
   proposals: [Proposal!]!
   searchBook(input: FindBookInput!): [Book!]!
   user(input: FindUserInput!): User!

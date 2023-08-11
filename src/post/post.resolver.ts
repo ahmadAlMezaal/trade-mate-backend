@@ -39,9 +39,10 @@ export class PostResolver {
         return await this.postService.fetchFeed(user._id);
     }
 
-    @Query(() => Post, { name: 'post' })
-    findOne(@Args('id', { type: () => Int }) _id: string) {
-        return this.postService.findOne({ _id: new ObjectId(_id) });
+    @Query(() => Post, { name: 'listing' })
+    public async findOne(@Args('_id', { type: () => String }) _id: string) {
+        console.log('reached here');
+        return await this.postService.findOne({ _id: new ObjectId(_id) });
     }
 
 }
