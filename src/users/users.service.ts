@@ -36,7 +36,7 @@ export class UsersService {
         createUserInput.password = await bcrypt.hash(password, saltOrRounds);
 
         const defaults: Partial<User> = {
-            bookmarkedPostIds: [],
+            bookmarkedListingIds: [],
             createdAt: new Date(),
             updatedAt: new Date(),
             isVerified: false,
@@ -114,7 +114,7 @@ export class UsersService {
         );
 
         if (!result.value) {
-            throw new NotFoundException('Post not found');
+            throw new NotFoundException('Listing not found');
         }
         return result.value;
     }
@@ -125,20 +125,20 @@ export class UsersService {
         return response.deletedCount === 1;
     }
 
-    public async updateBookmarkedPosts(user: User, postIdStr: string) {
-        const postId = new ObjectId(postIdStr);
+    public async updateBookmarkedListings(user: User, listingIdStr: string) {
+        const listingId = new ObjectId(listingIdStr);
 
-        const bookmarkedPostIds = [...user.bookmarkedPostIds];
-        const index = bookmarkedPostIds.findIndex((id) => id.equals(postId));
+        const bookmarkedListingIds = [...user.bookmarkedListingIds];
+        const index = bookmarkedListingIds.findIndex((id) => id.equals(listingId));
 
         if (index !== -1) {
-            bookmarkedPostIds.splice(index, 1);
+            bookmarkedListingIds.splice(index, 1);
         } else {
-            bookmarkedPostIds.push(postId);
+            bookmarkedListingIds.push(listingId);
         }
 
-        const updatedUser = await this.update({ _id: user._id }, { bookmarkedPostIds });
-        return { bookmarkedPostIds: updatedUser.bookmarkedPostIds };
+        const updatedUser = await this.update({ _id: user._id }, { bookmarkedListingIds: bookmarkedListingIds });
+        return { bookmarkedListingIds: updatedUser.bookmarkedListingIds };
     }
 
 

@@ -8,7 +8,7 @@ import { AuthModule } from './auth/auth.module';
 import { AppIdentifierMiddleware } from './common/middlewares/appIdentifier.middleware';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { BooksModule } from './books/books.module';
-import { PostModule } from './post/post.module';
+import { ListingModule } from './listing/listing.module';
 import { ProposalModule } from './proposal/Proposal.module';
 import { SharedModule } from './shared/shared.module';
 import { NotificationsModule } from './notifications/notifications.module';
@@ -20,7 +20,7 @@ import { NotificationsModule } from './notifications/notifications.module';
             UsersModule,
             AuthModule,
             BooksModule,
-            PostModule,
+            ListingModule,
             ProposalModule,
             SharedModule,
             NotificationsModule,

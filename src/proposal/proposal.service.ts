@@ -6,12 +6,12 @@ import { AwsService } from 'src/aws/aws.service';
 import { BooksService } from 'src/books/books.service';
 import { Proposal } from './entities/proposal.schema';
 import { FileUpload } from 'graphql-upload';
-import { PostService } from 'src/post/post.service';
 import { UsersService } from 'src/users/users.service';
 import { NotificationsService } from 'src/notifications/notifications.service';
 import { getCollection } from 'src/helpers/db.helpers';
 import { Notification, NotificationType } from 'src/notifications/entities/notification.schema';
 import { ProposalStatus } from 'src/types/enums';
+import { ListingService } from 'src/listing/listing.service';
 
 @Injectable()
 export class ProposalService {
@@ -21,7 +21,7 @@ export class ProposalService {
     constructor(
         @Inject('PROPOSAL_COLLECTION') private readonly db: Db,
         private readonly bookService: BooksService,
-        private readonly postService: PostService,
+        private readonly listingService: ListingService,
         private readonly awsService: AwsService,
         private readonly userService: UsersService,
         private readonly notificationService: NotificationsService,
@@ -33,10 +33,10 @@ export class ProposalService {
 
         const { listingId } = createOfferInput;
 
-        const [sender, post] = await Promise.all(
+        const [sender, listing] = await Promise.all(
             [
                 this.userService.findOne({ _id: userId }),
-                this.postService.findOne({ _id: new ObjectId(listingId) }),
+                this.listingService.findOne({ _id: new ObjectId(listingId) }),
             ]
         );
 
@@ -44,8 +44,8 @@ export class ProposalService {
             throw new NotFoundException('Sender not found');
         }
 
-        if (!post) {
-            throw new NotFoundException('Post not found');
+        if (!listing) {
+            throw new NotFoundException('Listing not found');
         }
 
         const senderFullName = `${sender.firstName} ${sender.lastName}`;
@@ -53,7 +53,7 @@ export class ProposalService {
 
         await Promise.all(
             [
-                this.postService.pushProposalId(listingId, proposal.insertedId.toString()),
+                this.listingService.pushProposalId(listingId, proposal.insertedId.toString()),
                 this.userService.addProposal(userId.toString(), proposal.insertedId.toString())
             ]
         )
@@ -63,7 +63,7 @@ export class ProposalService {
                 listingId,
                 title: 'Proposal request',
                 message: `${senderFullName} has send you a proposal request`,
-                recipientId: post.postOwnerId.toString(),
+                recipientId: listing.listingOwnerId.toString(),
                 senderId: userId.toString(),
                 type: NotificationType.PROPOSAL_RECEIVED,
                 proposalId: proposal.insertedId.toString(),

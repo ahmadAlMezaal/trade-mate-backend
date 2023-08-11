@@ -6,7 +6,7 @@ import { ProductCondition } from 'src/types/enums';
 @InputType()
 export class CreateProposalInput {
 
-    @Field(() => String, { description: 'Title of the post', nullable: true })
+    @Field(() => String, { description: 'Title of the listing', nullable: true })
     @IsString()
     @IsOptional()
     title?: string;

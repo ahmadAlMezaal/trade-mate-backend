@@ -10,7 +10,7 @@ export enum ProposalStatus {
     PENDING = 'Pending'
 }
 
-export enum PostStatus {
+export enum ListingStatus {
     PENDING = 'Pending',
     OPEN = 'Open',
     REJECTED = 'Rejected',

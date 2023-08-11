@@ -5,7 +5,7 @@ import { UsersService } from './users.service';
 import { UsersResolver } from './users.resolver';
 import { userProviders } from './providers/user.providers';
 import { ConfigModule } from '@nestjs/config';
-import { PostModule } from 'src/post/post.module';
+import { ListingModule } from 'src/listing/listing.module';
 import { SharedModule } from 'src/shared/shared.module';
 
 @Module(
@@ -14,7 +14,7 @@ import { SharedModule } from 'src/shared/shared.module';
         imports: [
             ConfigModule,
             CommonModule,
-            PostModule,
+            ListingModule,
             SharedModule
         ],
         providers: [

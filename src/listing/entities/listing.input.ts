@@ -3,14 +3,14 @@ import { ObjectId } from "mongodb";
 import { Book } from "src/books/entities/book.schema";
 
 @InputType()
-export class PostInput {
+export class ListingInput {
     @Field(() => ID)
     _id?: ObjectId;
 
-    @Field(() => String, { description: 'Title of the post' })
+    @Field(() => String, { description: 'Title of the listing' })
     title: string;
 
-    @Field(() => String, { description: 'description of the post' })
+    @Field(() => String, { description: 'description of the listing' })
     description: string;
 
     @Field(() => [String], { description: 'Images of the book' })
@@ -20,5 +20,5 @@ export class PostInput {
     bookInfo: Book;
 
     @Field(() => ID)
-    postOwnerId: ObjectId;
+    listingOwnerId: ObjectId;
 }

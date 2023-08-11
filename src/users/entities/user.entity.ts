@@ -7,7 +7,7 @@ export interface IUser {
     firstName: string;
     lastName: string;
     location: string;
-    bookmarkedPostIds: string[];
+    bookmarkedlistingIds: string[];
     role: string;
     verificationCode?: number;
     forgotPasswordCode?: number;

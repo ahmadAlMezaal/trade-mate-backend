@@ -30,8 +30,8 @@ export class User extends Timestamps {
   @Field(() => String, { description: "User's profile picture" })
   profilePhoto?: string;
 
-  @Field(() => [ID], { description: "IDs of posts bookmarked by the user", defaultValue: [] })
-  bookmarkedPostIds?: ObjectId[];
+  @Field(() => [ID], { description: "IDs of listings bookmarked by the user", defaultValue: [] })
+  bookmarkedListingIds?: ObjectId[];
 
   @Field(() => [ID], { description: "IDs of the proposals sent", defaultValue: [] })
   sentProposalsIds?: ObjectId[];

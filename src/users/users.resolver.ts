@@ -6,16 +6,16 @@ import { FindSingleUserInput, FindUserInput } from './dto/findOne.input';
 import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/guards/jwtAuth.guard';
 import { CurrentUser } from 'src/common/decorators/currentUser.decorator';
-import { PostService } from 'src/post/post.service';
+import { ListingService } from 'src/listing/listing.service';
 import { ObjectId } from 'mongodb';
-import { Post } from 'src/post/entities/post.schema';
+import { Listing } from 'src/listing/entities/listing.schema';
 import { Proposal } from 'src/proposal/entities/proposal.schema';
 
 @Resolver(() => User)
 export class UsersResolver {
     constructor(
         private readonly userService: UsersService,
-        private readonly postService: PostService
+        private readonly ListingService: ListingService
     ) { }
 
     @Query(() => User, { name: 'profile' })
@@ -31,11 +31,11 @@ export class UsersResolver {
         return this.userService.findOne(input);
     }
 
-    @Query(() => [Post], { name: 'bookmarks' })
+    @Query(() => [Listing], { name: 'bookmarks' })
     @UseGuards(JwtAuthGuard)
-    public async getBookmarkedPosts(@CurrentUser() user: User) {
-        const ids: ObjectId[] = user.bookmarkedPostIds?.map(_id => new ObjectId(_id))
-        return this.postService.getPostsByIds(ids);
+    public async getBookmarkedListings(@CurrentUser() user: User) {
+        const ids: ObjectId[] = user.bookmarkedListingIds?.map(_id => new ObjectId(_id))
+        return this.ListingService.getListingsByIds(ids);
     }
 
     @Query(() => [Proposal], { name: 'proposals' })
@@ -46,8 +46,8 @@ export class UsersResolver {
 
     @Mutation(() => User, { name: 'updateUserBookmarks' })
     @UseGuards(JwtAuthGuard)
-    public async updateUserBookmarks(@CurrentUser() user: User, @Args('postId') postId: string) {
-        return await this.userService.updateBookmarkedPosts(user, postId);
+    public async updateUserBookmarks(@CurrentUser() user: User, @Args('listingId') listingId: string) {
+        return await this.userService.updateBookmarkedListings(user, listingId);
     }
 
     @Query(() => [User], { name: 'users' })

@@ -2,18 +2,18 @@ import { ObjectType, Field, ID } from '@nestjs/graphql';
 import { ObjectId } from 'mongodb';
 import { Book } from 'src/books/entities/book.schema';
 import { Timestamps } from 'src/common/schemas/timestamps.schema';
-import { PostStatus, ProductCondition } from 'src/types/enums';
+import { ListingStatus, ProductCondition } from 'src/types/enums';
 
 @ObjectType()
-export class Post extends Timestamps {
+export class Listing extends Timestamps {
 
     @Field(() => ID)
     _id?: ObjectId;
 
-    @Field(() => String, { description: 'Title of the post', })
+    @Field(() => String, { description: 'Title of the listing' })
     title?: string;
 
-    @Field(() => String, { description: 'description of the post' })
+    @Field(() => String, { description: 'description of the listing' })
     description: string;
 
     @Field(() => [String], { description: 'Images of the book' })
@@ -26,13 +26,13 @@ export class Post extends Timestamps {
     desiredBookInfo: Book;
 
     @Field(() => ID)
-    postOwnerId: ObjectId;
+    listingOwnerId: ObjectId;
 
     @Field(() => String, { description: 'The language of the book' })
     productCondition: ProductCondition;
 
     @Field(() => String, { description: 'Used for the admin to approve the listing' })
-    status?: PostStatus;
+    status?: ListingStatus;
 
     @Field(() => [ID], { description: 'IDs of the proposals received' })
     proposalsIds?: ObjectId[];
