@@ -41,7 +41,6 @@ export class PostResolver {
 
     @Query(() => Post, { name: 'listing' })
     public async findOne(@Args('_id', { type: () => String }) _id: string) {
-        console.log('reached here');
         return await this.postService.findOne({ _id: new ObjectId(_id) });
     }
 
