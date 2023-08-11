@@ -1,10 +1,11 @@
 import { ObjectType, Field, ID } from '@nestjs/graphql';
 import { ObjectId } from 'mongodb';
 import { Book } from 'src/books/entities/book.schema';
-import { ProductCondition } from 'src/types/enums';
+import { Timestamps } from 'src/common/schemas/timestamps.schema';
+import { PostStatus, ProductCondition } from 'src/types/enums';
 
 @ObjectType()
-export class Post {
+export class Post extends Timestamps {
 
     @Field(() => ID)
     _id?: ObjectId;
@@ -27,16 +28,14 @@ export class Post {
     @Field(() => ID)
     postOwnerId: ObjectId;
 
-    @Field(() => Date, { description: 'The date when the post was created' })
-    createdAt?: Date;
-
-    @Field(() => Date, { description: 'The last date when the post was updated' })
-    updatedAt?: Date;
-
     @Field(() => String, { description: 'The language of the book' })
     productCondition: ProductCondition;
 
-    @Field(() => Boolean, { description: 'Used for the admin to approve the listing', defaultValue: false })
-    isApproved?: boolean;
+    @Field(() => String, { description: 'Used for the admin to approve the listing' })
+    status?: PostStatus;
+
+    @Field(() => [ID], { description: 'IDs of the proposals received' })
+    proposalsIds?: ObjectId[];
+
 
 }

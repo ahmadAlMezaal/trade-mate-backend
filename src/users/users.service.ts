@@ -5,11 +5,18 @@ import { FindUserInput } from './dto/findOne.input';
 import { DeleteUserInput, UpdateUserInput } from './dto/updateUser.input';
 import { User } from './entities/user.schema';
 import * as bcrypt from 'bcrypt';
+import { SharedService } from 'src/shared/shared.service';
+import { Proposal } from 'src/proposal/entities/proposal.schema';
 
 @Injectable()
 export class UsersService {
 
-    constructor(@Inject('USERS_COLLECTION') private readonly db: Db) { }
+    constructor(
+        @Inject('USERS_COLLECTION') private readonly db: Db,
+        private readonly sharedService: SharedService,
+    ) {
+
+    }
 
     private get collection(): Collection<User> {
         return this.db.collection<User>('users');
@@ -35,6 +42,7 @@ export class UsersService {
             isVerified: false,
             role: Role.TRADER,
             profilePhoto: 'https://spng.pngfind.com/pngs/s/676-6764065_default-profile-picture-transparent-hd-png-download.png',
+            sentProposalsIds: [],
         }
 
         const userObj: User = { ...createUserInput, ...defaults, email: createUserInput.email.toLowerCase() };
@@ -92,6 +100,25 @@ export class UsersService {
         return value;
     }
 
+    public async addProposal(userId: string, proposalIdStr: string) {
+        const _id = new ObjectId(userId);
+        const proposalId = new ObjectId(proposalIdStr);
+
+        const result = await this.collection.findOneAndUpdate(
+            { _id },
+            {
+                $push: { sentProposalsIds: proposalId },
+                $currentDate: { updatedAt: true },
+            },
+            { returnDocument: 'after' }
+        );
+
+        if (!result.value) {
+            throw new NotFoundException('Post not found');
+        }
+        return result.value;
+    }
+
     public async remove(input: DeleteUserInput): Promise<boolean> {
         const { _id } = input;
         const response = await this.collection.deleteOne({ _id: new ObjectId(_id) });
@@ -113,5 +140,11 @@ export class UsersService {
         const updatedUser = await this.update({ _id: user._id }, { bookmarkedPostIds });
         return { bookmarkedPostIds: updatedUser.bookmarkedPostIds };
     }
+
+
+    public getUserProposals(userId: string): Promise<Proposal[]> {
+        return this.sharedService.getUserProposals(userId);
+    }
+
 
 }

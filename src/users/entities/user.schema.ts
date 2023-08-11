@@ -1,9 +1,10 @@
 import { ObjectType, Field, ID } from '@nestjs/graphql';
 import { ObjectId } from 'mongodb';
 import { Role } from '../dto/createUser.input';
+import { Timestamps } from 'src/common/schemas/timestamps.schema';
 
 @ObjectType()
-export class User {
+export class User extends Timestamps {
 
   @Field(() => ID)
   _id?: ObjectId;
@@ -32,6 +33,9 @@ export class User {
   @Field(() => [ID], { description: "IDs of posts bookmarked by the user", defaultValue: [] })
   bookmarkedPostIds?: ObjectId[];
 
+  @Field(() => [ID], { description: "IDs of the proposals sent", defaultValue: [] })
+  sentProposalsIds?: ObjectId[];
+
   @Field(() => String, { description: 'User role', defaultValue: Role.TRADER })
   role?: Role;
 
@@ -40,11 +44,5 @@ export class User {
 
   @Field(() => String, { description: 'Code used whenever the user wants to reset their password', nullable: true })
   forgotPasswordCode?: number;
-
-  @Field(() => Date, { description: 'The date when the user was created' })
-  createdAt?: Date;
-
-  @Field(() => Date, { description: 'The last date when the user was updated' })
-  updatedAt?: Date;
 
 }

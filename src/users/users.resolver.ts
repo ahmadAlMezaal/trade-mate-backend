@@ -1,8 +1,7 @@
-import { Resolver, Query, Mutation, Args, Context } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
 import { UsersService } from './users.service';
 import { User } from './entities/user.schema';
-import { CreateUserInput } from './dto/createUser.input';
-import { DeleteUserInput, UpdateUserInput } from './dto/updateUser.input';
+import { DeleteUserInput } from './dto/updateUser.input';
 import { FindSingleUserInput, FindUserInput } from './dto/findOne.input';
 import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/guards/jwtAuth.guard';
@@ -10,6 +9,7 @@ import { CurrentUser } from 'src/common/decorators/currentUser.decorator';
 import { PostService } from 'src/post/post.service';
 import { ObjectId } from 'mongodb';
 import { Post } from 'src/post/entities/post.schema';
+import { Proposal } from 'src/proposal/entities/proposal.schema';
 
 @Resolver(() => User)
 export class UsersResolver {
@@ -36,6 +36,12 @@ export class UsersResolver {
     public async getBookmarkedPosts(@CurrentUser() user: User) {
         const ids: ObjectId[] = user.bookmarkedPostIds?.map(_id => new ObjectId(_id))
         return this.postService.getPostsByIds(ids);
+    }
+
+    @Query(() => [Proposal], { name: 'proposals' })
+    @UseGuards(JwtAuthGuard)
+    public async getUserProposals(@CurrentUser() user: User) {
+        return await this.userService.getUserProposals(user._id.toString());
     }
 
     @Mutation(() => User, { name: 'updateUserBookmarks' })

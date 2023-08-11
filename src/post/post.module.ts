@@ -12,7 +12,6 @@ import { AwsModule } from 'src/aws/aws.module';
         imports: [CommonModule, BooksModule, AwsModule],
         providers: [PostResolver, PostService, ...postsProviders],
         exports: [...postsProviders, PostService],
-
     }
 )
 

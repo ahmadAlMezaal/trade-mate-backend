@@ -32,6 +32,23 @@ type Book {
   totalPageCount: Float!
 }
 
+input CreateProposalInput {
+  """Description of the book"""
+  additionalInfo: String!
+
+  """Item submitted by the proposer"""
+  itemId: String!
+
+  """ID of the available book"""
+  listingId: String!
+
+  """Condition of the product"""
+  productCondition: String!
+
+  """Title of the post"""
+  title: String
+}
+
 input CreateUserInput {
   email: String!
   firstName: String!
@@ -101,21 +118,62 @@ type LoginResponse {
 }
 
 type Mutation {
-  addPost(availableBookId: String!, description: String!, desiredBookId: String!, file: Upload!, productCondition: String!): Boolean!
+  addPost(availableBookId: String!, description: String!, desiredBookId: String!, file: Upload!, productCondition: String!): String!
   deleteUser(input: DeleteUserInput!): Boolean!
   forgotPassword(input: ForgotPasswordInput!): ForgotPasswordResponse!
   login(input: LoginInput!): LoginResponse!
   removeBook(id: Int!): Book!
   resetPassword(input: ResetPasswordInput!): ResetPasswordResponse!
+  sendProposal(createProposalInput: CreateProposalInput!, file: Upload!): String!
   signup(input: CreateUserInput!): LoginResponse!
   updateBook(updateBookInput: UpdateBookInput!): Book!
+  updateProposalStatus(_id: String!, status: String!): Proposal!
   updateUserBookmarks(postId: String!): User!
+}
+
+type Notification {
+  """The unique identifier for the notification."""
+  _id: ID!
+
+  """The date when the entity was created"""
+  createdAt: DateTime!
+
+  """The identifier for the listing (if applicable)"""
+  listingId: ID
+
+  """The body of the message."""
+  message: String!
+
+  """The identifier for proposal (if applicable)"""
+  proposalId: ID
+
+  """The user who should receive the notification."""
+  recipientId: ID!
+
+  """
+  The user who initiated the action that triggered the notification (if applicable).
+  """
+  senderId: ID
+
+  """The status of the notification (e.g., "unread", "read")."""
+  status: String!
+
+  """The title of the message."""
+  title: String!
+
+  """
+  The type of notification (e.g., "proposal_received", "item_traded", etc.)
+  """
+  type: String!
+
+  """The last date when the entity was updated"""
+  updatedAt: DateTime!
 }
 
 type Post {
   _id: ID!
 
-  """The date when the post was created"""
+  """The date when the entity was created"""
   createdAt: DateTime!
 
   """description of the post"""
@@ -127,9 +185,6 @@ type Post {
   """Images of the book"""
   imageUrls: [String!]!
 
-  """Used for the admin to approve the listing"""
-  isApproved: Boolean!
-
   """Contains information about the book that the user is offering."""
   offeredBookInfo: Book!
   postOwnerId: ID!
@@ -137,11 +192,47 @@ type Post {
   """The language of the book"""
   productCondition: String!
 
+  """IDs of the proposals received"""
+  proposalsIds: [ID!]!
+
+  """Used for the admin to approve the listing"""
+  status: String!
+
   """Title of the post"""
   title: String!
 
-  """The last date when the post was updated"""
+  """The last date when the entity was updated"""
   updatedAt: DateTime!
+}
+
+type Proposal {
+  _id: ID!
+
+  """description of the proposal"""
+  additionalInfo: String!
+
+  """The date when the entity was created"""
+  createdAt: DateTime!
+
+  """Images of the book"""
+  imageUrls: [String!]!
+
+  """Contains information about the requested book."""
+  item: Book!
+  listingId: ID!
+
+  """The language of the book"""
+  productCondition: String!
+
+  """Status of the proposal"""
+  status: String!
+
+  """Title of the proposal"""
+  title: String!
+
+  """The last date when the entity was updated"""
+  updatedAt: DateTime!
+  userId: ID!
 }
 
 type Query {
@@ -149,10 +240,14 @@ type Query {
   books: [Book!]!
   feed: [Post!]!
   info(input: FindSingleUserInput!): User!
+  listing(_id: String!): Post!
   me: User!
-  post(id: Int!): Post!
+  notification(id: Int!): Notification!
+  notifications: [Notification!]!
   posts: [Post!]!
   profile: User!
+  proposal(_id: String!): Proposal!
+  proposals: [Proposal!]!
   searchBook(input: FindBookInput!): [Book!]!
   user(input: FindUserInput!): User!
   users: [User!]!
@@ -189,7 +284,7 @@ type User {
   """IDs of posts bookmarked by the user"""
   bookmarkedPostIds: [ID!]!
 
-  """The date when the user was created"""
+  """The date when the entity was created"""
   createdAt: DateTime!
 
   """Email address of the user"""
@@ -219,7 +314,10 @@ type User {
   """User role"""
   role: String!
 
-  """The last date when the user was updated"""
+  """IDs of the proposals sent"""
+  sentProposalsIds: [ID!]!
+
+  """The last date when the entity was updated"""
   updatedAt: DateTime!
 
   """Verification code on registration"""
