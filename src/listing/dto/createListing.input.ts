@@ -4,9 +4,9 @@ import { GraphQLUpload } from 'graphql-upload';
 import { ProductCondition } from 'src/types/enums';
 
 @InputType()
-export class CreatePostInput {
+export class CreateListingInput {
 
-    @Field(() => String, { description: 'Title of the post' })
+    @Field(() => String, { description: 'Title of the listing' })
     @IsString()
     @IsOptional()
     title?: string;

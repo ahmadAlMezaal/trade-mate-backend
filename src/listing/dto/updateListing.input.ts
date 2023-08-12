@@ -1,10 +1,10 @@
 
 import { Field, InputType } from '@nestjs/graphql';
 import { IsOptional, IsString } from 'class-validator';
-import { PostStatus } from 'src/types/enums';
+import { ListingStatus } from 'src/types/enums';
 
 @InputType()
-export class UpdatePostInput {
+export class UpdateListingInput {
 
     @Field(() => String, { nullable: true })
     @IsString()
@@ -15,6 +15,6 @@ export class UpdatePostInput {
     @Field(() => String, { nullable: true })
     @IsString()
     @IsOptional()
-    status?: PostStatus;
+    status?: ListingStatus;
 
 }

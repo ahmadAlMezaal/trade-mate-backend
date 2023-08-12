@@ -1,11 +1,11 @@
 import { ConfigService } from '@nestjs/config';
 import { MongoClient, Db, ServerApiVersion } from 'mongodb';
 
-export const postsProviders = [
+export const listingProviders = [
     {
 
         inject: [ConfigService],
-        provide: 'POSTS_COLLECTION',
+        provide: 'LISTING_COLLECTION',
         useFactory: async (configService: ConfigService): Promise<Db> => {
             try {
                 const client = await MongoClient.connect(

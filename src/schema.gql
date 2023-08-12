@@ -45,7 +45,7 @@ input CreateProposalInput {
   """Condition of the product"""
   productCondition: String!
 
-  """Title of the post"""
+  """Title of the listing"""
   title: String
 }
 
@@ -104,6 +104,41 @@ input ImageUrlsInput {
   thumbnail: String!
 }
 
+type Listing {
+  _id: ID!
+
+  """The date when the entity was created"""
+  createdAt: DateTime!
+
+  """description of the listing"""
+  description: String!
+
+  """Contains information about the requested book."""
+  desiredBookInfo: Book!
+
+  """Images of the book"""
+  imageUrls: [String!]!
+  listingOwnerId: ID!
+
+  """Contains information about the book that the user is offering."""
+  offeredBookInfo: Book!
+
+  """The language of the book"""
+  productCondition: String!
+
+  """IDs of the proposals received"""
+  proposalsIds: [ID!]!
+
+  """Used for the admin to approve the listing"""
+  status: String!
+
+  """Title of the listing"""
+  title: String!
+
+  """The last date when the entity was updated"""
+  updatedAt: DateTime!
+}
+
 input LoginInput {
   """email of the user"""
   email: String!
@@ -118,7 +153,7 @@ type LoginResponse {
 }
 
 type Mutation {
-  addPost(availableBookId: String!, description: String!, desiredBookId: String!, file: Upload!, productCondition: String!): String!
+  addListing(availableBookId: String!, description: String!, desiredBookId: String!, file: Upload!, productCondition: String!): String!
   deleteUser(input: DeleteUserInput!): Boolean!
   forgotPassword(input: ForgotPasswordInput!): ForgotPasswordResponse!
   login(input: LoginInput!): LoginResponse!
@@ -128,7 +163,7 @@ type Mutation {
   signup(input: CreateUserInput!): LoginResponse!
   updateBook(updateBookInput: UpdateBookInput!): Book!
   updateProposalStatus(_id: String!, status: String!): Proposal!
-  updateUserBookmarks(postId: String!): User!
+  updateUserBookmarks(listingId: String!): User!
 }
 
 type Notification {
@@ -170,41 +205,6 @@ type Notification {
   updatedAt: DateTime!
 }
 
-type Post {
-  _id: ID!
-
-  """The date when the entity was created"""
-  createdAt: DateTime!
-
-  """description of the post"""
-  description: String!
-
-  """Contains information about the requested book."""
-  desiredBookInfo: Book!
-
-  """Images of the book"""
-  imageUrls: [String!]!
-
-  """Contains information about the book that the user is offering."""
-  offeredBookInfo: Book!
-  postOwnerId: ID!
-
-  """The language of the book"""
-  productCondition: String!
-
-  """IDs of the proposals received"""
-  proposalsIds: [ID!]!
-
-  """Used for the admin to approve the listing"""
-  status: String!
-
-  """Title of the post"""
-  title: String!
-
-  """The last date when the entity was updated"""
-  updatedAt: DateTime!
-}
-
 type Proposal {
   _id: ID!
 
@@ -236,15 +236,15 @@ type Proposal {
 }
 
 type Query {
-  bookmarks: [Post!]!
+  bookmarks: [Listing!]!
   books: [Book!]!
-  feed: [Post!]!
+  feed: [Listing!]!
   info(input: FindSingleUserInput!): User!
-  listing(_id: String!): Post!
+  listing(_id: String!): Listing!
+  listings: [Listing!]!
   me: User!
   notification(id: Int!): Notification!
   notifications: [Notification!]!
-  posts: [Post!]!
   profile: User!
   proposal(_id: String!): Proposal!
   proposals: [Proposal!]!
@@ -281,8 +281,8 @@ scalar Upload
 type User {
   _id: ID!
 
-  """IDs of posts bookmarked by the user"""
-  bookmarkedPostIds: [ID!]!
+  """IDs of listings bookmarked by the user"""
+  bookmarkedListingIds: [ID!]!
 
   """The date when the entity was created"""
   createdAt: DateTime!

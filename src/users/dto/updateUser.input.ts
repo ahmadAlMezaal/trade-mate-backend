@@ -45,7 +45,7 @@ export class UpdateUserInput extends BaseUserInput {
 
     @Field(() => [ObjectId], { nullable: true })
     @IsArray()
-    bookmarkedPostIds?: ObjectId[];
+    bookmarkedListingIds?: ObjectId[];
 }
 
 @InputType()
