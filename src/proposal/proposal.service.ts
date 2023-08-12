@@ -12,6 +12,7 @@ import { getCollection } from 'src/helpers/db.helpers';
 import { Notification, NotificationType } from 'src/notifications/entities/notification.schema';
 import { ProposalStatus } from 'src/types/enums';
 import { ListingService } from 'src/listing/listing.service';
+import { User } from 'src/users/entities/user.schema';
 
 @Injectable()
 export class ProposalService {
@@ -96,7 +97,7 @@ export class ProposalService {
 
         const item = await this.bookService.getBookByProviderId(itemId);
 
-        const proposalDefautls: Partial<Proposal> = {
+        const proposalDefaults: Partial<Proposal> = {
             status: ProposalStatus.PENDING,
             title: `Trade ${item.title}`,
             createdAt: new Date(),
@@ -111,7 +112,7 @@ export class ProposalService {
                 listingId: new ObjectId(listingId),
                 imageUrls: [imageUrl],
                 userId,
-                ...proposalDefautls,
+                ...proposalDefaults,
             }
         );
 
@@ -139,7 +140,7 @@ export class ProposalService {
         return value;
     }
 
-    public async updateProposalStatus(idStr: string, status: ProposalStatus, sender): Promise<Proposal> {
+    public async updateProposalStatus(idStr: string, status: ProposalStatus, sender: User): Promise<Proposal> {
         const _id = new ObjectId(idStr);
 
         const proposal = await this.findOne(idStr);
@@ -147,10 +148,11 @@ export class ProposalService {
         let messageDecision = 'accepted';
         let type = NotificationType.PROPOSAL_ACCEPTED;
 
-        if (proposal.status === ProposalStatus.REJECTED) {
+        if (status === ProposalStatus.REJECTED) {
             messageDecision = 'rejected';
             type = NotificationType.PROPOSAL_REJECTED;
         }
+        const updatedProposal = await this.updateOne({ _id }, { status });
         this.notificationService.sendPushNotification(
             {
                 title: 'Your proposal status',
@@ -161,6 +163,6 @@ export class ProposalService {
                 type,
             }
         );
-        return this.updateOne({ _id }, { status });
+        return updatedProposal;
     }
 }
