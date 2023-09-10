@@ -44,4 +44,9 @@ export class ListingResolver {
         return await this.listingService.findOne({ _id: new ObjectId(_id) });
     }
 
+    @UseGuards(JwtAuthGuard)
+    @Query(() => [Listing], { name: 'myListings' })
+    async getUserListing(@CurrentUser() user: User): Promise<Listing[]> {
+        return await this.listingService.fetchUserListing(user._id);
+    }
 }

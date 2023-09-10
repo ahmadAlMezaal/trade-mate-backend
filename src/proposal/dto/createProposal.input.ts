@@ -23,7 +23,11 @@ export class CreateProposalInput {
 
     @Field(() => String, { description: 'Item submitted by the proposer' })
     @IsNotEmpty()
-    itemId: string;
+    offeredItemId: string;
+
+    @Field(() => String, { description: 'Item submitted by the proposer' })
+    @IsNotEmpty()
+    desiredItemId: string;
 
     @Field(() => String, { description: 'Condition of the product' })
     @IsEnum(ProductCondition)

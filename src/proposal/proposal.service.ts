@@ -1,7 +1,7 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateProposalInput } from './dto/createProposal.input';
 import { UpdateProposalInput } from './dto/updateProposal.input';
-import { Collection, Db, ObjectId } from 'mongodb';
+import { Collection, Db, ModifyResult, ObjectId } from 'mongodb';
 import { AwsService } from 'src/aws/aws.service';
 import { BooksService } from 'src/books/books.service';
 import { Proposal } from './entities/proposal.schema';
@@ -50,7 +50,7 @@ export class ProposalService {
         }
 
         const senderFullName = `${sender.firstName} ${sender.lastName}`;
-        const proposal = await this.insertOne(createOfferInput, fileUpload, userId)
+        const proposal = await this.insertOne(createOfferInput, fileUpload, userId, listing.listingOwnerId)
 
         await Promise.all(
             [
@@ -78,7 +78,7 @@ export class ProposalService {
         return `This action returns all offer`;
     }
 
-    public find(params: Partial<Pick<Proposal, 'userId' | 'status'>>) {
+    public find(params: Partial<Pick<Proposal, 'senderId' | 'status'>>) {
         return this.proposalCollection.find({ ...params }).toArray();
     }
 
@@ -91,15 +91,20 @@ export class ProposalService {
         return proposal;
     }
 
-    public async insertOne(createOfferInput: CreateProposalInput, fileUpload: FileUpload, userId: ObjectId) {
-        const { additionalInfo, listingId, itemId, productCondition } = createOfferInput;
+    public async insertOne(createOfferInput: CreateProposalInput, fileUpload: FileUpload, senderId: ObjectId, recepientId: ObjectId) {
+        const { additionalInfo, listingId, offeredItemId, desiredItemId, productCondition } = createOfferInput;
         const imageUrl = await this.awsService.uploadFile(fileUpload.createReadStream, fileUpload.filename);
 
-        const item = await this.bookService.getBookByProviderId(itemId);
+        const [offeredItem, desiredItem] = await Promise.all(
+            [
+                this.bookService.getBookByProviderId(offeredItemId),
+                this.bookService.getBookByProviderId(desiredItemId),
+            ]
+        );
 
         const proposalDefaults: Partial<Proposal> = {
             status: ProposalStatus.PENDING,
-            title: `Trade ${item.title}`,
+            title: `Trade ${offeredItem.title} for ${desiredItem.title}`,
             createdAt: new Date(),
             updatedAt: new Date(),
         };
@@ -108,10 +113,12 @@ export class ProposalService {
             {
                 productCondition,
                 additionalInfo,
-                item,
+                offeredItem,
+                desiredItem,
                 listingId: new ObjectId(listingId),
                 imageUrls: [imageUrl],
-                userId,
+                senderId,
+                recepientId,
                 ...proposalDefaults,
             }
         );
@@ -143,7 +150,7 @@ export class ProposalService {
     public async updateProposalStatus(idStr: string, status: ProposalStatus, sender: User): Promise<Proposal> {
         const _id = new ObjectId(idStr);
 
-        const proposal = await this.findOne(idStr);
+        const proposal = await this.updateOne({ _id }, { status });
 
         let messageDecision = 'accepted';
         let type = NotificationType.PROPOSAL_ACCEPTED;
@@ -157,7 +164,7 @@ export class ProposalService {
             {
                 title: 'Your proposal status',
                 message: `${sender.firstName} ${sender.lastName} has ${messageDecision} your proposal request`,
-                recipientId: proposal.userId.toString(),
+                recipientId: proposal.senderId.toString(),
                 senderId: sender._id.toString(),
                 proposalId: proposal._id.toString(),
                 type,

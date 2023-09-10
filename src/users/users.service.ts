@@ -18,12 +18,12 @@ export class UsersService {
 
     }
 
-    private get collection(): Collection<User> {
+    private get userCollection(): Collection<User> {
         return this.db.collection<User>('users');
     }
 
     public async create(createUserInput: CreateUserInput): Promise<User> {
-        const user = await this.collection.findOne({ email: createUserInput.email.toLowerCase() });
+        const user = await this.userCollection.findOne({ email: createUserInput.email.toLowerCase() });
         if (user) {
             throw new HttpException(
                 { message: 'Email already taken Error' },
@@ -47,7 +47,7 @@ export class UsersService {
 
         const userObj: User = { ...createUserInput, ...defaults, email: createUserInput.email.toLowerCase() };
 
-        const { insertedId } = await this.collection.insertOne({ ...userObj });
+        const { insertedId } = await this.userCollection.insertOne({ ...userObj });
 
         if (!insertedId) {
             throw new InternalServerErrorException('Error creating account');
@@ -66,11 +66,11 @@ export class UsersService {
     // }
 
     public async findAll(): Promise<User[]> {
-        return await this.collection.find().toArray();
+        return await this.userCollection.find().toArray();
     }
 
     public async findOne(query: FindUserInput): Promise<User> {
-        const user = await this.collection.findOne({ ...query });
+        const user = await this.userCollection.findOne({ ...query });
         if (!user) {
             throw new NotFoundException('Account not found');
         }
@@ -79,7 +79,7 @@ export class UsersService {
 
     public async update(queryObj: Partial<User>, updateUserInput: UpdateUserInput) {
         const { _id, ...restUpdateUserInput } = updateUserInput
-        const { value } = await this.collection.findOneAndUpdate(
+        const { value } = await this.userCollection.findOneAndUpdate(
             {
                 ...queryObj
             },
@@ -104,7 +104,7 @@ export class UsersService {
         const _id = new ObjectId(userId);
         const proposalId = new ObjectId(proposalIdStr);
 
-        const result = await this.collection.findOneAndUpdate(
+        const result = await this.userCollection.findOneAndUpdate(
             { _id },
             {
                 $push: { sentProposalsIds: proposalId },
@@ -121,7 +121,7 @@ export class UsersService {
 
     public async remove(input: DeleteUserInput): Promise<boolean> {
         const { _id } = input;
-        const response = await this.collection.deleteOne({ _id: new ObjectId(_id) });
+        const response = await this.userCollection.deleteOne({ _id: new ObjectId(_id) });
         return response.deletedCount === 1;
     }
 
