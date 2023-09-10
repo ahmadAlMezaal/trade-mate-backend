@@ -37,10 +37,13 @@ input CreateProposalInput {
   additionalInfo: String!
 
   """Item submitted by the proposer"""
-  itemId: String!
+  desiredItemId: String!
 
   """ID of the available book"""
   listingId: String!
+
+  """Item submitted by the proposer"""
+  offeredItemId: String!
 
   """Condition of the product"""
   productCondition: String!
@@ -214,15 +217,22 @@ type Proposal {
   """The date when the entity was created"""
   createdAt: DateTime!
 
+  """
+  Contains information about the item that the trader wants to trade for.
+  """
+  desiredItem: Book!
+
   """Images of the book"""
   imageUrls: [String!]!
-
-  """Contains information about the requested book."""
-  item: Book!
   listingId: ID!
+
+  """Contains information about the item offered by the trader."""
+  offeredItem: Book!
 
   """The language of the book"""
   productCondition: String!
+  recepientId: ID!
+  senderId: ID!
 
   """Status of the proposal"""
   status: String!
@@ -232,7 +242,6 @@ type Proposal {
 
   """The last date when the entity was updated"""
   updatedAt: DateTime!
-  userId: ID!
 }
 
 type Query {
@@ -243,6 +252,7 @@ type Query {
   listing(_id: String!): Listing!
   listings: [Listing!]!
   me: User!
+  myListings: [Listing!]!
   notification(id: Int!): Notification!
   notifications: [Notification!]!
   profile: User!

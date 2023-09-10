@@ -30,7 +30,7 @@ export class SharedService {
     }
 
     public getUserProposals(userId: string): Promise<Proposal[]> {
-        return this.proposalCollection.find({ userId: new ObjectId(userId) }).toArray();
+        return this.proposalCollection.find({ senderId: new ObjectId(userId) }).toArray();
     }
 
 }

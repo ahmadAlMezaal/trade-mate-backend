@@ -20,13 +20,19 @@ export class Proposal extends Timestamps {
     imageUrls: string[];
 
     @Field(() => ID)
-    userId: ObjectId;
+    senderId: ObjectId;
+
+    @Field(() => ID)
+    recepientId: ObjectId;
 
     @Field(() => ID)
     listingId: ObjectId;
 
-    @Field(() => Book, { description: 'Contains information about the requested book.' })
-    item: Book;
+    @Field(() => Book, { description: 'Contains information about the item offered by the trader.' })
+    offeredItem: Book;
+
+    @Field(() => Book, { description: 'Contains information about the item that the trader wants to trade for.' })
+    desiredItem: Book;
 
     @Field(() => String, { description: 'The language of the book' })
     productCondition: ProductCondition;
