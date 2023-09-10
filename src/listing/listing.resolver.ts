@@ -49,5 +49,4 @@ export class ListingResolver {
     async getUserListing(@CurrentUser() user: User): Promise<Listing[]> {
         return await this.listingService.fetchUserListing(user._id);
     }
-
 }
