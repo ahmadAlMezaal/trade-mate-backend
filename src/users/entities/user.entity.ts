@@ -11,4 +11,6 @@ export interface IUser {
     role: string;
     verificationCode?: number;
     forgotPasswordCode?: number;
+    connectionsIds: string[];
+    reputation: number;
 }

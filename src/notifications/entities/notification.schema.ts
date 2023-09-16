@@ -7,6 +7,7 @@ export enum NotificationType {
     ITEM_TRADED = 'item_traded',
     PROPOSAL_ACCEPTED = 'proposal_accepted',
     PROPOSAL_REJECTED = 'proposal_rejected',
+    CONNECTION_REQUEST = 'connection_request',
 }
 
 export enum NotificationStatus {

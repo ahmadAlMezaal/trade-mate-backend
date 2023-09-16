@@ -66,6 +66,25 @@ export class UsersResolver {
         return await this.userService.remove(input);
     }
 
+
+    @Mutation(() => User, { name: 'sendConnectionRequest' })
+    @UseGuards(JwtAuthGuard)
+    async sendUserConnectionsRequest(
+        @CurrentUser() user: User,
+        @Args("connectionId", { type: () => String }) connectionId: string,
+    ) {
+        return await this.userService.sendConnectionRequest(user, connectionId);
+    }
+
+    @Mutation(() => Boolean, { name: 'connectUser' })
+    @UseGuards(JwtAuthGuard)
+    async connectWithUser(
+        @CurrentUser() user: User,
+        @Args("connectionId", { type: () => String }) connectionId: string,
+    ) {
+        return await this.userService.respondToConnectionRequest(user._id.toString(), connectionId);
+    }
+
     //TODO: add this for pagination
     // @Query(() => [User], { name: 'users' })
     // findAll(@Args('input') paginationQuery?: PaginationInput) {

@@ -22,8 +22,4 @@ export class NotificationsResolver {
         return await this.notificationsService.getUserNotifications(user._id.toString());
     }
 
-    @Query(() => Notification, { name: 'notification' })
-    findOne(@Args('id', { type: () => Int }) id: string) {
-        return this.notificationsService.findOne(id);
-    }
 }

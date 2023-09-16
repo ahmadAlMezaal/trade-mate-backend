@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Inject, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, HttpException, HttpStatus, Inject, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { Collection, Db, ObjectId } from 'mongodb';
 import { CreateUserInput, Role } from './dto/createUser.input';
 import { FindUserInput } from './dto/findOne.input';
@@ -7,6 +7,8 @@ import { User } from './entities/user.schema';
 import * as bcrypt from 'bcrypt';
 import { SharedService } from 'src/shared/shared.service';
 import { Proposal } from 'src/proposal/entities/proposal.schema';
+import { NotificationsService } from 'src/notifications/notifications.service';
+import { NotificationType } from 'src/notifications/entities/notification.schema';
 
 @Injectable()
 export class UsersService {
@@ -14,6 +16,7 @@ export class UsersService {
     constructor(
         @Inject('USERS_COLLECTION') private readonly db: Db,
         private readonly sharedService: SharedService,
+        private readonly notificationService: NotificationsService,
     ) {
 
     }
@@ -43,6 +46,9 @@ export class UsersService {
             role: Role.TRADER,
             profilePhoto: 'https://spng.pngfind.com/pngs/s/676-6764065_default-profile-picture-transparent-hd-png-download.png',
             sentProposalsIds: [],
+            connectionsIds: [],
+            reputation: 0,
+            pendingUserConnectionRequestsIds: [],
         }
 
         const userObj: User = { ...createUserInput, ...defaults, email: createUserInput.email.toLowerCase() };
@@ -144,6 +150,112 @@ export class UsersService {
 
     public getUserProposals(userId: string): Promise<Proposal[]> {
         return this.sharedService.getUserProposals(userId);
+    }
+
+    public async sendConnectionRequest(user: User, connectionId: string) {
+
+        try {
+
+            const connectionUser = await this.findOne({ _id: new ObjectId(connectionId) })
+
+            const pendingUserConnectionRequestsIds = [...connectionUser.pendingUserConnectionRequestsIds];
+            const index = pendingUserConnectionRequestsIds.findIndex((id) => id.equals(user._id));
+            const isRequestExisting = index !== -1;
+
+            if (isRequestExisting) {
+                pendingUserConnectionRequestsIds.splice(index, 1);
+            } else {
+                pendingUserConnectionRequestsIds.push(user._id);
+            }
+
+
+            if (connectionUser.pendingUserConnectionRequestsIds.includes(user._id)) {
+                throw new ForbiddenException('Connection request already sent');
+            }
+
+            const updatedUser = await this.userCollection.findOneAndUpdate(
+                {
+                    _id: new ObjectId(connectionId)
+                },
+                {
+                    $set: {
+                        pendingUserConnectionRequestsIds
+                    }
+                },
+                {
+                    upsert: false,
+                    returnDocument: 'after'
+                }
+            );
+
+            // //Keep this for the push notification
+            // const twoWeeksAgo = new Date();
+            // twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
+
+            // const existingNotificationSent = await this.notificationService.findOne(
+            //     {
+            // type: NotificationType.CONNECTION_REQUEST,
+            // senderId: user._id,
+            //         createdAt: {
+            //             $gte: twoWeeksAgo,
+            //         } as any
+            //     }
+            // );
+            if (!isRequestExisting) {
+                await this.notificationService.sendPushNotification(
+                    {
+                        message: `${user.firstName} ${user.lastName} has requested to connect with you`,
+                        senderId: user._id.toString(),
+                        recipientId: connectionId,
+                        title: 'Connection Request',
+                        type: NotificationType.CONNECTION_REQUEST,
+                    }
+                );
+            } else {
+                await this.notificationService.deleteOne(
+                    {
+                        type: NotificationType.CONNECTION_REQUEST,
+                        senderId: user._id,
+                    }
+                );
+            }
+
+            return updatedUser.value;
+
+        } catch (error) {
+            console.log('error: ', error);
+
+        }
+    }
+
+    public async respondToConnectionRequest(loggedInUserId: string, connectionId: string): Promise<boolean> {
+
+        const responses = await Promise.all(
+            [
+                this.userCollection.findOneAndUpdate(
+                    {
+                        _id: new ObjectId(loggedInUserId)
+                    },
+                    {
+                        $push: {
+                            connectionsIds: new ObjectId(connectionId)
+                        }
+                    },
+                ),
+                this.userCollection.findOneAndUpdate(
+                    {
+                        _id: new ObjectId(connectionId)
+                    },
+                    {
+                        $push: {
+                            connectionsIds: new ObjectId(loggedInUserId)
+                        }
+                    },
+                ),
+            ]
+        );
+
+        return responses[0].ok === 1 && responses[1].ok === 1;
     }
 
 

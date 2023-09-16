@@ -45,4 +45,13 @@ export class User extends Timestamps {
   @Field(() => String, { description: 'Code used whenever the user wants to reset their password', nullable: true })
   forgotPasswordCode?: number;
 
+  @Field(() => Number, { description: 'A number that is responsible for the reputation of the user. The higher the more trusted', nullable: true })
+  reputation?: number;
+
+  @Field(() => [ID], { description: 'Other users that connected with the user', nullable: true })
+  connectionsIds?: ObjectId[];
+
+  @Field(() => [ID], { description: 'Other users that connected with the user', nullable: true })
+  pendingUserConnectionRequestsIds?: ObjectId[];
+
 }

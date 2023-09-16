@@ -60,9 +60,12 @@ export class NotificationsService {
 
     }
 
-    public async findOne(idStr: string) {
-        const _id = new ObjectId(idStr);
-        return await this.notificationsCollection.findOne({ _id });
+    public async findOne(params: Partial<Notification>) {
+        return await this.notificationsCollection.findOne({ ...params });
+    }
+
+    public async deleteOne(params: Partial<Notification>) {
+        return await this.notificationsCollection.deleteOne({ ...params });
     }
 
 }

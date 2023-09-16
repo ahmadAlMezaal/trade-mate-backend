@@ -81,8 +81,8 @@ export class ListingService {
             .toArray();
     }
 
-    public async fetchUserListing(_id: ObjectId): Promise<Listing[]> {
-        return await this.collection.find({ listingOwnerId: _id }).sort({ createdAt: -1 }).toArray();
+    public async fetchUserListing(_id: string): Promise<Listing[]> {
+        return await this.collection.find({ listingOwnerId: new ObjectId(_id) }).sort({ createdAt: -1 }).toArray();
     }
 
     public async getListingsByIds(_ids: ObjectId[]) {
