@@ -1,4 +1,4 @@
-import { ForbiddenException, HttpException, HttpStatus, Inject, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { Collection, Db, ObjectId } from 'mongodb';
 import { CreateUserInput, Role } from './dto/createUser.input';
 import { FindUserInput } from './dto/findOne.input';
@@ -8,7 +8,7 @@ import * as bcrypt from 'bcrypt';
 import { SharedService } from 'src/shared/shared.service';
 import { Proposal } from 'src/proposal/entities/proposal.schema';
 import { NotificationsService } from 'src/notifications/notifications.service';
-import { NotificationType } from 'src/notifications/entities/notification.schema';
+import { ConnectionStatus, NotificationType } from 'src/notifications/entities/notification.schema';
 
 @Injectable()
 export class UsersService {
@@ -168,11 +168,6 @@ export class UsersService {
                 pendingUserConnectionRequestsIds.push(user._id);
             }
 
-
-            if (connectionUser.pendingUserConnectionRequestsIds.includes(user._id)) {
-                throw new ForbiddenException('Connection request already sent');
-            }
-
             const updatedUser = await this.userCollection.findOneAndUpdate(
                 {
                     _id: new ObjectId(connectionId)
@@ -188,7 +183,7 @@ export class UsersService {
                 }
             );
 
-            // //Keep this for the push notification
+            //Keep this for the push notification
             // const twoWeeksAgo = new Date();
             // twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
 
@@ -209,6 +204,9 @@ export class UsersService {
                         recipientId: connectionId,
                         title: 'Connection Request',
                         type: NotificationType.CONNECTION_REQUEST,
+                        metadata: {
+                            status: ConnectionStatus.PENDING
+                        }
                     }
                 );
             } else {
@@ -216,6 +214,9 @@ export class UsersService {
                     {
                         type: NotificationType.CONNECTION_REQUEST,
                         senderId: user._id,
+                        metadata: {
+                            status: ConnectionStatus.PENDING
+                        }
                     }
                 );
             }
@@ -228,27 +229,52 @@ export class UsersService {
         }
     }
 
-    public async respondToConnectionRequest(loggedInUserId: string, connectionId: string): Promise<boolean> {
+    public async respondToConnectionRequest(connectionRecepient: User, connectionSenderId: string, connectionStatus: ConnectionStatus): Promise<boolean> {
+
+        await this.notificationService.respondToConnection(connectionRecepient._id.toString(), connectionStatus)
+        if (connectionStatus === ConnectionStatus.REJECTED) {
+            const response = await this.userCollection.findOneAndUpdate(
+                {
+                    _id: new ObjectId(connectionRecepient._id)
+                },
+                {
+                    $pull: {
+                        pendingUserConnectionRequestsIds: new ObjectId(connectionSenderId)
+                    }
+                },
+            );
+            return response.ok === 1;
+        }
+
+        await this.notificationService.sendPushNotification(
+            {
+                message: `${connectionRecepient.firstName} ${connectionRecepient.lastName} has accepted your connection request`,
+                senderId: connectionRecepient._id.toString(),
+                recipientId: connectionSenderId,
+                title: 'Connection Request',
+                type: NotificationType.CONNECTION_REQUEST_ACCEPTED,
+            }
+        );
 
         const responses = await Promise.all(
             [
                 this.userCollection.findOneAndUpdate(
                     {
-                        _id: new ObjectId(loggedInUserId)
+                        _id: connectionRecepient._id
                     },
                     {
                         $push: {
-                            connectionsIds: new ObjectId(connectionId)
+                            connectionsIds: new ObjectId(connectionSenderId)
                         }
                     },
                 ),
                 this.userCollection.findOneAndUpdate(
                     {
-                        _id: new ObjectId(connectionId)
+                        _id: new ObjectId(connectionSenderId)
                     },
                     {
                         $push: {
-                            connectionsIds: new ObjectId(loggedInUserId)
+                            connectionsIds: connectionRecepient._id
                         }
                     },
                 ),

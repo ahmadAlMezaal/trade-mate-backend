@@ -10,6 +10,7 @@ import { ListingService } from 'src/listing/listing.service';
 import { ObjectId } from 'mongodb';
 import { Listing } from 'src/listing/entities/listing.schema';
 import { Proposal } from 'src/proposal/entities/proposal.schema';
+import { ConnectionStatus } from 'src/notifications/entities/notification.schema';
 
 @Resolver(() => User)
 export class UsersResolver {
@@ -76,13 +77,14 @@ export class UsersResolver {
         return await this.userService.sendConnectionRequest(user, connectionId);
     }
 
-    @Mutation(() => Boolean, { name: 'connectUser' })
+    @Mutation(() => Boolean, { name: 'respondToConnection' })
     @UseGuards(JwtAuthGuard)
     async connectWithUser(
         @CurrentUser() user: User,
         @Args("connectionId", { type: () => String }) connectionId: string,
+        @Args("status", { type: () => String }) status: ConnectionStatus,
     ) {
-        return await this.userService.respondToConnectionRequest(user._id.toString(), connectionId);
+        return await this.userService.respondToConnectionRequest(user, connectionId, status);
     }
 
     //TODO: add this for pagination

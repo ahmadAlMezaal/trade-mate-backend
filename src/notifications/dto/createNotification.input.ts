@@ -1,6 +1,6 @@
 import { InputType, Field } from '@nestjs/graphql';
-import { IsString, IsOptional } from 'class-validator';
-import { NotificationType } from '../entities/notification.schema';
+import { IsString, IsOptional, IsObject } from 'class-validator';
+import { NotificationMetadata, NotificationType } from '../entities/notification.schema';
 
 @InputType()
 export class CreateNotificationInput {
@@ -33,4 +33,9 @@ export class CreateNotificationInput {
     @IsOptional()
     @IsString()
     proposalId?: string;
+
+    @Field(() => NotificationMetadata, { nullable: true })
+    @IsOptional()
+    @IsObject()
+    metadata?: NotificationMetadata;
 }

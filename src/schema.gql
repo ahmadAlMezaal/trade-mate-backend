@@ -157,12 +157,12 @@ type LoginResponse {
 
 type Mutation {
   addListing(availableBookId: String!, description: String!, desiredBookId: String!, file: Upload!, productCondition: String!): String!
-  connectUser(connectionId: String!): Boolean!
   deleteUser(input: DeleteUserInput!): Boolean!
   forgotPassword(input: ForgotPasswordInput!): ForgotPasswordResponse!
   login(input: LoginInput!): LoginResponse!
   removeBook(id: Int!): Book!
   resetPassword(input: ResetPasswordInput!): ResetPasswordResponse!
+  respondToConnection(connectionId: String!, status: String!): Boolean!
   sendConnectionRequest(connectionId: String!): User!
   sendProposal(createProposalInput: CreateProposalInput!, file: Upload!): String!
   signup(input: CreateUserInput!): LoginResponse!
@@ -183,6 +183,11 @@ type Notification {
 
   """The body of the message."""
   message: String!
+
+  """
+  The metadata of the notification, it's different for each notification type
+  """
+  metadata: NotificationMetadata!
 
   """The identifier for proposal (if applicable)"""
   proposalId: ID
@@ -208,6 +213,11 @@ type Notification {
 
   """The last date when the entity was updated"""
   updatedAt: DateTime!
+}
+
+type NotificationMetadata {
+  proposalId: ID
+  status: String
 }
 
 type Proposal {

@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { CreateNotificationInput } from './dto/createNotification.input';
 import { Collection, Db, ObjectId } from 'mongodb';
 import { getCollection } from 'src/helpers/db.helpers';
-import { Notification, NotificationStatus } from './entities/notification.schema';
+import { ConnectionStatus, Notification, NotificationMetadata, NotificationStatus, NotificationType } from './entities/notification.schema';
 
 @Injectable()
 export class NotificationsService {
@@ -13,8 +13,8 @@ export class NotificationsService {
         this.notificationsCollection = getCollection<Notification>(db, 'notifications');
     }
 
-    public async create(createNotificationInput: CreateNotificationInput): Promise<Notification> {
-        const { senderId, recipientId, message, type, listingId, title, proposalId } = createNotificationInput;
+    public async createOne(createNotificationInput: CreateNotificationInput): Promise<Notification> {
+        const { senderId, recipientId, message, type, listingId, title, proposalId, metadata } = createNotificationInput;
 
         const defaults: Partial<Notification> = {
             createdAt: new Date(),
@@ -29,6 +29,12 @@ export class NotificationsService {
             listingId: listingId ? new ObjectId(listingId) : null,
             senderId: senderId ? new ObjectId(senderId) : null,
             proposalId: proposalId ? new ObjectId(proposalId) : null,
+            metadata: metadata ?
+                {
+                    proposalId: metadata.proposalId || null,
+                    status: metadata.status || null,
+                } :
+                null,
             type,
             ...defaults
         };
@@ -37,17 +43,22 @@ export class NotificationsService {
     }
 
     public sendPushNotification(createNotificationInput: CreateNotificationInput) {
-        return this.create(createNotificationInput);
+        return this.createOne(createNotificationInput);
     }
 
-    findAll() {
-        return `This action returns all notifications`;
-    }
-
-    public getUserNotifications(userId: string): Promise<Notification[]> {
-        return this.notificationsCollection
-            .find({ recipientId: new ObjectId(userId) })
+    public async getUserNotifications(userId: string): Promise<Notification[]> {
+        return await this.notificationsCollection
+            .find(
+                {
+                    recipientId: new ObjectId(userId),
+                    $or: [
+                        { "metadata.status": null },
+                        { "metadata.status": ConnectionStatus.PENDING }
+                    ]
+                }
+            )
             .toArray();
+
     }
 
     public async markAsRead(notificationId: string): Promise<{ success: boolean }> {
@@ -66,6 +77,21 @@ export class NotificationsService {
 
     public async deleteOne(params: Partial<Notification>) {
         return await this.notificationsCollection.deleteOne({ ...params });
+    }
+
+    public async respondToConnection(recepientId: string, status: ConnectionStatus) {
+        return await this.notificationsCollection.findOneAndUpdate(
+            {
+                recipientId: new ObjectId(recepientId),
+                type: NotificationType.CONNECTION_REQUEST,
+                'metadata.status': ConnectionStatus.PENDING
+            },
+            {
+                $set: {
+                    'metadata.status': status
+                }
+            }
+        );
     }
 
 }

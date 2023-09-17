@@ -12,11 +12,6 @@ export class NotificationsResolver {
     constructor(private readonly notificationsService: NotificationsService) { }
 
     @Query(() => [Notification], { name: 'notifications' })
-    findAll() {
-        return this.notificationsService.findAll();
-    }
-
-    @Query(() => [Notification], { name: 'notifications' })
     @UseGuards(JwtAuthGuard)
     public async find(@CurrentUser() user: User) {
         return await this.notificationsService.getUserNotifications(user._id.toString());
