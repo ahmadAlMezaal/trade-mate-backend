@@ -7,6 +7,7 @@ import { userProviders } from './providers/user.providers';
 import { ConfigModule } from '@nestjs/config';
 import { ListingModule } from 'src/listing/listing.module';
 import { SharedModule } from 'src/shared/shared.module';
+import { NotificationsModule } from 'src/notifications/notifications.module';
 
 @Module(
     {
@@ -15,7 +16,8 @@ import { SharedModule } from 'src/shared/shared.module';
             ConfigModule,
             CommonModule,
             ListingModule,
-            SharedModule
+            SharedModule,
+            NotificationsModule
         ],
         providers: [
             UsersResolver,

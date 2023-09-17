@@ -1,4 +1,4 @@
-import { ObjectType, Field, ID } from '@nestjs/graphql';
+import { ObjectType, Field, ID, createUnionType } from '@nestjs/graphql';
 import { ObjectId } from 'mongodb';
 import { Timestamps } from 'src/common/schemas/timestamps.schema';
 
@@ -7,12 +7,30 @@ export enum NotificationType {
     ITEM_TRADED = 'item_traded',
     PROPOSAL_ACCEPTED = 'proposal_accepted',
     PROPOSAL_REJECTED = 'proposal_rejected',
+    CONNECTION_REQUEST = 'connection_request',
+    CONNECTION_REQUEST_ACCEPTED = 'connection_request_accepted',
 }
 
 export enum NotificationStatus {
     READ = 'read',
     UNREAD = 'unread'
 }
+
+export enum ConnectionStatus {
+    ACCEPTED = 'accepted',
+    REJECTED = 'rejected',
+    PENDING = 'pending',
+}
+
+@ObjectType()
+export class NotificationMetadata {
+    @Field(() => String, { nullable: true })
+    status?: ConnectionStatus
+
+    @Field(() => ID, { nullable: true })
+    proposalId?: ObjectId;
+}
+
 
 @ObjectType()
 export class Notification extends Timestamps {
@@ -43,5 +61,8 @@ export class Notification extends Timestamps {
 
     @Field(() => String, { description: 'The status of the notification (e.g., "unread", "read").' })
     status?: NotificationStatus;
+
+    @Field(() => NotificationMetadata, { description: "The metadata of the notification, it's different for each notification type" })
+    metadata?: NotificationMetadata;
 
 }

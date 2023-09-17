@@ -45,8 +45,8 @@ export class ListingResolver {
     }
 
     @UseGuards(JwtAuthGuard)
-    @Query(() => [Listing], { name: 'myListings' })
-    async getUserListing(@CurrentUser() user: User): Promise<Listing[]> {
-        return await this.listingService.fetchUserListing(user._id);
+    @Query(() => [Listing], { name: 'userListings' })
+    async getUserListing(@Args("_id", { type: () => String }) _id: string): Promise<Listing[]> {
+        return await this.listingService.fetchUserListing(_id);
     }
 }

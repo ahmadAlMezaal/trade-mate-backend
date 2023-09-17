@@ -162,6 +162,8 @@ type Mutation {
   login(input: LoginInput!): LoginResponse!
   removeBook(id: Int!): Book!
   resetPassword(input: ResetPasswordInput!): ResetPasswordResponse!
+  respondToConnection(connectionId: String!, status: String!): Boolean!
+  sendConnectionRequest(connectionId: String!): User!
   sendProposal(createProposalInput: CreateProposalInput!, file: Upload!): String!
   signup(input: CreateUserInput!): LoginResponse!
   updateBook(updateBookInput: UpdateBookInput!): Book!
@@ -181,6 +183,11 @@ type Notification {
 
   """The body of the message."""
   message: String!
+
+  """
+  The metadata of the notification, it's different for each notification type
+  """
+  metadata: NotificationMetadata!
 
   """The identifier for proposal (if applicable)"""
   proposalId: ID
@@ -206,6 +213,11 @@ type Notification {
 
   """The last date when the entity was updated"""
   updatedAt: DateTime!
+}
+
+type NotificationMetadata {
+  proposalId: ID
+  status: String
 }
 
 type Proposal {
@@ -252,14 +264,13 @@ type Query {
   listing(_id: String!): Listing!
   listings: [Listing!]!
   me: User!
-  myListings: [Listing!]!
-  notification(id: Int!): Notification!
   notifications: [Notification!]!
   profile: User!
   proposal(_id: String!): Proposal!
   proposals: [Proposal!]!
   searchBook(input: FindBookInput!): [Book!]!
   user(input: FindUserInput!): User!
+  userListings(_id: String!): [Listing!]!
   users: [User!]!
 }
 
@@ -294,6 +305,9 @@ type User {
   """IDs of listings bookmarked by the user"""
   bookmarkedListingIds: [ID!]!
 
+  """Other users that connected with the user"""
+  connectionsIds: [ID!]
+
   """The date when the entity was created"""
   createdAt: DateTime!
 
@@ -318,8 +332,16 @@ type User {
   """User's password"""
   password: String!
 
+  """Other users that connected with the user"""
+  pendingUserConnectionRequestsIds: [ID!]
+
   """User's profile picture"""
   profilePhoto: String!
+
+  """
+  A number that is responsible for the reputation of the user. The higher the more trusted
+  """
+  reputation: Float
 
   """User role"""
   role: String!

@@ -1,6 +1,6 @@
 
 import { Field, ID, InputType } from '@nestjs/graphql';
-import { IsArray, IsBoolean, IsEmail, IsOptional, IsString, MinLength } from 'class-validator';
+import { IsArray, IsBoolean, IsEmail, IsNumber, IsObject, IsOptional, IsString, MinLength } from 'class-validator';
 import { ObjectId } from 'mongodb';
 
 @InputType()
@@ -46,6 +46,16 @@ export class UpdateUserInput extends BaseUserInput {
     @Field(() => [ObjectId], { nullable: true })
     @IsArray()
     bookmarkedListingIds?: ObjectId[];
+
+
+    @Field(() => [ObjectId], { nullable: true })
+    @IsObject()
+    connectionsIds?: ObjectId[];
+
+    @Field(() => Number, { nullable: true })
+    @IsNumber()
+    reputation?: number;
+
 }
 
 @InputType()
