@@ -259,6 +259,7 @@ type Proposal {
 type Query {
   bookmarks: [Listing!]!
   books: [Book!]!
+  connectionsProfiles(userId: String!): [User!]!
   feed: [Listing!]!
   info(input: FindSingleUserInput!): User!
   listing(_id: String!): Listing!

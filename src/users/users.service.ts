@@ -75,6 +75,15 @@ export class UsersService {
         return await this.userCollection.find().toArray();
     }
 
+    public async getConnections(userId: string): Promise<User[]> {
+        const user = await this.userCollection.findOne({ _id: new ObjectId(userId) });
+        if (!user) {
+            throw new NotFoundException('User not found!');
+        }
+
+        return this.userCollection.find({ _id: { $in: user.connectionsIds } }).toArray();
+    }
+
     public async findOne(query: FindUserInput): Promise<User> {
         const user = await this.userCollection.findOne({ ...query });
         if (!user) {
