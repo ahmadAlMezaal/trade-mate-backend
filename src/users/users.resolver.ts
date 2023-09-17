@@ -87,6 +87,11 @@ export class UsersResolver {
         return await this.userService.respondToConnectionRequest(user, connectionId, status);
     }
 
+    @Query(() => [User], { name: 'connectionsProfiles' })
+    async fetchConnectionsProfiles(@Args('userId') userId: string): Promise<User[]> {
+        return await this.userService.getConnections(userId);
+    }
+
     //TODO: add this for pagination
     // @Query(() => [User], { name: 'users' })
     // findAll(@Args('input') paginationQuery?: PaginationInput) {
