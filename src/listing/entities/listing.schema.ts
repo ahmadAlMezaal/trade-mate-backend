@@ -37,5 +37,4 @@ export class Listing extends Timestamps {
     @Field(() => [ID], { description: 'IDs of the proposals received' })
     proposalsIds?: ObjectId[];
 
-
 }

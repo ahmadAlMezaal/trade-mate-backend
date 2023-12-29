@@ -1,20 +1,24 @@
 import { ConfigService } from '@nestjs/config';
-import { MongoClient, Db, ServerApiVersion } from 'mongodb';
+import { MongoClient, Db, ServerApiVersion, Collection } from 'mongodb';
+import { DBCollectionTokens, DBCollections } from 'src/types/enums';
+import { Proposal } from '../entities/proposal.schema';
 
 export const proposalProviders = [
     {
 
         inject: [ConfigService],
-        provide: 'PROPOSAL_COLLECTION',
-        useFactory: async (configService: ConfigService): Promise<Db> => {
+        provide: DBCollectionTokens.PROPOSALS_COLLECTION,
+        useFactory: async (configService: ConfigService): Promise<Collection<Proposal>> => {
             try {
                 const client = await MongoClient.connect(
-                    configService.get<string>('database.MONGODB_URI') as string,
+                    configService.get<string>('DATABASE.MONGODB_URI') as string,
                     {
                         serverApi: ServerApiVersion.v1,
                     }
                 );
-                return client.db(configService.get<string>('DATABASE'))
+                const db = client.db(configService.get<string>('DATABASE'))
+                const proposalCollection = db.collection(DBCollections.PROPOSALS) as Collection<Proposal>;
+                return proposalCollection;
             } catch (error) {
                 console.log('error connecting to MongoDB: ', error);
                 throw error;

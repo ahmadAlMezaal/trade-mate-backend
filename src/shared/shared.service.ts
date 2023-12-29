@@ -2,19 +2,17 @@ import { Inject, Injectable } from '@nestjs/common';
 import { Collection, Db, ObjectId } from 'mongodb';
 import { getCollection } from 'src/helpers/db.helpers';
 import { Proposal } from 'src/proposal/entities/proposal.schema';
+import { DBCollectionTokens } from 'src/types/enums';
 import { User } from 'src/users/entities/user.schema';
 
 @Injectable()
 export class SharedService {
 
-    private readonly proposalCollection: Collection<Proposal>;
-    private readonly userCollection: Collection<User>;
 
     constructor(
-        @Inject('DATABASE_CONNECTION') private readonly db: Db,
+        @Inject(DBCollectionTokens.PROPOSALS_COLLECTION) private readonly proposalCollection: Collection<Proposal>,
+        @Inject(DBCollectionTokens.USERS_COLLECTION) private readonly userCollection: Collection<User>,
     ) {
-        this.proposalCollection = getCollection<Proposal>(db, 'proposals');
-        this.userCollection = getCollection<User>(db, 'users');
     }
 
     findAll() {

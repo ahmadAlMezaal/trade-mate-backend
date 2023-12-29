@@ -5,8 +5,6 @@ import { AuthGuard } from '@nestjs/passport';
 @Injectable()
 export class GqlAuthGuard extends AuthGuard('local') {
 
-    // protected readonly logger = new Logger(LocalAuthGuard.name);
-
     getRequest(context: ExecutionContext) {
         try {
             const ctx = GqlExecutionContext.create(context);
