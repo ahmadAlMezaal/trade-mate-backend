@@ -1,11 +1,14 @@
 import { ConfigService } from '@nestjs/config';
 import { MongoClient, Db, ServerApiVersion, Collection } from 'mongodb';
+import { proposalProviders } from 'src/proposal/providers/proposal.provider';
+import { DBCollectionTokens } from 'src/types/enums';
+import { userProviders } from 'src/users/providers/user.providers';
 
 export const databaseProviders = [
     {
 
         inject: [ConfigService],
-        provide: 'DATABASE_CONNECTION',
+        provide: DBCollectionTokens.DATABASE_CONNECTION,
         useFactory: async (configService: ConfigService): Promise<Db> => {
             try {
                 const client = await MongoClient.connect(
@@ -22,5 +25,7 @@ export const databaseProviders = [
             }
         }
     },
+    ...userProviders,
+    ...proposalProviders
     //TODO: Try adding rest of the models here
 ];

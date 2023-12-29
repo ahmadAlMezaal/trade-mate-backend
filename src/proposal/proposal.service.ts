@@ -1,15 +1,14 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateProposalInput } from './dto/createProposal.input';
 import { UpdateProposalInput } from './dto/updateProposal.input';
-import { Collection, Db, ModifyResult, ObjectId } from 'mongodb';
+import { Collection, ObjectId } from 'mongodb';
 import { AwsService } from 'src/aws/aws.service';
 import { BooksService } from 'src/books/books.service';
 import { Proposal } from './entities/proposal.schema';
 import { FileUpload } from 'graphql-upload';
 import { UsersService } from 'src/users/users.service';
 import { NotificationsService } from 'src/notifications/notifications.service';
-import { getCollection } from 'src/helpers/db.helpers';
-import { Notification, NotificationType } from 'src/notifications/entities/notification.schema';
+import { NotificationType } from 'src/notifications/entities/notification.schema';
 import { DBCollectionTokens, ProposalStatus } from 'src/types/enums';
 import { ListingService } from 'src/listing/listing.service';
 import { User } from 'src/users/entities/user.schema';

@@ -7,16 +7,13 @@ import { CreateBookInput } from './dto/createBook.input';
 import { FindBookInput } from './dto/findBook.input';
 import { UpdateBookInput } from './dto/updateBook.input';
 import { Book } from './entities/book.schema';
+import { DBCollectionTokens } from 'src/types/enums';
 
 
 @Injectable()
 export class BooksService {
 
-    constructor(@Inject('BOOKS_COLLECTION') private readonly db: Db) { }
-
-    private get collection(): Collection<Book> {
-        return this.db.collection<Book>('books');
-    }
+    constructor(@Inject(DBCollectionTokens.BOOKS_COLLECTION) private readonly booksCollection: Collection<Book>) { }
 
     public async create(createBookInput: CreateBookInput, user: User): Promise<Book> {
         // const book = await this.collection.insertOne({ ...createBookInput });
@@ -24,7 +21,7 @@ export class BooksService {
     }
 
     findAll() {
-        return this.collection.find({}).toArray();
+        return this.booksCollection.find({}).toArray();
     }
 
     async queryBook({ name }: FindBookInput): Promise<IBook[]> {

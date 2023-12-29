@@ -12,14 +12,10 @@ import { DBCollectionTokens, ListingStatus, ProductCondition } from 'src/types/e
 export class ListingService {
 
     constructor(
-        @Inject(DBCollectionTokens.LISTINGS_COLLECTION) private readonly db: Db,
+        @Inject(DBCollectionTokens.LISTINGS_COLLECTION) private readonly listingsCollection: Collection<Listing>,
         private readonly bookService: BooksService,
         private readonly awsService: AwsService,
     ) { }
-
-    private get collection(): Collection<Listing> {
-        return this.db.collection<Listing>('listings');
-    }
 
     private async createOne(createListingInput: CreateListingInput, userId: ObjectId): Promise<ObjectId> {
         const { description, imageUrls, availableBookId, desiredBookId, productCondition } = createListingInput;
@@ -35,7 +31,7 @@ export class ListingService {
             updatedAt: new Date(),
             status: ListingStatus.PENDING
         }
-        const listingId = await this.collection.insertOne(
+        const listingId = await this.listingsCollection.insertOne(
             {
                 title: `Trade ${offeredBookInfo.title} for ${desiredBookInfo.title}`,
                 offeredBookInfo,
@@ -67,11 +63,11 @@ export class ListingService {
     }
 
     public async findAll(): Promise<Listing[]> {
-        return await this.collection.find({}).sort({ createdAt: -1 }).toArray();
+        return await this.listingsCollection.find({}).sort({ createdAt: -1 }).toArray();
     }
 
     public fetchFeed(_id: ObjectId): Promise<Listing[]> {
-        return this.collection.find(
+        return this.listingsCollection.find(
             {
                 listingOwnerId: { $ne: new ObjectId(_id) },
                 status: { $in: [ListingStatus.OPEN, ListingStatus.APPROVED] },
@@ -82,22 +78,22 @@ export class ListingService {
     }
 
     public async fetchUserListing(_id: string): Promise<Listing[]> {
-        return await this.collection.find({ listingOwnerId: new ObjectId(_id) }).sort({ createdAt: -1 }).toArray();
+        return await this.listingsCollection.find({ listingOwnerId: new ObjectId(_id) }).sort({ createdAt: -1 }).toArray();
     }
 
     public async getListingsByIds(_ids: ObjectId[]) {
-        return await this.collection.find({ _id: { $in: _ids } }).toArray();
+        return await this.listingsCollection.find({ _id: { $in: _ids } }).toArray();
     }
 
     public findOne(params: Partial<Listing>) {
-        return this.collection.findOne({ ...params });
+        return this.listingsCollection.findOne({ ...params });
     }
 
     public async pushProposalId(listingIdStr: string, proposalIdStr: string) {
         const _id = new ObjectId(listingIdStr);
         const proposalId = new ObjectId(proposalIdStr);
 
-        const result = await this.collection.findOneAndUpdate(
+        const result = await this.listingsCollection.findOneAndUpdate(
             { _id },
             {
                 $push: { proposalsIds: proposalId },
@@ -115,7 +111,7 @@ export class ListingService {
     public async updateListingStatus(listingIdStr: string, status: ListingStatus) {
         const _id = new ObjectId(listingIdStr);
 
-        const result = await this.collection.findOneAndUpdate(
+        const result = await this.listingsCollection.findOneAndUpdate(
             { _id },
             {
                 $set: { status },
