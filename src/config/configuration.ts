@@ -4,8 +4,8 @@ dotenv.config();
 export const configuration = () => {
     return {
         port: process.env.PORT,
-        database: {
-            MONGODB_URI: process.env.MONO_DB_CONNECTION_STRING
+        DATABASE: {
+            MONGODB_URI: process.env.MONGODB_CONNECTION_STRING
         },
         jwt: {
             secret: process.env.JWT_SECRET,

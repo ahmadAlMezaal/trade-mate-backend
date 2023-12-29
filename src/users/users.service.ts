@@ -1,5 +1,5 @@
 import { HttpException, HttpStatus, Inject, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
-import { Collection, Db, ObjectId } from 'mongodb';
+import { Collection, ObjectId } from 'mongodb';
 import { CreateUserInput, Role } from './dto/createUser.input';
 import { FindUserInput } from './dto/findOne.input';
 import { DeleteUserInput, UpdateUserInput } from './dto/updateUser.input';
@@ -9,20 +9,17 @@ import { SharedService } from 'src/shared/shared.service';
 import { Proposal } from 'src/proposal/entities/proposal.schema';
 import { NotificationsService } from 'src/notifications/notifications.service';
 import { ConnectionStatus, NotificationType } from 'src/notifications/entities/notification.schema';
+import { DBCollectionTokens } from 'src/types/enums';
 
 @Injectable()
 export class UsersService {
 
     constructor(
-        @Inject('USERS_COLLECTION') private readonly db: Db,
+        @Inject(DBCollectionTokens.USERS_COLLECTION) private readonly userCollection: Collection<User>,
         private readonly sharedService: SharedService,
         private readonly notificationService: NotificationsService,
     ) {
 
-    }
-
-    private get userCollection(): Collection<User> {
-        return this.db.collection<User>('users');
     }
 
     public async create(createUserInput: CreateUserInput): Promise<User> {

@@ -1,16 +1,14 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { CreateNotificationInput } from './dto/createNotification.input';
-import { Collection, Db, ObjectId } from 'mongodb';
-import { getCollection } from 'src/helpers/db.helpers';
-import { ConnectionStatus, Notification, NotificationMetadata, NotificationStatus, NotificationType } from './entities/notification.schema';
+import { Collection, ObjectId } from 'mongodb';
+import { ConnectionStatus, Notification, NotificationStatus, NotificationType } from './entities/notification.schema';
+import { DBCollectionTokens } from 'src/types/enums';
 
 @Injectable()
 export class NotificationsService {
 
-    private readonly notificationsCollection: Collection<Notification>;
-
-    constructor(@Inject('NOTIFICATIONS_COLLECTION') private readonly db: Db) {
-        this.notificationsCollection = getCollection<Notification>(db, 'notifications');
+    constructor(
+        @Inject(DBCollectionTokens.NOTIFICATIONS_COLLECTION) private readonly notificationsCollection: Collection<Notification>) {
     }
 
     public async createOne(createNotificationInput: CreateNotificationInput): Promise<Notification> {
@@ -79,10 +77,10 @@ export class NotificationsService {
         return await this.notificationsCollection.deleteOne({ ...params });
     }
 
-    public async respondToConnection(recepientId: string, status: ConnectionStatus) {
+    public async respondToConnection(recipientId: string, status: ConnectionStatus) {
         return await this.notificationsCollection.findOneAndUpdate(
             {
-                recipientId: new ObjectId(recepientId),
+                recipientId: new ObjectId(recipientId),
                 type: NotificationType.CONNECTION_REQUEST,
                 'metadata.status': ConnectionStatus.PENDING
             },

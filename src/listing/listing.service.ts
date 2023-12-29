@@ -6,13 +6,13 @@ import { CreateListingInput } from './dto/createListing.input';
 import { Listing } from './entities/listing.schema';
 import { AwsService } from 'src/aws/aws.service';
 import { FileUpload } from 'graphql-upload';
-import { ListingStatus, ProductCondition } from 'src/types/enums';
+import { DBCollectionTokens, ListingStatus, ProductCondition } from 'src/types/enums';
 
 @Injectable()
 export class ListingService {
 
     constructor(
-        @Inject('LISTING_COLLECTION') private readonly db: Db,
+        @Inject(DBCollectionTokens.LISTINGS_COLLECTION) private readonly db: Db,
         private readonly bookService: BooksService,
         private readonly awsService: AwsService,
     ) { }

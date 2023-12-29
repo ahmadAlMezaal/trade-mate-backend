@@ -10,24 +10,21 @@ import { UsersService } from 'src/users/users.service';
 import { NotificationsService } from 'src/notifications/notifications.service';
 import { getCollection } from 'src/helpers/db.helpers';
 import { Notification, NotificationType } from 'src/notifications/entities/notification.schema';
-import { ProposalStatus } from 'src/types/enums';
+import { DBCollectionTokens, ProposalStatus } from 'src/types/enums';
 import { ListingService } from 'src/listing/listing.service';
 import { User } from 'src/users/entities/user.schema';
 
 @Injectable()
 export class ProposalService {
 
-    private readonly proposalCollection: Collection<Proposal>;
-
     constructor(
-        @Inject('PROPOSAL_COLLECTION') private readonly db: Db,
+        @Inject(DBCollectionTokens.PROPOSALS_COLLECTION) private readonly proposalCollection: Collection<Proposal>,
         private readonly bookService: BooksService,
         private readonly listingService: ListingService,
         private readonly awsService: AwsService,
         private readonly userService: UsersService,
         private readonly notificationService: NotificationsService,
     ) {
-        this.proposalCollection = getCollection<Proposal>(this.db, 'proposals');
     }
 
     public async createOne(createOfferInput: CreateProposalInput, fileUpload: FileUpload, userId: ObjectId): Promise<string> {

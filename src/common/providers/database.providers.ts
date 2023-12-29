@@ -9,7 +9,7 @@ export const databaseProviders = [
         useFactory: async (configService: ConfigService): Promise<Db> => {
             try {
                 const client = await MongoClient.connect(
-                    configService.get<string>('database.MONGODB_URI') as string,
+                    configService.get<string>('DATABASE.MONGODB_URI') as string,
                     {
                         serverApi: ServerApiVersion.v1,
                     }
