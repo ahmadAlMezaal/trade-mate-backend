@@ -7,8 +7,7 @@ import { CreateBookInput } from './dto/createBook.input';
 import { FindBookInput } from './dto/findBook.input';
 import { UpdateBookInput } from './dto/updateBook.input';
 import { Book } from './entities/book.schema';
-import { DBCollectionTokens, DBCollections } from 'src/types/enums';
-
+import { DBCollectionTokens } from 'src/types/enums';
 
 @Injectable()
 export class BooksService {

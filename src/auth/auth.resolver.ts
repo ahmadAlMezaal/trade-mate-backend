@@ -18,7 +18,8 @@ export class AuthResolver {
     constructor(
         private readonly authService: AuthService,
         private readonly userService: UsersService
-    ) { }
+    ) {
+    }
 
     @Mutation(() => LoginResponse, { name: 'signup', })
     public async signup(@Args('input') createUserInput: CreateUserInput): Promise<LoginResponse> {
