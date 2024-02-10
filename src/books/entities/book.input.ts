@@ -24,7 +24,7 @@ export class BookInput {
     imageUrls: ImageUrls;
 
     @Field(() => Number, { description: 'The total page count of the book' })
-    totalPageCount: number
+    totalPageCount: number;
 
     @Field(_type => [String], { description: 'Categories of the book', defaultValue: [] })
     genres: string[];

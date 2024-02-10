@@ -1,5 +1,5 @@
 import { ConfigService } from '@nestjs/config';
-import { MongoClient, Db, ServerApiVersion, Collection } from 'mongodb';
+import { MongoClient, ServerApiVersion, Collection } from 'mongodb';
 import { DBCollectionTokens, DBCollections } from 'src/types/enums';
 import { Proposal } from '../entities/proposal.schema';
 
@@ -16,7 +16,7 @@ export const proposalProviders = [
                         serverApi: ServerApiVersion.v1,
                     }
                 );
-                const db = client.db(configService.get<string>('DATABASE'))
+                const db = client.db(configService.get<string>('DATABASE'));
                 const proposalCollection = db.collection(DBCollections.PROPOSALS) as Collection<Proposal>;
                 return proposalCollection;
             } catch (error) {

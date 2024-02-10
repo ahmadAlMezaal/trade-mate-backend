@@ -11,7 +11,6 @@ export class UpdateListingInput {
     @IsOptional()
     proposalIds?: string;
 
-
     @Field(() => String, { nullable: true })
     @IsString()
     @IsOptional()

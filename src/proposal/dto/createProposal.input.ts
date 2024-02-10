@@ -1,6 +1,5 @@
 import { InputType, Field } from '@nestjs/graphql';
 import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
-import { Book } from 'src/books/entities/book.schema';
 import { ProductCondition } from 'src/types/enums';
 
 @InputType()

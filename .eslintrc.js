@@ -16,5 +16,10 @@ module.exports = {
         "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
         "no-multiple-empty-lines": ["warn", { "max": 1, "maxEOF": 1 }],
         "@typescript-eslint/no-explicit-any": "warn",
+        "no-var": "error",
+        "no-empty": ["error", { "allowEmptyCatch": true }],
+        "prefer-const": "error",
+        "arrow-body-style": ["error", "as-needed"],
+        "prefer-template": "error"
     }
 };

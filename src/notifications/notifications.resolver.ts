@@ -1,4 +1,4 @@
-import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
+import { Resolver, Query } from '@nestjs/graphql';
 import { NotificationsService } from './notifications.service';
 import { Notification } from './entities/notification.schema';
 import { JwtAuthGuard } from 'src/auth/guards/jwtAuth.guard';

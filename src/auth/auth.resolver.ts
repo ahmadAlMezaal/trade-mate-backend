@@ -35,7 +35,7 @@ export class AuthResolver {
 
     @Mutation(() => ForgotPasswordResponse, { name: 'forgotPassword' })
     public forgotPassword(@Args('input') input: ForgotPasswordInput) {
-        return this.authService.requestforgotPassword(input.email);
+        return this.authService.requestForgotPassword(input.email);
     }
 
     @Mutation(() => ResetPasswordResponse, { name: 'resetPassword' })

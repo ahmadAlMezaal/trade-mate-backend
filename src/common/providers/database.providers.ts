@@ -1,5 +1,5 @@
 import { ConfigService } from '@nestjs/config';
-import { MongoClient, Db, ServerApiVersion, Collection } from 'mongodb';
+import { MongoClient, Db, ServerApiVersion } from 'mongodb';
 import { proposalProviders } from 'src/proposal/providers/proposal.provider';
 import { DBCollectionTokens } from 'src/types/enums';
 import { userProviders } from 'src/users/providers/user.providers';

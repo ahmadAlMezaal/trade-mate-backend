@@ -18,7 +18,7 @@ export class NotificationsService {
             createdAt: new Date(),
             updatedAt: new Date(),
             status: NotificationStatus.UNREAD,
-        }
+        };
 
         const notification: Notification = {
             title,
