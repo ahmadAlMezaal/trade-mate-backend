@@ -46,14 +46,14 @@ export class ProposalService {
         }
 
         const senderFullName = `${sender.firstName} ${sender.lastName}`;
-        const proposal = await this.insertOne(createOfferInput, fileUpload, userId, listing.listingOwnerId)
+        const proposal = await this.insertOne(createOfferInput, fileUpload, userId, listing.listingOwnerId);
 
         await Promise.all(
             [
                 this.listingService.pushProposalId(listingId, proposal.insertedId.toString()),
                 this.userService.addProposal(userId.toString(), proposal.insertedId.toString())
             ]
-        )
+        );
 
         this.notificationService.sendPushNotification(
             {
@@ -136,7 +136,8 @@ export class ProposalService {
                 upsert: false,
                 returnDocument: 'after'
             }
-        )
+        );
+
         if (!value) {
             throw new NotFoundException('Account not found');
         }

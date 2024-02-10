@@ -46,7 +46,7 @@ export class UsersService {
             connectionsIds: [],
             reputation: 0,
             pendingUserConnectionRequestsIds: [],
-        }
+        };
 
         const userObj: User = { ...createUserInput, ...defaults, email: createUserInput.email.toLowerCase() };
 
@@ -90,14 +90,14 @@ export class UsersService {
     }
 
     public async update(queryObj: Partial<User>, updateUserInput: UpdateUserInput) {
-        const { _id, ...restUpdateUserInput } = updateUserInput
+        delete updateUserInput._id;
         const { value } = await this.userCollection.findOneAndUpdate(
             {
                 ...queryObj
             },
             {
                 $set: {
-                    ...restUpdateUserInput,
+                    ...updateUserInput,
                     updatedAt: new Date()
                 }
             },
@@ -105,7 +105,7 @@ export class UsersService {
                 upsert: false,
                 returnDocument: 'after'
             }
-        )
+        );
         if (!value) {
             throw new NotFoundException('Account not found');
         }
@@ -153,7 +153,6 @@ export class UsersService {
         return { bookmarkedListingIds: updatedUser.bookmarkedListingIds };
     }
 
-
     public getUserProposals(userId: string): Promise<Proposal[]> {
         return this.sharedService.getUserProposals(userId);
     }
@@ -162,7 +161,7 @@ export class UsersService {
 
         try {
 
-            const connectionUser = await this.findOne({ _id: new ObjectId(connectionId) })
+            const connectionUser = await this.findOne({ _id: new ObjectId(connectionId) });
 
             const pendingUserConnectionRequestsIds = [...connectionUser.pendingUserConnectionRequestsIds];
             const index = pendingUserConnectionRequestsIds.findIndex((id) => id.equals(user._id));
@@ -237,7 +236,7 @@ export class UsersService {
 
     public async respondToConnectionRequest(connectionRecepient: User, connectionSenderId: string, connectionStatus: ConnectionStatus): Promise<boolean> {
 
-        await this.notificationService.respondToConnection(connectionRecepient._id.toString(), connectionStatus)
+        await this.notificationService.respondToConnection(connectionRecepient._id.toString(), connectionStatus);
         if (connectionStatus === ConnectionStatus.REJECTED) {
             const response = await this.userCollection.findOneAndUpdate(
                 {
@@ -289,6 +288,4 @@ export class UsersService {
 
         return responses[0].ok === 1 && responses[1].ok === 1;
     }
-
-
 }
