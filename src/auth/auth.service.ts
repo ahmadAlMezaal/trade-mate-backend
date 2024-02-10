@@ -21,7 +21,7 @@ export class AuthService {
         }
         const doesPasswordMatch = await bcrypt.compare(pass, user.password);
         if (doesPasswordMatch) {
-            delete user.password
+            delete user.password;
             return user;
         }
         return null;
@@ -29,7 +29,7 @@ export class AuthService {
 
     public async generateToken(email: string, sub: ObjectId) {
         const payload = { email, sub };
-        return await this.jwtService.signAsync(payload)
+        return await this.jwtService.signAsync(payload);
     }
 
     public async login(user: User): Promise<{ user: User, accessToken: string }> {
@@ -39,13 +39,13 @@ export class AuthService {
         };
     }
 
-    public async requestforgotPassword(email: string) {
+    public async requestForgotPassword(email: string) {
         const user = await this.usersService.findOne({ email: email.toLowerCase() });
         if (!user) {
             throw new NotFoundException('Email does not exist');
         }
         const code = Math.floor(Math.random() * 90000) + 100000;
-        await this.usersService.update({ _id: user._id }, { forgotPasswordCode: code })
+        await this.usersService.update({ _id: user._id }, { forgotPasswordCode: code });
         return {
             code,
             message: 'Password reset request has been sent to your email address.',
@@ -62,7 +62,7 @@ export class AuthService {
 
         await this.usersService.update({ _id: user._id }, { forgotPasswordCode: null, password: newPassword });
 
-        return { message: 'Password changed successfully!' }
+        return { message: 'Password changed successfully!' };
     }
 }
 

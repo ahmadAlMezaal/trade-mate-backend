@@ -1,8 +1,7 @@
 import * as dotenv from 'dotenv';
 dotenv.config();
 
-export const configuration = () => {
-    return {
+export const configuration = () => ({
         port: process.env.PORT,
         DATABASE: {
             MONGODB_URI: process.env.MONGODB_CONNECTION_STRING
@@ -17,5 +16,4 @@ export const configuration = () => {
             secret: process.env.AWS_SECRET_ACCESS_KEY,
             bucketName: process.env.AWS_BUCKET_NAME,
         }
-    }
-};
+    });

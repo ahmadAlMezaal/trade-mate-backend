@@ -6,11 +6,11 @@ import { FindSingleUserInput, FindUserInput } from './dto/findOne.input';
 import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/guards/jwtAuth.guard';
 import { CurrentUser } from 'src/common/decorators/currentUser.decorator';
-import { ListingService } from 'src/listing/listing.service';
 import { ObjectId } from 'mongodb';
 import { Listing } from 'src/listing/entities/listing.schema';
 import { Proposal } from 'src/proposal/entities/proposal.schema';
 import { ConnectionStatus } from 'src/notifications/entities/notification.schema';
+import { ListingService } from 'src/listing/listing.service';
 
 @Resolver(() => User)
 export class UsersResolver {
@@ -35,7 +35,7 @@ export class UsersResolver {
     @Query(() => [Listing], { name: 'bookmarks' })
     @UseGuards(JwtAuthGuard)
     public async getBookmarkedListings(@CurrentUser() user: User) {
-        const ids: ObjectId[] = user.bookmarkedListingIds?.map(_id => new ObjectId(_id))
+        const ids: ObjectId[] = user.bookmarkedListingIds?.map(_id => new ObjectId(_id));
         return this.ListingService.getListingsByIds(ids);
     }
 
@@ -61,12 +61,10 @@ export class UsersResolver {
         return this.userService.findOne(input);
     }
 
-
     @Mutation(() => Boolean, { name: 'deleteUser' })
     async removeUser(@Args('input') input: DeleteUserInput) {
         return await this.userService.remove(input);
     }
-
 
     @Mutation(() => User, { name: 'sendConnectionRequest' })
     @UseGuards(JwtAuthGuard)
@@ -97,7 +95,6 @@ export class UsersResolver {
     // findAll(@Args('input') paginationQuery?: PaginationInput) {
     //     return this.usersService.findAll(paginationQuery);
     // }
-
 
     // @Mutation(() => User, { name: 'updateUser' })
     // updateUser(@Args('input') updateUserInput: UpdateUserInput) {

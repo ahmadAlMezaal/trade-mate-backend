@@ -1,5 +1,5 @@
 import { ConfigService } from '@nestjs/config';
-import { MongoClient, Db, ServerApiVersion, Collection } from 'mongodb';
+import { MongoClient, ServerApiVersion, Collection } from 'mongodb';
 import { DBCollectionTokens, DBCollections } from 'src/types/enums';
 import { Listing } from '../entities/listing.schema';
 
@@ -16,7 +16,7 @@ export const listingProviders = [
                         serverApi: ServerApiVersion.v1,
                     }
                 );
-                const db = client.db(configService.get<string>('DATABASE'))
+                const db = client.db(configService.get<string>('DATABASE'));
                 const listingsCollection = db.collection(DBCollections.LISTINGS) as Collection<Listing>;
                 return listingsCollection;
             } catch (error) {

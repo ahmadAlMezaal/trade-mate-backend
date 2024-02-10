@@ -1,5 +1,5 @@
 import { ConfigService } from '@nestjs/config';
-import { MongoClient, Db, ServerApiVersion, Collection } from 'mongodb';
+import { MongoClient, ServerApiVersion, Collection } from 'mongodb';
 import { Book } from '../entities/book.schema';
 import { DBCollectionTokens, DBCollections } from 'src/types/enums';
 
@@ -16,7 +16,7 @@ export const booksProviders = [
                         serverApi: ServerApiVersion.v1,
                     }
                 );
-                const db = client.db(configService.get<string>('DATABASE'))
+                const db = client.db(configService.get<string>('DATABASE'));
                 const booksCollection = db.collection(DBCollections.BOOKS) as Collection<Book>;
                 await booksCollection.createIndex({ name: 1, }, { unique: true });
                 return booksCollection;

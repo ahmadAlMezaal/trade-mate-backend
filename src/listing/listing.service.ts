@@ -1,5 +1,5 @@
 import { Inject, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
-import { Collection, Db, ObjectId } from 'mongodb';
+import { Collection, ObjectId } from 'mongodb';
 import { BooksService } from 'src/books/books.service';
 import { User } from 'src/users/entities/user.schema';
 import { CreateListingInput } from './dto/createListing.input';
@@ -30,7 +30,7 @@ export class ListingService {
             createdAt: new Date(),
             updatedAt: new Date(),
             status: ListingStatus.PENDING
-        }
+        };
         const listingId = await this.listingsCollection.insertOne(
             {
                 title: `Trade ${offeredBookInfo.title} for ${desiredBookInfo.title}`,
@@ -56,7 +56,7 @@ export class ListingService {
                 availableBookId,
                 desiredBookId
             };
-            return await this.createOne(newListingInfo, user._id)
+            return await this.createOne(newListingInfo, user._id);
         } catch (error) {
             throw new InternalServerErrorException('Error uploading file');
         }

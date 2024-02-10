@@ -1,4 +1,4 @@
-import { ObjectType, Field, ID, createUnionType } from '@nestjs/graphql';
+import { ObjectType, Field, ID } from '@nestjs/graphql';
 import { ObjectId } from 'mongodb';
 import { Timestamps } from 'src/common/schemas/timestamps.schema';
 
@@ -25,12 +25,11 @@ export enum ConnectionStatus {
 @ObjectType()
 export class NotificationMetadata {
     @Field(() => String, { nullable: true })
-    status?: ConnectionStatus
+    status?: ConnectionStatus;
 
     @Field(() => ID, { nullable: true })
     proposalId?: ObjectId;
 }
-
 
 @ObjectType()
 export class Notification extends Timestamps {

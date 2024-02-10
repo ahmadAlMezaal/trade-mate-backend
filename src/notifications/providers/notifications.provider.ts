@@ -16,7 +16,7 @@ export const notificationsProviders = [
                         serverApi: ServerApiVersion.v1,
                     }
                 );
-                const db = client.db(configService.get<string>('DATABASE'))
+                const db = client.db(configService.get<string>('DATABASE'));
                 const notificationsCollection = db.collection(DBCollections.NOTIFICATIONS) as Collection<Notification>;
                 return notificationsCollection;
             } catch (error) {

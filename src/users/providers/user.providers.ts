@@ -16,7 +16,7 @@ export const userProviders = [
                         serverApi: ServerApiVersion.v1,
                     }
                 );
-                const db = client.db(configService.get<string>('DATABASE'))
+                const db = client.db(configService.get<string>('DATABASE'));
                 const usersCollection = db.collection(DBCollections.USERS) as Collection<User>;
                 await usersCollection.createIndex({ email: 1, }, { unique: true });
                 return usersCollection;

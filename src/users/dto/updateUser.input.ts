@@ -47,7 +47,6 @@ export class UpdateUserInput extends BaseUserInput {
     @IsArray()
     bookmarkedListingIds?: ObjectId[];
 
-
     @Field(() => [ObjectId], { nullable: true })
     @IsObject()
     connectionsIds?: ObjectId[];
