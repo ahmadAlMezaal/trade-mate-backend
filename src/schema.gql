@@ -166,7 +166,6 @@ type Mutation {
   sendConnectionRequest(connectionId: String!): User!
   sendProposal(createProposalInput: CreateProposalInput!, file: Upload!): String!
   signup(input: CreateUserInput!): LoginResponse!
-  updateBook(updateBookInput: UpdateBookInput!): Book!
   updateProposalStatus(_id: String!, status: String!): Proposal!
   updateUserBookmarks(listingId: String!): User!
 }
@@ -282,19 +281,6 @@ input ResetPasswordInput {
 
 type ResetPasswordResponse {
   message: String!
-}
-
-input UpdateBookInput {
-  """Description of the book"""
-  description: String
-
-  """Genre of the book"""
-  genre: String
-  id: Int!
-  imageUrls: String
-
-  """Official name of the book"""
-  name: String
 }
 
 """The `Upload` scalar type represents a file upload."""

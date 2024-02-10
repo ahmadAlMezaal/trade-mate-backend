@@ -1,6 +1,5 @@
 import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
 import { BooksService } from './books.service';
-import { UpdateBookInput } from './dto/updateBook.input';
 import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/guards/jwtAuth.guard';
 import { FindBookInput } from './dto/findBook.input';
@@ -27,11 +26,6 @@ export class BooksResolver {
     // findOne(@Args('id', { type: () => Int }) id: number) {
     //     return this.booksService.findOne(id);
     // }
-
-    @Mutation(() => Book)
-    updateBook(@Args('updateBookInput') updateBookInput: UpdateBookInput) {
-        return this.booksService.update(updateBookInput.id, updateBookInput);
-    }
 
     @Mutation(() => Book)
     removeBook(@Args('id', { type: () => Int }) id: number) {
