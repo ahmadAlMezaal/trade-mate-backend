@@ -9,12 +9,15 @@ import { join } from 'path';
         imports: [
             GraphQLModule.forRoot<ApolloDriverConfig>(
                 {
-                    // include: [UsersModule],
                     driver: ApolloDriver,
                     autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
                     debug: true,
                     sortSchema: true,
                     playground: true,
+                    // formatError: (error) => {
+                    //     console.log('error: ', error)
+                    //     return error;
+                    // },
                 }
             ),
         ],

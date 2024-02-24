@@ -242,7 +242,7 @@ type Proposal {
 
   """The language of the book"""
   productCondition: String!
-  recepientId: ID!
+  recipientId: ID!
   senderId: ID!
 
   """Status of the proposal"""

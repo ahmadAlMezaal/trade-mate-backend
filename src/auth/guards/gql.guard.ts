@@ -1,9 +1,10 @@
 import { ExecutionContext, Injectable } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
 import { AuthGuard } from '@nestjs/passport';
+import { StrategyType } from '../strategies/strategyTypes.enum';
 
 @Injectable()
-export class GqlAuthGuard extends AuthGuard('local') {
+export class GqlAuthGuard extends AuthGuard(StrategyType.LOCAL) {
 
     getRequest(context: ExecutionContext) {
         try {
@@ -19,29 +20,5 @@ export class GqlAuthGuard extends AuthGuard('local') {
             console.log('getRequest error: ', error);
         }
     }
-
-    // handleRequest(err, user, info) {
-
-    //     if (err || !user) {
-    //         throw err || new UnauthorizedException();
-    //     }
-    //     return user; // return the authenticated user object
-    // }
-
-    // async canActivate(context: ExecutionContext): Promise<boolean> {
-    //     try {
-    //         const ctx = GqlExecutionContext.create(context);
-    //         const { req } = ctx.getContext();
-    //         const superCanActivate = await super.canActivate(new ExecutionContextHost([req]));
-
-    //         if (superCanActivate) {
-    //             return true;
-    //         }
-    //     } catch (error) {
-
-    //     }
-
-    //     throw new AuthenticationError('Unauthorized');
-    // }
 
 }
