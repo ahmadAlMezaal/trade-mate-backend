@@ -87,7 +87,7 @@ export class ProposalService {
         return proposal;
     }
 
-    public async insertOne(createOfferInput: CreateProposalInput, fileUpload: FileUpload, senderId: ObjectId, recepientId: ObjectId) {
+    public async insertOne(createOfferInput: CreateProposalInput, fileUpload: FileUpload, senderId: ObjectId, recipientId: ObjectId) {
         const { additionalInfo, listingId, offeredItemId, desiredItemId, productCondition } = createOfferInput;
         const imageUrl = await this.awsService.uploadFile(fileUpload.createReadStream, fileUpload.filename);
 
@@ -114,7 +114,7 @@ export class ProposalService {
                 listingId: new ObjectId(listingId),
                 imageUrls: [imageUrl],
                 senderId,
-                recepientId,
+                recipientId,
                 ...proposalDefaults,
             }
         );

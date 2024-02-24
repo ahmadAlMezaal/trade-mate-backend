@@ -23,7 +23,7 @@ export class Proposal extends Timestamps {
     senderId: ObjectId;
 
     @Field(() => ID)
-    recepientId: ObjectId;
+    recipientId: ObjectId;
 
     @Field(() => ID)
     listingId: ObjectId;
