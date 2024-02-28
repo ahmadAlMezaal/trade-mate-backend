@@ -53,10 +53,12 @@ input CreateProposalInput {
 }
 
 input CreateUserInput {
+  city: String!
+  country: String!
   email: String!
   firstName: String!
+  isoCountryCode: String!
   lastName: String!
-  location: String!
   password: String!
 }
 
@@ -107,6 +109,11 @@ input ImageUrlsInput {
   thumbnail: String!
 }
 
+"""
+The `JSONObject` scalar type represents JSON objects as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSONObject
+
 type Listing {
   _id: ID!
 
@@ -143,8 +150,12 @@ type Listing {
 }
 
 input LoginInput {
+  city: String
+  country: String
+
   """email of the user"""
   email: String!
+  isoCountryCode: String
 
   """password of the user"""
   password: String!
@@ -313,8 +324,8 @@ type User {
   """User's last name"""
   lastName: String!
 
-  """User's location"""
-  location: String!
+  """Users location attributes"""
+  location: JSONObject!
 
   """User's password"""
   password: String!

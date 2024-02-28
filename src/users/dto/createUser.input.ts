@@ -34,6 +34,16 @@ export class CreateUserInput {
     @Field(() => String)
     @IsNotEmpty()
     @IsString()
-    location: string;
+    country: string;
+
+    @Field(() => String)
+    @IsNotEmpty()
+    @IsString()
+    isoCountryCode: string;
+
+    @Field(() => String)
+    @IsNotEmpty()
+    @IsString()
+    city: string;
 
 }

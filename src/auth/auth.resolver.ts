@@ -29,8 +29,8 @@ export class AuthResolver {
 
     @UseGuards(GqlAuthGuard)
     @Mutation(() => LoginResponse, { name: 'login' })
-    public async login(@Args('input') _input: LoginInput, @Context() context: any): Promise<LoginResponse> {
-        return await this.authService.login(context.req.user);
+    public async login(@Args('input') input: LoginInput, @Context() context: any): Promise<LoginResponse> {
+        return await this.authService.login(context.req.user, input);
     }
 
     @Mutation(() => ForgotPasswordResponse, { name: 'forgotPassword' })

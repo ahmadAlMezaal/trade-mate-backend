@@ -2,6 +2,8 @@
 import { Field, ID, InputType } from '@nestjs/graphql';
 import { IsArray, IsBoolean, IsEmail, IsNumber, IsObject, IsOptional, IsString, MinLength } from 'class-validator';
 import { ObjectId } from 'mongodb';
+import { IUserLocation } from '../entities/user.entity';
+import { GraphQLJSONObject } from 'graphql-type-json';
 
 @InputType()
 export class BaseUserInput {
@@ -31,9 +33,10 @@ export class UpdateUserInput extends BaseUserInput {
     @MinLength(2)
     lastName?: string;
 
-    @Field({ nullable: true })
-    @IsString()
-    location?: string;
+    @Field(() => GraphQLJSONObject, { nullable: true })
+    @IsObject()
+    @IsOptional()
+    location?: IUserLocation;
 
     @Field(() => Number, { nullable: true })
     @IsBoolean()
