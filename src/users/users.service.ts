@@ -10,6 +10,7 @@ import { Proposal } from 'src/proposal/entities/proposal.schema';
 import { NotificationsService } from 'src/notifications/notifications.service';
 import { ConnectionStatus, NotificationType } from 'src/notifications/entities/notification.schema';
 import { DBCollectionTokens } from 'src/types/enums';
+import { IUserLocation } from './entities/user.entity';
 
 @Injectable()
 export class UsersService {
@@ -48,7 +49,22 @@ export class UsersService {
             pendingUserConnectionRequestsIds: [],
         };
 
-        const userObj: User = { ...createUserInput, ...defaults, email: createUserInput.email.toLowerCase() };
+        const location: IUserLocation = {
+            city: createUserInput.city,
+            country: createUserInput.country,
+            isoCode: createUserInput.isoCountryCode
+        };
+
+        delete createUserInput.city;
+        delete createUserInput.country;
+        delete createUserInput.isoCountryCode;
+
+        const userObj: User = {
+            ...createUserInput,
+            ...defaults,
+            location,
+            email: createUserInput.email.toLowerCase(),
+        };
 
         const { insertedId } = await this.userCollection.insertOne({ ...userObj });
 

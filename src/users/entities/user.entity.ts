@@ -1,5 +1,11 @@
 
-export interface IUser {
+export type IUserLocation = {
+    isoCode: string;
+    country: string;
+    city: string;
+};
+
+export type IUser = {
     _id: string;
     email: string;
     password: string;
@@ -7,10 +13,10 @@ export interface IUser {
     firstName: string;
     lastName: string;
     location: string;
-    bookmarkedlistingIds: string[];
+    bookmarkedListingIds: string[];
     role: string;
     verificationCode?: number;
     forgotPasswordCode?: number;
     connectionsIds: string[];
     reputation: number;
-}
+};

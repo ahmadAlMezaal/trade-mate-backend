@@ -2,6 +2,8 @@ import { ObjectType, Field, ID } from '@nestjs/graphql';
 import { ObjectId } from 'mongodb';
 import { Role } from '../dto/createUser.input';
 import { Timestamps } from 'src/common/schemas/timestamps.schema';
+import { IUserLocation } from './user.entity';
+import { GraphQLJSONObject } from 'graphql-type-json';
 
 @ObjectType()
 export class User extends Timestamps {
@@ -24,8 +26,8 @@ export class User extends Timestamps {
   @Field(() => String, { description: "User's last name" })
   lastName: string;
 
-  @Field(() => String, { description: "User's location" })
-  location: string;
+  @Field(() => GraphQLJSONObject, { description: "Users location attributes" })
+  location: IUserLocation;
 
   @Field(() => String, { description: "User's profile picture" })
   profilePhoto?: string;

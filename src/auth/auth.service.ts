@@ -6,6 +6,8 @@ import * as bcrypt from 'bcrypt';
 import { User } from 'src/users/entities/user.schema';
 import { ObjectId } from 'mongodb';
 import { ResetPasswordInput } from './dto/resetPassword.input';
+import { LoginInput } from 'src/users/dto/login.input';
+import { IUserLocation } from 'src/users/entities/user.entity';
 
 @Injectable()
 export class AuthService {
@@ -14,7 +16,7 @@ export class AuthService {
         private readonly jwtService: JwtService
     ) { }
 
-    public async validateUser(email: string, pass: string): Promise<any> {
+    public async validateUser(email: string, pass: string): Promise<User> {
         const user = await this.usersService.findOne({ email });
         if (!user) {
             throw new NotFoundException('Account not found!');
@@ -32,11 +34,38 @@ export class AuthService {
         return await this.jwtService.signAsync(payload);
     }
 
-    public async login(user: User): Promise<{ user: User, accessToken: string }> {
-        return {
-            accessToken: await this.generateToken(user.email, user._id),
-            user,
-        };
+    public async login(user: User, input?: LoginInput): Promise<{ user: User, accessToken: string }> {
+        try {
+            const updatedAttributes: IUserLocation = { ...user.location };
+
+            if (input.city) {
+                updatedAttributes['city'] = input.city;
+            }
+
+            if (input.country) {
+                updatedAttributes['country'] = input.country;
+            }
+
+            if (input.isoCountryCode) {
+                updatedAttributes['isoCode'] = input.isoCountryCode;
+            }
+
+            const updatedUser = await this.usersService.update(
+                {
+                    email: user.email
+                },
+                {
+                    location: { ...updatedAttributes }
+                }
+            );
+
+            return {
+                accessToken: await this.generateToken(user.email, user._id),
+                user: updatedUser,
+            };
+        } catch {
+            throw new Error('An error occurred during the login process.');
+        }
     }
 
     public async requestForgotPassword(email: string) {
