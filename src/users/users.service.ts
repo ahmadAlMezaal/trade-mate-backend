@@ -147,6 +147,8 @@ export class UsersService {
             updatedUserParams['isoCode'] = input.isoCountryCode;
         }
 
+        const updatedUser = await this.update({ email: input.email.toLowerCase() }, updatedUserParams);
+        return updatedUser;
     }
 
     public async addProposal(userId: string, proposalIdStr: string) {
