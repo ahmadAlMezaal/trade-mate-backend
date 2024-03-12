@@ -1,5 +1,5 @@
 
-import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
@@ -18,9 +18,6 @@ export class AuthService {
 
     public async validateUser(email: string, pass: string): Promise<User> {
         const user = await this.usersService.getUser({ email });
-        if (!user) {
-            throw new NotFoundException('Account not found!');
-        }
         const doesPasswordMatch = await bcrypt.compare(pass, user.password);
         if (doesPasswordMatch) {
             delete user.password;
@@ -70,9 +67,6 @@ export class AuthService {
 
     public async requestForgotPassword(email: string) {
         const user = await this.usersService.getUser({ email: email.toLowerCase() });
-        if (!user) {
-            throw new NotFoundException('Email does not exist');
-        }
         const code = Math.floor(Math.random() * 90000) + 100000;
         await this.usersService.update({ _id: user._id }, { forgotPasswordCode: code });
         return {
@@ -83,9 +77,6 @@ export class AuthService {
 
     public async resetPassword(input: ResetPasswordInput) {
         const user = await this.usersService.getUser({ email: input.email.toLowerCase() });
-        if (!user) {
-            throw new HttpException('User does not exist', HttpStatus.UNAUTHORIZED);
-        }
         const saltOrRounds = 10;
         const newPassword = await bcrypt.hash(input.password, saltOrRounds);
 
