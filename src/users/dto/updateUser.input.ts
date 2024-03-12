@@ -57,11 +57,49 @@ export class UpdateUserInput extends BaseUserInput {
     @Field(() => Number, { nullable: true })
     @IsNumber()
     reputation?: number;
-
 }
 
 @InputType()
 export class DeleteUserInput {
     @Field(() => ID)
     _id: ObjectId;
+}
+
+@InputType()
+export class UpdateUserProfileInput extends BaseUserInput {
+
+    @Field({ nullable: true })
+    @IsString()
+    @MinLength(2)
+    @IsOptional()
+    firstName?: string;
+
+    @Field({ nullable: true })
+    @IsString()
+    @MinLength(2)
+    lastName?: string;
+
+    @Field(() => String, { nullable: true })
+    @IsArray()
+    city?: string;
+
+    @Field(() => String, { nullable: true })
+    @IsArray()
+    country?: string;
+
+    @Field(() => String, { nullable: true })
+    @IsArray()
+    isoCountryCode?: string;
+
+    @Field(() => [ObjectId], { nullable: true })
+    @IsArray()
+    bookmarkedListingIds?: ObjectId[];
+
+    @Field(() => [ObjectId], { nullable: true })
+    @IsObject()
+    connectionsIds?: ObjectId[];
+
+    @Field(() => Number, { nullable: true })
+    @IsNumber()
+    reputation?: number;
 }

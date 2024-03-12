@@ -12,6 +12,7 @@ import { ListingModule } from './listing/listing.module';
 import { ProposalModule } from './proposal/proposal.module';
 import { SharedModule } from './shared/shared.module';
 import { NotificationsModule } from './notifications/notifications.module';
+import { OauthModule } from './oauth/oauth.module';
 
 @Module(
     {
@@ -24,6 +25,7 @@ import { NotificationsModule } from './notifications/notifications.module';
             ProposalModule,
             SharedModule,
             NotificationsModule,
+            OauthModule,
         ],
         providers: [
             AppService,

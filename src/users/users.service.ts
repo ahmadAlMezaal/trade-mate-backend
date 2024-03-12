@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Inject, Injectable, InternalServerErrorExcep
 import { Collection, ObjectId } from 'mongodb';
 import { CreateUserInput, Role } from './dto/createUser.input';
 import { FindUserInput } from './dto/findOne.input';
-import { DeleteUserInput, UpdateUserInput } from './dto/updateUser.input';
+import { DeleteUserInput, UpdateUserInput, UpdateUserProfileInput } from './dto/updateUser.input';
 import { User } from './entities/user.schema';
 import * as bcrypt from 'bcrypt';
 import { SharedService } from 'src/shared/shared.service';
@@ -97,7 +97,11 @@ export class UsersService {
         return this.userCollection.find({ _id: { $in: user.connectionsIds } }).toArray();
     }
 
-    public async findOne(query: FindUserInput): Promise<User> {
+    public findOne(query: FindUserInput): Promise<User> {
+        return this.userCollection.findOne({ ...query });
+    }
+
+    public async getUser(query: FindUserInput): Promise<User> {
         const user = await this.userCollection.findOne({ ...query });
         if (!user) {
             throw new NotFoundException('Account not found');
@@ -126,6 +130,25 @@ export class UsersService {
             throw new NotFoundException('Account not found');
         }
         return value;
+    }
+
+    public async updateUserProfile(input: UpdateUserProfileInput) {
+        const updatedUserParams: Partial<User> = {};
+
+        if (input.city) {
+            updatedUserParams['city'] = input.city;
+        }
+
+        if (input.country) {
+            updatedUserParams['country'] = input.country;
+        }
+
+        if (input.isoCountryCode) {
+            updatedUserParams['isoCode'] = input.isoCountryCode;
+        }
+
+        const updatedUser = await this.update({ email: input.email.toLowerCase() }, updatedUserParams);
+        return updatedUser;
     }
 
     public async addProposal(userId: string, proposalIdStr: string) {
@@ -177,7 +200,7 @@ export class UsersService {
 
         try {
 
-            const connectionUser = await this.findOne({ _id: new ObjectId(connectionId) });
+            const connectionUser = await this.getUser({ _id: new ObjectId(connectionId) });
 
             const pendingUserConnectionRequestsIds = [...connectionUser.pendingUserConnectionRequestsIds];
             const index = pendingUserConnectionRequestsIds.findIndex((id) => id.equals(user._id));

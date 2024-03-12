@@ -29,7 +29,7 @@ export class UsersResolver {
     @UseGuards(JwtAuthGuard)
     public async getUserInfo(@Args('input') input: FindSingleUserInput) {
         input._id = new ObjectId(input._id);
-        return this.userService.findOne(input);
+        return this.userService.getUser(input);
     }
 
     @Query(() => [Listing], { name: 'bookmarks' })
@@ -58,7 +58,7 @@ export class UsersResolver {
 
     @Query(() => User, { name: 'user' })
     async findOne(@Args('input') input: FindUserInput): Promise<User> {
-        return this.userService.findOne(input);
+        return this.userService.getUser(input);
     }
 
     @Mutation(() => Boolean, { name: 'deleteUser' })
