@@ -17,7 +17,7 @@ export class AuthService {
     ) { }
 
     public async validateUser(email: string, pass: string): Promise<User> {
-        const user = await this.usersService.findOne({ email });
+        const user = await this.usersService.getUser({ email });
         if (!user) {
             throw new NotFoundException('Account not found!');
         }
@@ -29,9 +29,9 @@ export class AuthService {
         return null;
     }
 
-    public async generateToken(email: string, sub: ObjectId) {
+    public generateToken(email: string, sub: ObjectId) {
         const payload = { email, sub };
-        return await this.jwtService.signAsync(payload);
+        return this.jwtService.signAsync(payload);
     }
 
     public async login(user: User, input?: LoginInput): Promise<{ user: User, accessToken: string }> {
@@ -69,7 +69,7 @@ export class AuthService {
     }
 
     public async requestForgotPassword(email: string) {
-        const user = await this.usersService.findOne({ email: email.toLowerCase() });
+        const user = await this.usersService.getUser({ email: email.toLowerCase() });
         if (!user) {
             throw new NotFoundException('Email does not exist');
         }
@@ -82,7 +82,7 @@ export class AuthService {
     }
 
     public async resetPassword(input: ResetPasswordInput) {
-        const user = await this.usersService.findOne({ email: input.email.toLowerCase() });
+        const user = await this.usersService.getUser({ email: input.email.toLowerCase() });
         if (!user) {
             throw new HttpException('User does not exist', HttpStatus.UNAUTHORIZED);
         }

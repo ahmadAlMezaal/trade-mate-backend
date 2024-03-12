@@ -1,23 +1,13 @@
-import { Field, InputType } from '@nestjs/graphql';
-import { IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validator';
-
-export enum Role {
-    ADMIN = 105,
-    TRADER = 36
-}
+import { Field, InputType } from "@nestjs/graphql";
+import { IsEmail, IsNotEmpty, IsOptional, IsString, MinLength } from "class-validator";
 
 @InputType()
-export class CreateUserInput {
+export class OauthInput {
 
     @Field(() => String)
     @IsEmail()
     @IsNotEmpty()
     email: string;
-
-    @Field(() => String)
-    @IsString()
-    @IsNotEmpty()
-    password: string;
 
     @Field(() => String)
     @IsString()
@@ -45,4 +35,9 @@ export class CreateUserInput {
     @IsNotEmpty()
     @IsString()
     city: string;
+
+    @Field(() => String, { nullable: true })
+    @IsOptional()
+    @IsString()
+    profilePhoto?: string;
 }

@@ -32,7 +32,7 @@ export class ProposalService {
 
         const [sender, listing] = await Promise.all(
             [
-                this.userService.findOne({ _id: userId }),
+                this.userService.getUser({ _id: userId }),
                 this.listingService.findOne({ _id: new ObjectId(listingId) }),
             ]
         );

@@ -47,7 +47,7 @@ export class AuthResolver {
     @UseGuards(GqlAuthGuard)
     public async me(@Context() ctx: any) {
         const user = ctx.req.user;
-        return await this.userService.findOne({ _id: user._id });
+        return await this.userService.getUser({ _id: user._id });
     }
 
     // @Mutation(() => Boolean)

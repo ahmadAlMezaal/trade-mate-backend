@@ -168,6 +168,7 @@ type LoginResponse {
 
 type Mutation {
   addListing(availableBookId: String!, description: String!, desiredBookId: String!, file: Upload!, productCondition: String!): String!
+  authenticateWithGoogle(input: OauthInput!): LoginResponse!
   deleteUser(input: DeleteUserInput!): Boolean!
   forgotPassword(input: ForgotPasswordInput!): ForgotPasswordResponse!
   login(input: LoginInput!): LoginResponse!
@@ -228,6 +229,16 @@ type Notification {
 type NotificationMetadata {
   proposalId: ID
   status: String
+}
+
+input OauthInput {
+  city: String!
+  country: String!
+  email: String!
+  firstName: String!
+  isoCountryCode: String!
+  lastName: String!
+  profilePhoto: String
 }
 
 type Proposal {
