@@ -29,7 +29,7 @@ export class OauthService {
                     country,
                     isoCountryCode,
                 };
-                this.usersService.updateUserProfile(updateParams);
+                this.usersService.updateUserProfile(email, updateParams);
 
                 return {
                     user:
