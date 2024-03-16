@@ -132,7 +132,7 @@ export class UsersService {
         return value;
     }
 
-    public async updateUserProfile(input: UpdateUserProfileInput) {
+    public async updateUserProfile(email: string, input: UpdateUserProfileInput) {
         const updatedUserParams: Partial<User> = {};
 
         if (input.city) {
@@ -147,7 +147,7 @@ export class UsersService {
             updatedUserParams['isoCode'] = input.isoCountryCode;
         }
 
-        const updatedUser = await this.update({ email: input.email.toLowerCase() }, updatedUserParams);
+        const updatedUser = await this.update({ email: email?.toLowerCase() }, updatedUserParams);
         return updatedUser;
     }
 
