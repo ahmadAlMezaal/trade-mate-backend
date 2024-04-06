@@ -16,6 +16,9 @@ export class FindUserInput {
     @Field(() => String, { nullable: true })
     lastName?: string;
 
+    @Field(() => String, { nullable: true })
+    facebookId?: string;
+
     @Field(() => Number, { nullable: true })
     verificationCode?: number;
 

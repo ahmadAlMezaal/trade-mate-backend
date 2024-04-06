@@ -26,6 +26,9 @@ export class User extends Timestamps {
   @Field(() => String, { description: "User's last name" })
   lastName: string;
 
+  @Field(() => String, { description: "Facebook ID (users who joined the app with facebook)", nullable: true })
+  facebookId?: string;
+
   @Field(() => GraphQLJSONObject, { description: "Users location attributes" })
   location: IUserLocation;
 

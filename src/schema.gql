@@ -56,10 +56,12 @@ input CreateUserInput {
   city: String!
   country: String!
   email: String!
+  facebookId: String
   firstName: String!
   isoCountryCode: String!
   lastName: String!
   password: String!
+  profilePhoto: String
 }
 
 """
@@ -69,6 +71,13 @@ scalar DateTime
 
 input DeleteUserInput {
   _id: ID!
+}
+
+input FacebookAuthDto {
+  city: String!
+  country: String!
+  identityToken: String!
+  isoCountryCode: String!
 }
 
 input FindBookInput {
@@ -84,6 +93,7 @@ input FindSingleUserInput {
 input FindUserInput {
   _id: ID
   email: String
+  facebookId: String
   firstName: String
   forgotPasswordCode: Float
   lastName: String
@@ -168,6 +178,7 @@ type LoginResponse {
 
 type Mutation {
   addListing(availableBookId: String!, description: String!, desiredBookId: String!, file: Upload!, productCondition: String!): String!
+  authenticateWithFacebook(input: FacebookAuthDto!): LoginResponse!
   authenticateWithGoogle(input: OauthInput!): LoginResponse!
   deleteUser(input: DeleteUserInput!): Boolean!
   forgotPassword(input: ForgotPasswordInput!): ForgotPasswordResponse!
@@ -322,6 +333,9 @@ type User {
 
   """Email address of the user"""
   email: String!
+
+  """Facebook ID (users who joined the app with facebook)"""
+  facebookId: String
 
   """User's first name"""
   firstName: String!
