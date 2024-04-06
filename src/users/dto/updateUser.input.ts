@@ -33,6 +33,11 @@ export class UpdateUserInput extends BaseUserInput {
     @MinLength(2)
     lastName?: string;
 
+    @Field(() => String, { nullable: true })
+    @IsString()
+    @IsOptional()
+    profilePhoto?: string;
+
     @Field(() => GraphQLJSONObject, { nullable: true })
     @IsObject()
     @IsOptional()

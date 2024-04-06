@@ -1,5 +1,5 @@
 import { Field, InputType } from '@nestjs/graphql';
-import { IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsOptional, IsString, MinLength } from 'class-validator';
 
 export enum Role {
     ADMIN = 105,
@@ -30,6 +30,16 @@ export class CreateUserInput {
     @IsNotEmpty()
     @MinLength(2)
     lastName: string;
+
+    @Field(() => String, { nullable: true })
+    @IsString()
+    @IsOptional()
+    profilePhoto?: string;
+
+    @Field(() => String, { nullable: true })
+    @IsString()
+    @IsOptional()
+    facebookId?: string;
 
     @Field(() => String)
     @IsNotEmpty()

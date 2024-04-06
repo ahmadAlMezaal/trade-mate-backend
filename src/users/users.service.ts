@@ -47,6 +47,7 @@ export class UsersService {
             connectionsIds: [],
             reputation: 0,
             pendingUserConnectionRequestsIds: [],
+            facebookId: null
         };
 
         const location: IUserLocation = {
@@ -60,8 +61,8 @@ export class UsersService {
         delete createUserInput.isoCountryCode;
 
         const userObj: User = {
-            ...createUserInput,
             ...defaults,
+            ...createUserInput,
             location,
             email: createUserInput.email.toLowerCase(),
         };

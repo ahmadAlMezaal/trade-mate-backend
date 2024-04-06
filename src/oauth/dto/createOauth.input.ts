@@ -3,7 +3,6 @@ import { IsEmail, IsNotEmpty, IsOptional, IsString, MinLength } from "class-vali
 
 @InputType()
 export class OauthInput {
-
     @Field(() => String)
     @IsEmail()
     @IsNotEmpty()
@@ -40,4 +39,26 @@ export class OauthInput {
     @IsOptional()
     @IsString()
     profilePhoto?: string;
+}
+
+@InputType()
+export class FacebookAuthDto {
+    @IsNotEmpty()
+    @Field(() => String)
+    identityToken: string;
+
+    @Field(() => String)
+    @IsNotEmpty()
+    @IsString()
+    country: string;
+
+    @Field(() => String)
+    @IsNotEmpty()
+    @IsString()
+    isoCountryCode: string;
+
+    @Field(() => String)
+    @IsNotEmpty()
+    @IsString()
+    city: string;
 }
