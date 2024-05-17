@@ -15,6 +15,7 @@ spec:
             containers:
                 - name: trade-mate
                   image: trade-mate:latest
+                  imagePullPolicy: IfNotPresent
                   ports:
                       - containerPort: 3000
                   env:
