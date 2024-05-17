@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: trade-mate
+spec:
+    replicas: 3
+    selector:
+        matchLabels:
+            app: trade-mate
+    template:
+        metadata:
+            labels:
+                app: trade-mate
+        spec:
+            containers:
+                - name: trade-mate
+                  image: trade-mate:latest
+                  ports:
+                      - containerPort: 3000
+                  env:
+                      - name: NODE_ENV
+                        value: development

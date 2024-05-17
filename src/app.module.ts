@@ -9,10 +9,10 @@ import { AppIdentifierMiddleware } from './common/middlewares/appIdentifier.midd
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { BooksModule } from './books/books.module';
 import { ListingModule } from './listing/listing.module';
-import { ProposalModule } from './proposal/proposal.module';
 import { SharedModule } from './shared/shared.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { OauthModule } from './oauth/oauth.module';
+import { ProposalModule } from './proposal/Proposal.module';
 
 @Module(
     {
