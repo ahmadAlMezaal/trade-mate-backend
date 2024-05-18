@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: Service
 metadata:
-    name: trade-mate-service
+    name: trade-mate-backend-service
 spec:
     selector:
-        app: trade-mate
+        app: trade-mate-backend
     ports:
         - protocol: TCP
           port: 3000

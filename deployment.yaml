@@ -1,20 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-    name: trade-mate
+    name: trade-mate-backend
 spec:
     replicas: 3
     selector:
         matchLabels:
-            app: trade-mate
+            app: trade-mate-backend
     template:
         metadata:
             labels:
-                app: trade-mate
+                app: trade-mate-backend
         spec:
             containers:
-                - name: trade-mate
-                  image: trade-mate:latest
+                - name: trade-mate-backend
+                  image: trade-mate-backend:latest
                   imagePullPolicy: IfNotPresent
                   ports:
                       - containerPort: 3000
