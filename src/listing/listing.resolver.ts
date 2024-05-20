@@ -6,8 +6,8 @@ import { JwtAuthGuard } from 'src/auth/guards/jwtAuth.guard';
 import { User } from 'src/users/entities/user.schema';
 import { CurrentUser } from 'src/common/decorators/currentUser.decorator';
 import { GraphQLUpload, FileUpload } from 'graphql-upload';
-import { ObjectId } from 'mongodb';
 import { ProductCondition } from 'src/types/enums';
+import { Types } from 'mongoose';
 
 @Resolver(() => Listing)
 export class ListingResolver {
@@ -41,7 +41,7 @@ export class ListingResolver {
 
     @Query(() => Listing, { name: 'listing' })
     public async findOne(@Args('_id', { type: () => String }) _id: string) {
-        return await this.listingService.findOne({ _id: new ObjectId(_id) });
+        return await this.listingService.findOne({ _id: new Types.ObjectId(_id) });
     }
 
     @UseGuards(JwtAuthGuard)

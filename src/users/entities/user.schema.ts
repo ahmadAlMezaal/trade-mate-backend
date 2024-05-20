@@ -1,15 +1,16 @@
 import { ObjectType, Field, ID } from '@nestjs/graphql';
-import { ObjectId } from 'mongodb';
 import { Role } from '../dto/createUser.input';
-import { Timestamps } from 'src/common/schemas/timestamps.schema';
 import { IUserLocation } from './user.entity';
 import { GraphQLJSONObject } from 'graphql-type-json';
+import { Document, HydratedDocument, Types } from 'mongoose';
+import { Schema, SchemaFactory } from '@nestjs/mongoose';
 
 @ObjectType()
-export class User extends Timestamps {
+@Schema({ timestamps: true })
+export class User extends Document {
 
   @Field(() => ID)
-  _id?: ObjectId;
+  _id?: Types.ObjectId;
 
   @Field(() => String, { description: 'Email address of the user' })
   email: string;
@@ -36,10 +37,10 @@ export class User extends Timestamps {
   profilePhoto?: string;
 
   @Field(() => [ID], { description: "IDs of listings bookmarked by the user", defaultValue: [] })
-  bookmarkedListingIds?: ObjectId[];
+  bookmarkedListingIds?: Types.ObjectId[];
 
   @Field(() => [ID], { description: "IDs of the proposals sent", defaultValue: [] })
-  sentProposalsIds?: ObjectId[];
+  sentProposalsIds?: Types.ObjectId[];
 
   @Field(() => String, { description: 'User role', defaultValue: Role.TRADER })
   role?: Role;
@@ -54,9 +55,13 @@ export class User extends Timestamps {
   reputation?: number;
 
   @Field(() => [ID], { description: 'Other users that connected with the user', nullable: true })
-  connectionsIds?: ObjectId[];
+  connectionsIds?: Types.ObjectId[];
 
   @Field(() => [ID], { description: 'Other users that connected with the user', nullable: true })
-  pendingUserConnectionRequestsIds?: ObjectId[];
-
+  pendingUserConnectionRequestsIds?: Types.ObjectId[];
 }
+
+export const UserSchema = SchemaFactory.createForClass(User);
+
+export type UserDocument = HydratedDocument<User>;
+

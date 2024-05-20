@@ -1,43 +1,46 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateNotificationInput } from './dto/createNotification.input';
-import { Collection, ObjectId } from 'mongodb';
-import { ConnectionStatus, Notification, NotificationStatus, NotificationType } from './entities/notification.schema';
-import { DBCollectionTokens } from 'src/types/enums';
+import { ConnectionStatus, Notification, NotificationDocument, NotificationStatus, NotificationType } from './entities/notification.schema';
+import { FilterQuery, Model, Types } from 'mongoose';
+import { InjectModel } from '@nestjs/mongoose';
+import { DeleteResult } from 'mongodb';
 
 @Injectable()
 export class NotificationsService {
 
     constructor(
-        @Inject(DBCollectionTokens.NOTIFICATIONS_COLLECTION) private readonly notificationsCollection: Collection<Notification>) {
+        @InjectModel(Notification.name) private readonly notificationsCollection: Model<NotificationDocument>,
+
+    ) {
     }
 
     public async createOne(createNotificationInput: CreateNotificationInput): Promise<Notification> {
         const { senderId, recipientId, message, type, listingId, title, proposalId, metadata } = createNotificationInput;
 
         const defaults: Partial<Notification> = {
-            createdAt: new Date(),
-            updatedAt: new Date(),
             status: NotificationStatus.UNREAD,
         };
 
-        const notification: Notification = {
-            title,
-            message,
-            recipientId: new ObjectId(recipientId),
-            listingId: listingId ? new ObjectId(listingId) : null,
-            senderId: senderId ? new ObjectId(senderId) : null,
-            proposalId: proposalId ? new ObjectId(proposalId) : null,
-            metadata: metadata ?
-                {
-                    proposalId: metadata.proposalId || null,
-                    status: metadata.status || null,
-                } :
-                null,
-            type,
-            ...defaults
-        };
-        const result = await this.notificationsCollection.insertOne(notification);
-        return { _id: result.insertedId, ...notification };
+        const notification = new Notification(
+            {
+                title,
+                message,
+                recipientId: new Types.ObjectId(recipientId),
+                listingId: listingId ? new Types.ObjectId(listingId) : null,
+                senderId: senderId ? new Types.ObjectId(senderId) : null,
+                proposalId: proposalId ? new Types.ObjectId(proposalId) : null,
+                metadata: metadata ?
+                    {
+                        proposalId: metadata.proposalId || null,
+                        status: metadata.status || null,
+                    } :
+                    null,
+                type,
+                ...defaults
+            }
+        );
+        const result = await notification.save();
+        return result;
     }
 
     public sendPushNotification(createNotificationInput: CreateNotificationInput) {
@@ -48,39 +51,38 @@ export class NotificationsService {
         return await this.notificationsCollection
             .find(
                 {
-                    recipientId: new ObjectId(userId),
+                    recipientId: new Types.ObjectId(userId),
                     $or: [
                         { "metadata.status": null },
                         { "metadata.status": ConnectionStatus.PENDING }
                     ]
                 }
-            )
-            .toArray();
+            );
 
     }
 
     public async markAsRead(notificationId: string): Promise<{ success: boolean }> {
         const result = await this.notificationsCollection
             .updateOne(
-                { _id: new ObjectId(notificationId) },
+                { _id: new Types.ObjectId(notificationId) },
                 { $set: { status: NotificationStatus.READ } },
             );
         return { success: result.modifiedCount > 0 };
 
     }
 
-    public async findOne(params: Partial<Notification>) {
+    public async findOne(params: FilterQuery<Notification>) {
         return await this.notificationsCollection.findOne({ ...params });
     }
 
-    public async deleteOne(params: Partial<Notification>) {
-        return await this.notificationsCollection.deleteOne({ ...params });
+    public async deleteNotification(params: FilterQuery<Notification>): Promise<DeleteResult> {
+        return this.notificationsCollection.deleteOne({ ...params });
     }
 
     public async respondToConnection(recipientId: string, status: ConnectionStatus) {
         return await this.notificationsCollection.findOneAndUpdate(
             {
-                recipientId: new ObjectId(recipientId),
+                recipientId: new Types.ObjectId(recipientId),
                 type: NotificationType.CONNECTION_REQUEST,
                 'metadata.status': ConnectionStatus.PENDING
             },

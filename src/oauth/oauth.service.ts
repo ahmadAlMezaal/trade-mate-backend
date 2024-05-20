@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { FacebookAuthDto, OauthInput } from './dto/createOauth.input';
 import { UsersService } from 'src/users/users.service';
-import { User } from 'src/users/entities/user.schema';
 import { AuthService } from 'src/auth/auth.service';
 import { CreateUserInput } from 'src/users/dto/createUser.input';
 import * as bcrypt from 'bcrypt';
@@ -9,6 +8,7 @@ import { UpdateUserProfileInput } from 'src/users/dto/updateUser.input';
 import axios from 'axios';
 import { FacebookUserDataResponse } from './entities/oauth.entity';
 import { LoginResponse } from 'src/auth/schemas/auth.schema';
+import { User } from 'src/users/entities/user.schema';
 
 @Injectable()
 export class OauthService {
@@ -39,7 +39,7 @@ export class OauthService {
                 return {
                     user:
                     {
-                        ...existingUser,
+                        ...existingUser as any,
                         location: {
                             city,
                             country,
@@ -91,7 +91,7 @@ export class OauthService {
         if (existingUser) {
             accessToken = await this.authService.generateToken(existingUser.email, existingUser._id);
             if (picture.data.url && (!existingUser.profilePhoto || existingUser.profilePhoto !== picture.data.url)) {
-                existingUser = await this.usersService.update({ _id: existingUser._id }, { profilePhoto: picture.data.url });
+                existingUser = await this.usersService.updateOne({ _id: existingUser._id }, { profilePhoto: picture.data.url });
             }
             return { user: existingUser, accessToken };
         }

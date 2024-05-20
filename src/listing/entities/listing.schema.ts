@@ -1,14 +1,15 @@
 import { ObjectType, Field, ID } from '@nestjs/graphql';
-import { ObjectId } from 'mongodb';
+import { Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Document, HydratedDocument, Types } from 'mongoose';
 import { Book } from 'src/books/entities/book.schema';
-import { Timestamps } from 'src/common/schemas/timestamps.schema';
 import { ListingStatus, ProductCondition } from 'src/types/enums';
 
 @ObjectType()
-export class Listing extends Timestamps {
+@Schema({ timestamps: true })
+export class Listing extends Document {
 
     @Field(() => ID)
-    _id?: ObjectId;
+    _id?: Types.ObjectId;
 
     @Field(() => String, { description: 'Title of the listing' })
     title?: string;
@@ -26,7 +27,7 @@ export class Listing extends Timestamps {
     desiredBookInfo: Book;
 
     @Field(() => ID)
-    listingOwnerId: ObjectId;
+    listingOwnerId: Types.ObjectId;
 
     @Field(() => String, { description: 'The language of the book' })
     productCondition: ProductCondition;
@@ -35,6 +36,10 @@ export class Listing extends Timestamps {
     status?: ListingStatus;
 
     @Field(() => [ID], { description: 'IDs of the proposals received' })
-    proposalsIds?: ObjectId[];
+    proposalsIds?: Types.ObjectId[];
 
 }
+
+export const ListingSchema = SchemaFactory.createForClass(Listing);
+
+export type ListingDocument = HydratedDocument<Listing>;

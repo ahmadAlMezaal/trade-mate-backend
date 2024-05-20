@@ -6,37 +6,44 @@ import { FindSingleUserInput, FindUserInput } from './dto/findOne.input';
 import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/guards/jwtAuth.guard';
 import { CurrentUser } from 'src/common/decorators/currentUser.decorator';
-import { ObjectId } from 'mongodb';
 import { Listing } from 'src/listing/entities/listing.schema';
 import { Proposal } from 'src/proposal/entities/proposal.schema';
 import { ConnectionStatus } from 'src/notifications/entities/notification.schema';
 import { ListingService } from 'src/listing/listing.service';
+import { Types } from 'mongoose';
 
 @Resolver(() => User)
 export class UsersResolver {
     constructor(
         private readonly userService: UsersService,
-        private readonly ListingService: ListingService
+        private readonly listingService: ListingService
     ) { }
 
     @Query(() => User, { name: 'profile' })
-    @UseGuards(JwtAuthGuard)
-    public getLoggedInUser(@CurrentUser() user: User): User {
-        return user;
+    public async getLoggedInUser() {
+        const tst = await this.userService.findAll();
+        console.log('tst: ', tst);
+        return {} as User;
     }
+
+    // @Query(() => User, { name: 'profile' })
+    // @UseGuards(JwtAuthGuard)
+    // public getLoggedInUser(@CurrentUser() user: User): User {
+    //     return user;
+    // }
 
     @Query(() => User, { name: 'info' })
     @UseGuards(JwtAuthGuard)
     public async getUserInfo(@Args('input') input: FindSingleUserInput) {
-        input._id = new ObjectId(input._id);
+        input._id = new Types.ObjectId(input._id);
         return this.userService.getUser(input);
     }
 
     @Query(() => [Listing], { name: 'bookmarks' })
     @UseGuards(JwtAuthGuard)
     public async getBookmarkedListings(@CurrentUser() user: User) {
-        const ids: ObjectId[] = user.bookmarkedListingIds?.map(_id => new ObjectId(_id));
-        return this.ListingService.getListingsByIds(ids);
+        const ids: Types.ObjectId[] = user.bookmarkedListingIds?.map(_id => new Types.ObjectId(_id));
+        return this.listingService.getListingsByIds(ids);
     }
 
     @Query(() => [Proposal], { name: 'proposals' })

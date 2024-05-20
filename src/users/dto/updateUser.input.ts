@@ -4,6 +4,7 @@ import { IsArray, IsBoolean, IsEmail, IsNumber, IsObject, IsOptional, IsString, 
 import { ObjectId } from 'mongodb';
 import { IUserLocation } from '../entities/user.entity';
 import { GraphQLJSONObject } from 'graphql-type-json';
+import { Types } from 'mongoose';
 
 @InputType()
 export class BaseUserInput {
@@ -62,6 +63,11 @@ export class UpdateUserInput extends BaseUserInput {
     @Field(() => Number, { nullable: true })
     @IsNumber()
     reputation?: number;
+
+    @Field(() => [ObjectId], { nullable: true })
+    @IsArray()
+    pendingUserConnectionRequestsIds?: Types.ObjectId[];
+
 }
 
 @InputType()

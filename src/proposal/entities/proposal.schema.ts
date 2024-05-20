@@ -1,14 +1,15 @@
 import { ObjectType, Field, ID } from '@nestjs/graphql';
-import { ObjectId } from 'mongodb';
+import { Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Document, HydratedDocument, Types } from 'mongoose';
 import { Book } from 'src/books/entities/book.schema';
-import { Timestamps } from 'src/common/schemas/timestamps.schema';
 import { ProposalStatus, ProductCondition } from 'src/types/enums';
 
 @ObjectType()
-export class Proposal extends Timestamps {
+@Schema({ timestamps: true })
+export class Proposal extends Document {
 
     @Field(() => ID)
-    _id?: ObjectId;
+    _id?: Types.ObjectId;
 
     @Field(() => String, { description: 'Title of the proposal', })
     title?: string;
@@ -20,13 +21,13 @@ export class Proposal extends Timestamps {
     imageUrls: string[];
 
     @Field(() => ID)
-    senderId: ObjectId;
+    senderId: Types.ObjectId;
 
     @Field(() => ID)
-    recipientId: ObjectId;
+    recipientId: Types.ObjectId;
 
     @Field(() => ID)
-    listingId: ObjectId;
+    listingId: Types.ObjectId;
 
     @Field(() => Book, { description: 'Contains information about the item offered by the trader.' })
     offeredItem: Book;
@@ -39,5 +40,8 @@ export class Proposal extends Timestamps {
 
     @Field(() => String, { description: 'Status of the proposal' })
     status?: ProposalStatus;
-
 }
+
+export const ProposalSchema = SchemaFactory.createForClass(Proposal);
+
+export type ProposalDocument = HydratedDocument<Proposal>;

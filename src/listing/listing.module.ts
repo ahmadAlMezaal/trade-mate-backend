@@ -3,15 +3,28 @@ import { CommonModule } from 'src/common/modules/common.module';
 
 import { ListingService } from './listing.service';
 import { ListingResolver } from './listing.resolver';
-import { listingProviders } from './providers/listing.provider';
 import { BooksModule } from 'src/books/books.module';
 import { AwsModule } from 'src/aws/aws.module';
+import { MongooseModule } from '@nestjs/mongoose';
+import { Listing, ListingSchema } from './entities/listing.schema';
 
 @Module(
     {
-        imports: [CommonModule, BooksModule, AwsModule],
-        providers: [ListingResolver, ListingService, ...listingProviders],
-        exports: [...listingProviders, ListingService],
+        imports: [
+            CommonModule,
+            BooksModule,
+            AwsModule,
+            MongooseModule.forFeature(
+                [
+                    {
+                        name: Listing.name,
+                        schema: ListingSchema
+                    }
+                ]
+            )
+        ],
+        providers: [ListingResolver, ListingService],
+        exports: [ListingService],
     }
 )
 

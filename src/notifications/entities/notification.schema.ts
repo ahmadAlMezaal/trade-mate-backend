@@ -1,6 +1,6 @@
 import { ObjectType, Field, ID } from '@nestjs/graphql';
-import { ObjectId } from 'mongodb';
-import { Timestamps } from 'src/common/schemas/timestamps.schema';
+import { Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Document, HydratedDocument, Types } from 'mongoose';
 
 export enum NotificationType {
     PROPOSAL_RECEIVED = 'proposal_received',
@@ -28,14 +28,15 @@ export class NotificationMetadata {
     status?: ConnectionStatus;
 
     @Field(() => ID, { nullable: true })
-    proposalId?: ObjectId;
+    proposalId?: Types.ObjectId;
 }
 
 @ObjectType()
-export class Notification extends Timestamps {
+@Schema({ timestamps: true })
+export class Notification extends Document {
 
     @Field(() => ID, { description: 'The unique identifier for the notification.' })
-    _id?: ObjectId;
+    _id?: Types.ObjectId;
 
     @Field(() => String, { description: 'The title of the message.' })
     title: string;
@@ -47,16 +48,16 @@ export class Notification extends Timestamps {
     type: NotificationType;
 
     @Field(() => ID, { description: 'The user who should receive the notification.' })
-    recipientId: ObjectId;
+    recipientId: Types.ObjectId;
 
     @Field(() => ID, { description: 'The user who initiated the action that triggered the notification (if applicable).', nullable: true })
-    senderId?: ObjectId;
+    senderId?: Types.ObjectId;
 
     @Field(() => ID, { description: 'The identifier for the listing (if applicable)', nullable: true })
-    listingId?: ObjectId;
+    listingId?: Types.ObjectId;
 
     @Field(() => ID, { description: 'The identifier for proposal (if applicable)', nullable: true })
-    proposalId?: ObjectId;
+    proposalId?: Types.ObjectId;
 
     @Field(() => String, { description: 'The status of the notification (e.g., "unread", "read").' })
     status?: NotificationStatus;
@@ -65,3 +66,7 @@ export class Notification extends Timestamps {
     metadata?: NotificationMetadata;
 
 }
+
+export const NotificationSchema = SchemaFactory.createForClass(Notification);
+
+export type NotificationDocument = HydratedDocument<Notification>;

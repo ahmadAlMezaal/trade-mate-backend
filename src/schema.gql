@@ -64,11 +64,6 @@ input CreateUserInput {
   profilePhoto: String
 }
 
-"""
-A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
-"""
-scalar DateTime
-
 input DeleteUserInput {
   _id: ID!
 }
@@ -127,9 +122,6 @@ scalar JSONObject
 type Listing {
   _id: ID!
 
-  """The date when the entity was created"""
-  createdAt: DateTime!
-
   """description of the listing"""
   description: String!
 
@@ -154,9 +146,6 @@ type Listing {
 
   """Title of the listing"""
   title: String!
-
-  """The last date when the entity was updated"""
-  updatedAt: DateTime!
 }
 
 input LoginInput {
@@ -197,9 +186,6 @@ type Notification {
   """The unique identifier for the notification."""
   _id: ID!
 
-  """The date when the entity was created"""
-  createdAt: DateTime!
-
   """The identifier for the listing (if applicable)"""
   listingId: ID
 
@@ -232,9 +218,6 @@ type Notification {
   The type of notification (e.g., "proposal_received", "item_traded", etc.)
   """
   type: String!
-
-  """The last date when the entity was updated"""
-  updatedAt: DateTime!
 }
 
 type NotificationMetadata {
@@ -258,9 +241,6 @@ type Proposal {
   """description of the proposal"""
   additionalInfo: String!
 
-  """The date when the entity was created"""
-  createdAt: DateTime!
-
   """
   Contains information about the item that the trader wants to trade for.
   """
@@ -283,9 +263,6 @@ type Proposal {
 
   """Title of the proposal"""
   title: String!
-
-  """The last date when the entity was updated"""
-  updatedAt: DateTime!
 }
 
 type Query {
@@ -328,9 +305,6 @@ type User {
   """Other users that connected with the user"""
   connectionsIds: [ID!]
 
-  """The date when the entity was created"""
-  createdAt: DateTime!
-
   """Email address of the user"""
   email: String!
 
@@ -371,9 +345,6 @@ type User {
 
   """IDs of the proposals sent"""
   sentProposalsIds: [ID!]!
-
-  """The last date when the entity was updated"""
-  updatedAt: DateTime!
 
   """Verification code on registration"""
   verificationCode: String

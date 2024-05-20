@@ -19,15 +19,6 @@ export enum ListingStatus {
     TRADED = 'Traded',
 }
 
-export enum DBCollectionTokens {
-    DATABASE_CONNECTION = 'DATABASE_CONNECTION',
-    BOOKS_COLLECTION = 'BOOKS_COLLECTION',
-    USERS_COLLECTION = 'USERS_COLLECTION',
-    LISTINGS_COLLECTION = 'LISTINGS_COLLECTION',
-    PROPOSALS_COLLECTION = 'PROPOSALS_COLLECTION',
-    NOTIFICATIONS_COLLECTION = 'NOTIFICATIONS_COLLECTION',
-}
-
 export enum DBCollections {
     USERS = 'users',
     LISTINGS = 'listings',
@@ -36,3 +27,6 @@ export enum DBCollections {
     NOTIFICATIONS = 'notifications'
 }
 
+export enum ConfigVariables {
+    MONGODB_URI = 'database.mongodbUri',
+}

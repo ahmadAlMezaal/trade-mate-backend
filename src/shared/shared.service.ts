@@ -1,15 +1,15 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { Collection, ObjectId } from 'mongodb';
+import { Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model, Types } from 'mongoose';
 import { Proposal } from 'src/proposal/entities/proposal.schema';
-import { DBCollectionTokens } from 'src/types/enums';
-import { User } from 'src/users/entities/user.schema';
+import { User, UserDocument } from 'src/users/entities/user.schema';
 
 @Injectable()
 export class SharedService {
 
     constructor(
-        @Inject(DBCollectionTokens.PROPOSALS_COLLECTION) private readonly proposalCollection: Collection<Proposal>,
-        @Inject(DBCollectionTokens.USERS_COLLECTION) private readonly userCollection: Collection<User>,
+        @InjectModel(User.name) private readonly userCollection: Model<UserDocument>,
+        @InjectModel(User.name) private readonly proposalCollection: Model<UserDocument>,
     ) {
     }
 
@@ -26,7 +26,7 @@ export class SharedService {
     }
 
     public getUserProposals(userId: string): Promise<Proposal[]> {
-        return this.proposalCollection.find({ senderId: new ObjectId(userId) }).toArray();
+        return this.proposalCollection.find({ senderId: new Types.ObjectId(userId) });
     }
 
 }
