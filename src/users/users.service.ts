@@ -81,9 +81,12 @@ export class UsersService {
     // }
 
     public async findAll(): Promise<User[]> {
+        console.log('User.length: ', User.length);
+        console.log('User.name: ', User.name);
+
         console.log('this.userCollection: ', this.userCollection);
 
-        return this.userCollection.find({});
+        return this.userCollection.find().exec();
     }
 
     public async getConnections(userId: string): Promise<User[]> {

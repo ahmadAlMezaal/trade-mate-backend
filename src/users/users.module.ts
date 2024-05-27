@@ -14,11 +14,6 @@ import { User, UserSchema } from './entities/user.schema';
     {
         //TODO: Try to make the ConfigModule in CommonModule
         imports: [
-            ConfigModule,
-            CommonModule,
-            ListingModule,
-            SharedModule,
-            NotificationsModule,
             MongooseModule.forFeature(
                 [
                     {
@@ -26,7 +21,12 @@ import { User, UserSchema } from './entities/user.schema';
                         schema: UserSchema
                     }
                 ]
-            )
+            ),
+            ConfigModule,
+            CommonModule,
+            ListingModule,
+            SharedModule,
+            NotificationsModule,
         ],
         providers: [
             UsersResolver,
