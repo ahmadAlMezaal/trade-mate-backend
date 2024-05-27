@@ -8,35 +8,25 @@ import { DeleteResult } from 'mongodb';
 @Injectable()
 export class NotificationsService {
 
-    constructor(
-        @InjectModel(Notification.name) private readonly notificationsCollection: Model<NotificationDocument>,
-
-    ) {
-    }
+    constructor(@InjectModel(Notification.name) private readonly notificationsCollection: Model<NotificationDocument>) { }
 
     public async createOne(createNotificationInput: CreateNotificationInput): Promise<Notification> {
         const { senderId, recipientId, message, type, listingId, title, proposalId, metadata } = createNotificationInput;
-
-        const defaults: Partial<Notification> = {
-            status: NotificationStatus.UNREAD,
-        };
 
         const notification = new Notification(
             {
                 title,
                 message,
-                recipientId: new Types.ObjectId(recipientId),
-                listingId: listingId ? new Types.ObjectId(listingId) : null,
-                senderId: senderId ? new Types.ObjectId(senderId) : null,
-                proposalId: proposalId ? new Types.ObjectId(proposalId) : null,
-                metadata: metadata ?
-                    {
-                        proposalId: metadata.proposalId || null,
-                        status: metadata.status || null,
-                    } :
-                    null,
                 type,
-                ...defaults
+                recipientId: new Types.ObjectId(recipientId),
+                listingId: listingId && new Types.ObjectId(listingId),
+                senderId: senderId && new Types.ObjectId(senderId),
+                proposalId: proposalId && new Types.ObjectId(proposalId),
+                metadata: metadata &&
+                {
+                    proposalId: metadata.proposalId || null,
+                    status: metadata.status || null,
+                },
             }
         );
         const result = await notification.save();

@@ -1,17 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
-import { Proposal } from 'src/proposal/entities/proposal.schema';
-import { User, UserDocument } from 'src/users/entities/user.schema';
+import { Proposal, ProposalDocument } from 'src/proposal/entities/proposal.schema';
 
 @Injectable()
 export class SharedService {
 
-    constructor(
-        @InjectModel(User.name) private readonly userCollection: Model<UserDocument>,
-        @InjectModel(User.name) private readonly proposalCollection: Model<UserDocument>,
-    ) {
-    }
+    constructor(@InjectModel(Proposal.name) private readonly proposalCollection: Model<ProposalDocument>) { }
 
     findAll() {
         return `This action returns all shared`;

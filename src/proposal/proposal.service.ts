@@ -25,8 +25,7 @@ export class ProposalService {
         private readonly awsService: AwsService,
         private readonly userService: UsersService,
         private readonly notificationService: NotificationsService,
-    ) {
-    }
+    ) { }
 
     public async createOne(createOfferInput: CreateProposalInput, fileUpload: FileUpload, userId: ObjectId): Promise<string> {
 
@@ -101,11 +100,10 @@ export class ProposalService {
         );
 
         const proposalDefaults: Partial<Proposal> = {
-            status: ProposalStatus.PENDING,
             title: `Trade ${offeredItem.title} for ${desiredItem.title}`,
         };
 
-        const proposal = new Proposal(
+        const proposal = new this.proposalCollection(
             {
                 productCondition,
                 additionalInfo,

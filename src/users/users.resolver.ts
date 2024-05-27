@@ -20,10 +20,9 @@ export class UsersResolver {
     ) { }
 
     @Query(() => User, { name: 'profile' })
-    public async getLoggedInUser() {
-        const tst = await this.userService.findAll();
-        console.log('tst: ', tst);
-        return {} as User;
+    @UseGuards(JwtAuthGuard)
+    public getLoggedInUser(@CurrentUser() user: User): User {
+        return user;
     }
 
     // @Query(() => User, { name: 'profile' })

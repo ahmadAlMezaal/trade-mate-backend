@@ -64,6 +64,11 @@ input CreateUserInput {
   profilePhoto: String
 }
 
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
 input DeleteUserInput {
   _id: ID!
 }
@@ -305,6 +310,9 @@ type User {
   """Other users that connected with the user"""
   connectionsIds: [ID!]
 
+  """The date when the entity was created"""
+  createdAt: DateTime!
+
   """Email address of the user"""
   email: String!
 
@@ -345,6 +353,9 @@ type User {
 
   """IDs of the proposals sent"""
   sentProposalsIds: [ID!]!
+
+  """The last date when the entity was updated"""
+  updatedAt: DateTime!
 
   """Verification code on registration"""
   verificationCode: String

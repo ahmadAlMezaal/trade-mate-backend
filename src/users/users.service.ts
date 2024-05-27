@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { ObjectId } from 'mongodb';
-import { CreateUserInput, Role } from './dto/createUser.input';
+import { CreateUserInput } from './dto/createUser.input';
 import { FindUserInput } from './dto/findOne.input';
 import { DeleteUserInput, UpdateUserInput, UpdateUserProfileInput } from './dto/updateUser.input';
 import { User, UserDocument } from './entities/user.schema';
@@ -23,7 +23,8 @@ export class UsersService {
     ) { }
 
     public async create(createUserInput: CreateUserInput): Promise<User> {
-        const user = await this.userCollection.findOne({ email: createUserInput.email.toLowerCase() });
+        const email = createUserInput.email.toLowerCase();
+        const user = await this.userCollection.findOne({ email });
         if (user) {
             throw new HttpException(
                 { message: 'Email already taken Error' },
@@ -35,18 +36,6 @@ export class UsersService {
         const password = createUserInput.password;
         createUserInput.password = await bcrypt.hash(password, saltOrRounds);
 
-        const defaults: Partial<User> = {
-            bookmarkedListingIds: [],
-            isVerified: false,
-            role: Role.TRADER,
-            profilePhoto: 'https://spng.pngfind.com/pngs/s/676-6764065_default-profile-picture-transparent-hd-png-download.png',
-            sentProposalsIds: [],
-            connectionsIds: [],
-            reputation: 0,
-            pendingUserConnectionRequestsIds: [],
-            facebookId: null
-        };
-
         const location: IUserLocation = {
             city: createUserInput.city,
             country: createUserInput.country,
@@ -57,21 +46,17 @@ export class UsersService {
         delete createUserInput.country;
         delete createUserInput.isoCountryCode;
 
-        const userObj = {
-            ...defaults,
-            ...createUserInput,
-            location,
-            email: createUserInput.email.toLowerCase(),
-        };
+        const userObj = { ...createUserInput, location, email };
 
-        const returnedUser = await new User(userObj).save();
-
-        if (!returnedUser) {
+        const savedUser = new this.userCollection(userObj);
+        await savedUser.save();
+        if (!savedUser) {
             throw new InternalServerErrorException('Error creating account');
         }
-        delete returnedUser.password;
+        delete savedUser.password;
+        const { password: _, ...userWithoutPassword } = savedUser.toObject();
 
-        return returnedUser;
+        return userWithoutPassword as User;
     }
 
     //TODO Config this for pagination, follow this tutorial: https://javascript.plainenglish.io/graphql-nodejs-mongodb-made-easy-with-nestjs-and-mongoose-29f9c0ea7e1d
@@ -81,12 +66,7 @@ export class UsersService {
     // }
 
     public async findAll(): Promise<User[]> {
-        console.log('User.length: ', User.length);
-        console.log('User.name: ', User.name);
-
-        console.log('this.userCollection: ', this.userCollection);
-
-        return this.userCollection.find().exec();
+        return this.userCollection.find({});
     }
 
     public async getConnections(userId: string): Promise<User[]> {
