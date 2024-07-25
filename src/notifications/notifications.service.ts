@@ -13,7 +13,7 @@ export class NotificationsService {
     public async createOne(createNotificationInput: CreateNotificationInput): Promise<Notification> {
         const { senderId, recipientId, message, type, listingId, title, proposalId, metadata } = createNotificationInput;
 
-        const notification = new Notification(
+        const notification = new this.notificationsCollection(
             {
                 title,
                 message,
@@ -29,8 +29,7 @@ export class NotificationsService {
                 },
             }
         );
-        const result = await notification.save();
-        return result;
+        return notification.save();
     }
 
     public sendPushNotification(createNotificationInput: CreateNotificationInput) {
@@ -38,7 +37,7 @@ export class NotificationsService {
     }
 
     public async getUserNotifications(userId: string): Promise<Notification[]> {
-        return await this.notificationsCollection
+        return this.notificationsCollection
             .find(
                 {
                     recipientId: new Types.ObjectId(userId),
