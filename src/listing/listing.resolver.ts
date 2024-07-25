@@ -36,7 +36,10 @@ export class ListingResolver {
     @UseGuards(JwtAuthGuard)
     @Query(() => [Listing], { name: 'feed' })
     async getFeed(@CurrentUser() user: User): Promise<Listing[]> {
-        return await this.listingService.fetchFeed(user._id);
+        console.log('reached here');
+        const tst = await this.listingService.fetchFeed(user._id);
+        console.log('tst: ', tst);
+        return tst;
     }
 
     @Query(() => Listing, { name: 'listing' })

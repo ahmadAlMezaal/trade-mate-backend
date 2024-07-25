@@ -56,23 +56,23 @@ export class User extends Document {
   @Prop({ type: String, default: Role.TRADER })
   role?: Role;
 
-  @Field(() => String, { description: 'Verification code on registration', nullable: true })
+  @Field(() => String, { description: 'Verification code on registration', defaultValue: null })
   @Prop({ type: Number })
   verificationCode?: number;
 
-  @Field(() => String, { description: 'Code used whenever the user wants to reset their password', nullable: true })
+  @Field(() => String, { description: 'Code used whenever the user wants to reset their password', defaultValue: null })
   @Prop({ type: Number })
   forgotPasswordCode?: number;
 
-  @Field(() => Number, { description: 'A number that is responsible for the reputation of the user. The higher the more trusted', nullable: true })
+  @Field(() => Number, { description: 'A number that is responsible for the reputation of the user. The higher the more trusted', defaultValue: 0 })
   @Prop({ type: Number, default: 0 })
   reputation: number;
 
-  @Field(() => [ID], { description: 'Other users that connected with the user', nullable: true })
+  @Field(() => [ID], { description: 'Other users that connected with the user', defaultValue: [] })
   @Prop({ type: [Types.ObjectId], default: [] })
   connectionsIds: Types.ObjectId[];
 
-  @Field(() => [ID], { description: 'Other users that connected with the user', nullable: true })
+  @Field(() => [ID], { description: 'Other users that connected with the user', defaultValue: [] })
   @Prop({ type: [Types.ObjectId], default: [] })
   pendingUserConnectionRequestsIds: Types.ObjectId[];
 

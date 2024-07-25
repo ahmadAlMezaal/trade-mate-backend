@@ -1,7 +1,6 @@
 
 import { Field, ID, InputType } from '@nestjs/graphql';
 import { IsArray, IsBoolean, IsEmail, IsNumber, IsObject, IsOptional, IsString, MinLength } from 'class-validator';
-import { ObjectId } from 'mongodb';
 import { IUserLocation } from '../entities/user.entity';
 import { GraphQLJSONObject } from 'graphql-type-json';
 import { Types } from 'mongoose';
@@ -10,7 +9,7 @@ import { Types } from 'mongoose';
 export class BaseUserInput {
 
     @Field(() => ID, { nullable: true })
-    _id?: ObjectId;
+    _id?: Types.ObjectId;
 
     @Field({ nullable: true })
     @IsEmail()
@@ -52,19 +51,19 @@ export class UpdateUserInput extends BaseUserInput {
     @IsBoolean()
     forgotPasswordCode?: number;
 
-    @Field(() => [ObjectId], { nullable: true })
+    @Field(() => [Types.ObjectId], { nullable: true })
     @IsArray()
-    bookmarkedListingIds?: ObjectId[];
+    bookmarkedListingIds?: Types.ObjectId[];
 
-    @Field(() => [ObjectId], { nullable: true })
+    @Field(() => [Types.ObjectId], { nullable: true })
     @IsObject()
-    connectionsIds?: ObjectId[];
+    connectionsIds?: Types.ObjectId[];
 
     @Field(() => Number, { nullable: true })
     @IsNumber()
     reputation?: number;
 
-    @Field(() => [ObjectId], { nullable: true })
+    @Field(() => [Types.ObjectId], { nullable: true })
     @IsArray()
     pendingUserConnectionRequestsIds?: Types.ObjectId[];
 
@@ -73,7 +72,7 @@ export class UpdateUserInput extends BaseUserInput {
 @InputType()
 export class DeleteUserInput {
     @Field(() => ID)
-    _id: ObjectId;
+    _id: Types.ObjectId;
 }
 
 @InputType()
@@ -102,13 +101,13 @@ export class UpdateUserProfileInput extends BaseUserInput {
     @IsArray()
     isoCountryCode?: string;
 
-    @Field(() => [ObjectId], { nullable: true })
+    @Field(() => [Types.ObjectId], { nullable: true })
     @IsArray()
-    bookmarkedListingIds?: ObjectId[];
+    bookmarkedListingIds?: Types.ObjectId[];
 
-    @Field(() => [ObjectId], { nullable: true })
+    @Field(() => [Types.ObjectId], { nullable: true })
     @IsObject()
-    connectionsIds?: ObjectId[];
+    connectionsIds?: Types.ObjectId[];
 
     @Field(() => Number, { nullable: true })
     @IsNumber()

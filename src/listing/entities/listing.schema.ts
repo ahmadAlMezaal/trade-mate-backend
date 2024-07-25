@@ -32,10 +32,10 @@ export class Listing extends Document {
     @Field(() => String, { description: 'The language of the book' })
     productCondition: ProductCondition;
 
-    @Field(() => String, { description: 'Used for the admin to approve the listing' })
+    @Field(() => String, { description: 'Used for the admin to approve the listing', defaultValue: ListingStatus.PENDING })
     status?: ListingStatus;
 
-    @Field(() => [ID], { description: 'IDs of the proposals received' })
+    @Field(() => [ID], { description: 'IDs of the proposals received', defaultValue: [] })
     proposalsIds?: Types.ObjectId[];
 
 }

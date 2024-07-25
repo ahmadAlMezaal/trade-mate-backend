@@ -1,11 +1,11 @@
 import { Field, ID, InputType } from "@nestjs/graphql";
-import { ObjectId } from "mongodb";
+import { Types } from "mongoose";
 import { Book } from "src/books/entities/book.schema";
 
 @InputType()
 export class ListingInput {
     @Field(() => ID)
-    _id?: ObjectId;
+    _id?: Types.ObjectId;
 
     @Field(() => String, { description: 'Title of the listing' })
     title: string;
@@ -20,5 +20,5 @@ export class ListingInput {
     bookInfo: Book;
 
     @Field(() => ID)
-    listingOwnerId: ObjectId;
+    listingOwnerId: Types.ObjectId;
 }

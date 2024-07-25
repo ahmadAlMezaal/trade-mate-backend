@@ -1,11 +1,11 @@
 import { Field, ID, InputType } from "@nestjs/graphql";
-import { ObjectId } from "mongodb";
+import { Types } from "mongoose";
 
 @InputType()
 export class FindBookInput {
 
     @Field(() => ID, { nullable: true })
-    _id?: ObjectId;
+    _id?: Types.ObjectId;
 
     @Field(() => String, { nullable: true })
     name?: string;

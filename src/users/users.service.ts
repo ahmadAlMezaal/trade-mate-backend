@@ -1,5 +1,4 @@
 import { HttpException, HttpStatus, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
-import { ObjectId } from 'mongodb';
 import { CreateUserInput } from './dto/createUser.input';
 import { FindUserInput } from './dto/findOne.input';
 import { DeleteUserInput, UpdateUserInput, UpdateUserProfileInput } from './dto/updateUser.input';
@@ -70,7 +69,7 @@ export class UsersService {
     }
 
     public async getConnections(userId: string): Promise<User[]> {
-        const user = await this.userCollection.findOne({ _id: new ObjectId(userId) });
+        const user = await this.userCollection.findOne({ _id: new Types.ObjectId(userId) });
         if (!user) {
             throw new NotFoundException('User not found!');
         }
@@ -125,8 +124,8 @@ export class UsersService {
     }
 
     public async addProposal(userId: string, proposalIdStr: string) {
-        const _id = new ObjectId(userId);
-        const proposalId = new ObjectId(proposalIdStr);
+        const _id = new Types.ObjectId(userId);
+        const proposalId = new Types.ObjectId(proposalIdStr);
 
         const result = await this.userCollection.findOneAndUpdate(
             { _id },
@@ -144,7 +143,7 @@ export class UsersService {
 
     public async remove(input: DeleteUserInput): Promise<boolean> {
         const { _id } = input;
-        const response = await this.userCollection.deleteOne({ _id: new ObjectId(_id) });
+        const response = await this.userCollection.deleteOne({ _id: new Types.ObjectId(_id) });
         return response.deletedCount === 1;
     }
 
@@ -172,7 +171,7 @@ export class UsersService {
 
         try {
 
-            const connectionUser = await this.getUser({ _id: new ObjectId(connectionId) });
+            const connectionUser = await this.getUser({ _id: new Types.ObjectId(connectionId) });
 
             const pendingUserConnectionRequestsIds = [...connectionUser.pendingUserConnectionRequestsIds];
             const index = pendingUserConnectionRequestsIds.findIndex((id) => id.equals(user._id));
@@ -186,7 +185,7 @@ export class UsersService {
 
             const updatedUser = await this.updateOne(
                 {
-                    _id: new ObjectId(connectionId)
+                    _id: new Types.ObjectId(connectionId)
                 },
                 {
                     pendingUserConnectionRequestsIds
@@ -255,11 +254,11 @@ export class UsersService {
         if (connectionStatus === ConnectionStatus.REJECTED) {
             const result = await this.userCollection.findOneAndUpdate(
                 {
-                    _id: new ObjectId(connectionRecipient._id)
+                    _id: new Types.ObjectId(connectionRecipient._id)
                 },
                 {
                     $pull: {
-                        pendingUserConnectionRequestsIds: new ObjectId(connectionSenderId)
+                        pendingUserConnectionRequestsIds: new Types.ObjectId(connectionSenderId)
                     }
                 },
                 {
@@ -291,7 +290,7 @@ export class UsersService {
                     connectionRecipient._id.toString(),
                     {
                         $push: {
-                            connectionsIds: new ObjectId(connectionSenderId)
+                            connectionsIds: new Types.ObjectId(connectionSenderId)
                         }
                     },
                 ),

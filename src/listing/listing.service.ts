@@ -26,11 +26,8 @@ export class ListingService {
                 this.bookService.getBookByProviderId(desiredBookId)
             ]
         );
-        const defaults: Partial<Listing> = {
-            proposalsIds: [],
-            status: ListingStatus.PENDING
-        };
-        const listing = new Listing(
+
+        const listing = new this.listingsCollection(
             {
                 title: `Trade ${offeredBookInfo.title} for ${desiredBookInfo.title}`,
                 offeredBookInfo,
@@ -39,9 +36,11 @@ export class ListingService {
                 imageUrls,
                 listingOwnerId: userId,
                 productCondition,
-                ...defaults,
             }
         );
+
+        console.log('listing: ', listing);
+
         const newListing = await listing.save();
         return newListing._id;
     }
@@ -56,8 +55,12 @@ export class ListingService {
                 availableBookId,
                 desiredBookId
             };
-            return await this.createOne(newListingInfo, user._id);
+
+            console.log('newListingInfo: ', newListingInfo);
+
+            return this.createOne(newListingInfo, user._id);
         } catch (error) {
+            console.log('error creating a new listing: ', error);
             throw new InternalServerErrorException('Error uploading file');
         }
     }

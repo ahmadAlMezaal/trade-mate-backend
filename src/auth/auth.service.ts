@@ -4,10 +4,10 @@ import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { User } from 'src/users/entities/user.schema';
-import { ObjectId } from 'mongodb';
 import { ResetPasswordInput } from './dto/resetPassword.input';
 import { LoginInput } from 'src/users/dto/login.input';
 import { IUserLocation } from 'src/users/entities/user.entity';
+import { Types } from 'mongoose';
 
 @Injectable()
 export class AuthService {
@@ -26,7 +26,7 @@ export class AuthService {
         return null;
     }
 
-    public generateToken(email: string, sub: ObjectId) {
+    public generateToken(email: string, sub: Types.ObjectId) {
         const payload = { email, sub };
         return this.jwtService.signAsync(payload);
     }

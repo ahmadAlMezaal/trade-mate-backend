@@ -1,7 +1,6 @@
 import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { CreateProposalInput } from './dto/createProposal.input';
 import { UpdateProposalInput } from './dto/updateProposal.input';
-import { ObjectId } from 'mongodb';
 import { AwsService } from 'src/aws/aws.service';
 import { BooksService } from 'src/books/books.service';
 import { Proposal, ProposalDocument } from './entities/proposal.schema';
@@ -27,7 +26,7 @@ export class ProposalService {
         private readonly notificationService: NotificationsService,
     ) { }
 
-    public async createOne(createOfferInput: CreateProposalInput, fileUpload: FileUpload, userId: ObjectId): Promise<string> {
+    public async createOne(createOfferInput: CreateProposalInput, fileUpload: FileUpload, userId: Types.ObjectId): Promise<string> {
 
         const { listingId } = createOfferInput;
 
@@ -80,7 +79,7 @@ export class ProposalService {
     }
 
     public async findOne(idStr: string): Promise<Proposal> {
-        const _id = new ObjectId(idStr);
+        const _id = new Types.ObjectId(idStr);
         const proposal = await this.proposalCollection.findOne({ _id });
         if (!proposal) {
             throw new NotFoundException('Proposal not found!');
@@ -88,7 +87,7 @@ export class ProposalService {
         return proposal;
     }
 
-    public async insertOne(createOfferInput: CreateProposalInput, fileUpload: FileUpload, senderId: ObjectId, recipientId: ObjectId): Promise<Proposal> {
+    public async insertOne(createOfferInput: CreateProposalInput, fileUpload: FileUpload, senderId: Types.ObjectId, recipientId: Types.ObjectId): Promise<Proposal> {
         const { additionalInfo, listingId, offeredItemId, desiredItemId, productCondition } = createOfferInput;
         const imageUrl = await this.awsService.uploadFile(fileUpload.createReadStream, fileUpload.filename);
 
@@ -109,7 +108,7 @@ export class ProposalService {
                 additionalInfo,
                 offeredItem,
                 desiredItem,
-                listingId: new ObjectId(listingId),
+                listingId: new Types.ObjectId(listingId),
                 imageUrls: [imageUrl],
                 senderId,
                 recipientId,
@@ -144,7 +143,7 @@ export class ProposalService {
     }
 
     public async updateProposalStatus(idStr: string, status: ProposalStatus, sender: User): Promise<Proposal> {
-        const _id = new ObjectId(idStr);
+        const _id = new Types.ObjectId(idStr);
 
         const proposal = await this.updateOne({ _id }, { status });
 

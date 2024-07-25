@@ -308,7 +308,7 @@ type User {
   bookmarkedListingIds: [ID!]!
 
   """Other users that connected with the user"""
-  connectionsIds: [ID!]
+  connectionsIds: [ID!]!
 
   """The date when the entity was created"""
   createdAt: DateTime!
@@ -323,7 +323,7 @@ type User {
   firstName: String!
 
   """Code used whenever the user wants to reset their password"""
-  forgotPasswordCode: String
+  forgotPasswordCode: String!
 
   """To show if the user veirifed their email or not"""
   isVerified: String!
@@ -338,7 +338,7 @@ type User {
   password: String!
 
   """Other users that connected with the user"""
-  pendingUserConnectionRequestsIds: [ID!]
+  pendingUserConnectionRequestsIds: [ID!]!
 
   """User's profile picture"""
   profilePhoto: String!
@@ -346,7 +346,7 @@ type User {
   """
   A number that is responsible for the reputation of the user. The higher the more trusted
   """
-  reputation: Float
+  reputation: Float!
 
   """User role"""
   role: String!
@@ -358,5 +358,5 @@ type User {
   updatedAt: DateTime!
 
   """Verification code on registration"""
-  verificationCode: String
+  verificationCode: String!
 }

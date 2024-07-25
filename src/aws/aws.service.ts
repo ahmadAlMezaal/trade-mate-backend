@@ -9,7 +9,14 @@ export class AwsService {
     private s3: S3Client;
 
     constructor(private readonly configService: ConfigService) {
-        this.s3 = new S3Client({ region: this.configService.get('aws.region') });
+        const region = this.configService.get('aws.region');
+        const credentials = {
+            accessKeyId: this.configService.get('aws.keyId'),
+            secretAccessKey: this.configService.get('aws.secret'),
+        };
+        console.log('credentials: ', credentials);
+
+        this.s3 = new S3Client({ credentials, region });
     }
 
     private generateBuffer(stream: Stream) {
