@@ -1,5 +1,5 @@
 import { ObjectType, Field, ID } from '@nestjs/graphql';
-import { Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, HydratedDocument, Types } from 'mongoose';
 import { Book } from 'src/books/entities/book.schema';
 import { ListingStatus, ProductCondition } from 'src/types/enums';
@@ -12,30 +12,39 @@ export class Listing extends Document {
     _id?: Types.ObjectId;
 
     @Field(() => String, { description: 'Title of the listing' })
+    @Prop({ type: String })
     title?: string;
 
     @Field(() => String, { description: 'description of the listing' })
+    @Prop({ type: String })
     description: string;
 
     @Field(() => [String], { description: 'Images of the book' })
+    @Prop({ type: Array })
     imageUrls: string[];
 
     @Field(() => Book, { description: 'Contains information about the book that the user is offering.' })
+    @Prop({ type: Object })
     offeredBookInfo: Book;
 
     @Field(() => Book, { description: 'Contains information about the requested book.' })
+    @Prop({ type: Object })
     desiredBookInfo: Book;
 
     @Field(() => ID)
+    @Prop({ type: Object })
     listingOwnerId: Types.ObjectId;
 
-    @Field(() => String, { description: 'The language of the book' })
+    @Field(() => String, { description: 'The condition of the book' })
+    @Prop({ type: String })
     productCondition: ProductCondition;
 
-    @Field(() => String, { description: 'Used for the admin to approve the listing', defaultValue: ListingStatus.PENDING })
+    @Field(() => String, { description: 'Used for the admin to approve the listing' })
+    @Prop({ type: String, default: ListingStatus.PENDING })
     status?: ListingStatus;
 
-    @Field(() => [ID], { description: 'IDs of the proposals received', defaultValue: [] })
+    @Field(() => [ID], { description: 'IDs of the proposals received' })
+    @Prop({ type: Object, default: [] })
     proposalsIds?: Types.ObjectId[];
 
 }

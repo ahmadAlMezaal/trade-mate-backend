@@ -14,8 +14,6 @@ export class AwsService {
             accessKeyId: this.configService.get('aws.keyId'),
             secretAccessKey: this.configService.get('aws.secret'),
         };
-        console.log('credentials: ', credentials);
-
         this.s3 = new S3Client({ credentials, region });
     }
 

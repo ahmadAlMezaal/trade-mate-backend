@@ -39,8 +39,6 @@ export class ListingService {
             }
         );
 
-        console.log('listing: ', listing);
-
         const newListing = await listing.save();
         return newListing._id;
     }

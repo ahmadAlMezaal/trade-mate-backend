@@ -140,7 +140,7 @@ type Listing {
   """Contains information about the book that the user is offering."""
   offeredBookInfo: Book!
 
-  """The language of the book"""
+  """The condition of the book"""
   productCondition: String!
 
   """IDs of the proposals received"""
@@ -246,6 +246,9 @@ type Proposal {
   """description of the proposal"""
   additionalInfo: String!
 
+  """The date when the entity was created"""
+  createdAt: DateTime!
+
   """
   Contains information about the item that the trader wants to trade for.
   """
@@ -268,6 +271,9 @@ type Proposal {
 
   """Title of the proposal"""
   title: String!
+
+  """The last date when the entity was updated"""
+  updatedAt: DateTime!
 }
 
 type Query {

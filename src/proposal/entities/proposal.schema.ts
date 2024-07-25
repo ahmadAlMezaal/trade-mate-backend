@@ -50,6 +50,14 @@ export class Proposal extends Document {
     @Field(() => String, { description: 'Status of the proposal' })
     @Prop({ type: String, default: ProposalStatus.PENDING })
     status: ProposalStatus;
+
+    @Field(() => Date, { description: 'The date when the entity was created' })
+    @Prop({ type: Date })
+    createdAt?: Date;
+
+    @Field(() => Date, { description: 'The last date when the entity was updated' })
+    @Prop({ type: Date })
+    updatedAt?: Date;
 }
 
 export const ProposalSchema = SchemaFactory.createForClass(Proposal);
