@@ -1,23 +1,24 @@
-import { Inject, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
-import { Collection, ObjectId } from 'mongodb';
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { BooksService } from 'src/books/books.service';
 import { User } from 'src/users/entities/user.schema';
 import { CreateListingInput } from './dto/createListing.input';
-import { Listing } from './entities/listing.schema';
+import { Listing, ListingDocument } from './entities/listing.schema';
 import { AwsService } from 'src/aws/aws.service';
 import { FileUpload } from 'graphql-upload';
-import { DBCollectionTokens, ListingStatus, ProductCondition } from 'src/types/enums';
+import { ListingStatus, ProductCondition } from 'src/types/enums';
+import { FilterQuery, Model, Types } from 'mongoose';
+import { InjectModel } from '@nestjs/mongoose';
 
 @Injectable()
 export class ListingService {
 
     constructor(
-        @Inject(DBCollectionTokens.LISTINGS_COLLECTION) private readonly listingsCollection: Collection<Listing>,
+        @InjectModel(Listing.name) private readonly listingsCollection: Model<ListingDocument>,
         private readonly bookService: BooksService,
         private readonly awsService: AwsService,
     ) { }
 
-    private async createOne(createListingInput: CreateListingInput, userId: ObjectId): Promise<ObjectId> {
+    private async createOne(createListingInput: CreateListingInput, userId: Types.ObjectId): Promise<Types.ObjectId> {
         const { description, imageUrls, availableBookId, desiredBookId, productCondition } = createListingInput;
         const [offeredBookInfo, desiredBookInfo] = await Promise.all(
             [
@@ -25,13 +26,8 @@ export class ListingService {
                 this.bookService.getBookByProviderId(desiredBookId)
             ]
         );
-        const defaults: Partial<Listing> = {
-            proposalsIds: [],
-            createdAt: new Date(),
-            updatedAt: new Date(),
-            status: ListingStatus.PENDING
-        };
-        const listingId = await this.listingsCollection.insertOne(
+
+        const listing = new this.listingsCollection(
             {
                 title: `Trade ${offeredBookInfo.title} for ${desiredBookInfo.title}`,
                 offeredBookInfo,
@@ -40,10 +36,11 @@ export class ListingService {
                 imageUrls,
                 listingOwnerId: userId,
                 productCondition,
-                ...defaults,
             }
         );
-        return listingId.insertedId;
+
+        const newListing = await listing.save();
+        return newListing._id;
     }
 
     public async addListing(user: User, availableBookId: string, desiredBookId: string, fileUpload: FileUpload, productCondition: ProductCondition, description: string) {
@@ -56,50 +53,52 @@ export class ListingService {
                 availableBookId,
                 desiredBookId
             };
-            return await this.createOne(newListingInfo, user._id);
+
+            return this.createOne(newListingInfo, user._id);
         } catch (error) {
             throw new InternalServerErrorException('Error uploading file');
         }
     }
 
     public async findAll(): Promise<Listing[]> {
-        return await this.listingsCollection.find({}).sort({ createdAt: -1 }).toArray();
+        return await this.listingsCollection.find({}).sort({ createdAt: -1 });
     }
 
-    public fetchFeed(_id: ObjectId): Promise<Listing[]> {
+    public fetchFeed(_id: Types.ObjectId): Promise<Listing[]> {
         return this.listingsCollection.find(
             {
-                listingOwnerId: { $ne: new ObjectId(_id) },
+                listingOwnerId: { $ne: new Types.ObjectId(_id) },
                 status: { $in: [ListingStatus.OPEN, ListingStatus.APPROVED] },
             }
         )
-            .sort({ createdAt: -1 })
-            .toArray();
+            .sort({ createdAt: -1 });
     }
 
     public async fetchUserListing(_id: string): Promise<Listing[]> {
-        return await this.listingsCollection.find({ listingOwnerId: new ObjectId(_id) }).sort({ createdAt: -1 }).toArray();
+        return await this.listingsCollection.find({ listingOwnerId: new Types.ObjectId(_id) }).sort({ createdAt: -1 });
     }
 
-    public async getListingsByIds(_ids: ObjectId[]) {
-        return await this.listingsCollection.find({ _id: { $in: _ids } }).toArray();
+    public async getListingsByIds(_ids: Types.ObjectId[]) {
+        return await this.listingsCollection.find({ _id: { $in: _ids } });
     }
 
-    public findOne(params: Partial<Listing>) {
+    public findOne(params: FilterQuery<Listing>) {
         return this.listingsCollection.findOne({ ...params });
     }
 
     public async pushProposalId(listingIdStr: string, proposalIdStr: string) {
-        const _id = new ObjectId(listingIdStr);
-        const proposalId = new ObjectId(proposalIdStr);
+        const _id = new Types.ObjectId(listingIdStr);
+        const proposalId = new Types.ObjectId(proposalIdStr);
 
         const result = await this.listingsCollection.findOneAndUpdate(
             { _id },
             {
                 $push: { proposalsIds: proposalId },
-                $currentDate: { updatedAt: true },
             },
-            { returnDocument: 'after' }
+            {
+                new: true,
+                includeResultMetadata: true
+            }
         );
 
         if (!result.value) {
@@ -109,7 +108,7 @@ export class ListingService {
     }
 
     public async updateListingStatus(listingIdStr: string, status: ListingStatus) {
-        const _id = new ObjectId(listingIdStr);
+        const _id = new Types.ObjectId(listingIdStr);
 
         const result = await this.listingsCollection.findOneAndUpdate(
             { _id },
@@ -117,7 +116,10 @@ export class ListingService {
                 $set: { status },
                 $currentDate: { updatedAt: true },
             },
-            { returnDocument: 'after' }
+            {
+                new: true,
+                includeResultMetadata: true
+            }
         );
 
         if (!result.value) {

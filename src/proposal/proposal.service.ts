@@ -1,39 +1,39 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { CreateProposalInput } from './dto/createProposal.input';
 import { UpdateProposalInput } from './dto/updateProposal.input';
-import { Collection, ObjectId } from 'mongodb';
 import { AwsService } from 'src/aws/aws.service';
 import { BooksService } from 'src/books/books.service';
-import { Proposal } from './entities/proposal.schema';
+import { Proposal, ProposalDocument } from './entities/proposal.schema';
 import { FileUpload } from 'graphql-upload';
 import { UsersService } from 'src/users/users.service';
 import { NotificationsService } from 'src/notifications/notifications.service';
 import { NotificationType } from 'src/notifications/entities/notification.schema';
-import { DBCollectionTokens, ProposalStatus } from 'src/types/enums';
+import { ProposalStatus } from 'src/types/enums';
 import { ListingService } from 'src/listing/listing.service';
 import { User } from 'src/users/entities/user.schema';
+import { FilterQuery, Model, Types } from 'mongoose';
+import { InjectModel } from '@nestjs/mongoose';
 
 @Injectable()
 export class ProposalService {
 
     constructor(
-        @Inject(DBCollectionTokens.PROPOSALS_COLLECTION) private readonly proposalCollection: Collection<Proposal>,
+        @InjectModel(Proposal.name) private readonly proposalCollection: Model<ProposalDocument>,
         private readonly bookService: BooksService,
         private readonly listingService: ListingService,
         private readonly awsService: AwsService,
         private readonly userService: UsersService,
         private readonly notificationService: NotificationsService,
-    ) {
-    }
+    ) { }
 
-    public async createOne(createOfferInput: CreateProposalInput, fileUpload: FileUpload, userId: ObjectId): Promise<string> {
+    public async createOne(createOfferInput: CreateProposalInput, fileUpload: FileUpload, userId: Types.ObjectId): Promise<string> {
 
         const { listingId } = createOfferInput;
 
         const [sender, listing] = await Promise.all(
             [
                 this.userService.getUser({ _id: userId }),
-                this.listingService.findOne({ _id: new ObjectId(listingId) }),
+                this.listingService.findOne({ _id: new Types.ObjectId(listingId) }),
             ]
         );
 
@@ -50,8 +50,8 @@ export class ProposalService {
 
         await Promise.all(
             [
-                this.listingService.pushProposalId(listingId, proposal.insertedId.toString()),
-                this.userService.addProposal(userId.toString(), proposal.insertedId.toString())
+                this.listingService.pushProposalId(listingId, proposal._id.toString()),
+                this.userService.addProposal(userId.toString(), proposal._id.toString())
             ]
         );
 
@@ -63,11 +63,11 @@ export class ProposalService {
                 recipientId: listing.listingOwnerId.toString(),
                 senderId: userId.toString(),
                 type: NotificationType.PROPOSAL_RECEIVED,
-                proposalId: proposal.insertedId.toString(),
+                proposalId: proposal._id.toString(),
             }
         );
 
-        return proposal.insertedId.toString();
+        return proposal._id.toString();
     }
 
     public findAll() {
@@ -75,11 +75,11 @@ export class ProposalService {
     }
 
     public find(params: Partial<Pick<Proposal, 'senderId' | 'status'>>) {
-        return this.proposalCollection.find({ ...params }).toArray();
+        return this.proposalCollection.find({ ...params });
     }
 
     public async findOne(idStr: string): Promise<Proposal> {
-        const _id = new ObjectId(idStr);
+        const _id = new Types.ObjectId(idStr);
         const proposal = await this.proposalCollection.findOne({ _id });
         if (!proposal) {
             throw new NotFoundException('Proposal not found!');
@@ -87,7 +87,7 @@ export class ProposalService {
         return proposal;
     }
 
-    public async insertOne(createOfferInput: CreateProposalInput, fileUpload: FileUpload, senderId: ObjectId, recipientId: ObjectId) {
+    public async insertOne(createOfferInput: CreateProposalInput, fileUpload: FileUpload, senderId: Types.ObjectId, recipientId: Types.ObjectId): Promise<Proposal> {
         const { additionalInfo, listingId, offeredItemId, desiredItemId, productCondition } = createOfferInput;
         const imageUrl = await this.awsService.uploadFile(fileUpload.createReadStream, fileUpload.filename);
 
@@ -99,19 +99,16 @@ export class ProposalService {
         );
 
         const proposalDefaults: Partial<Proposal> = {
-            status: ProposalStatus.PENDING,
             title: `Trade ${offeredItem.title} for ${desiredItem.title}`,
-            createdAt: new Date(),
-            updatedAt: new Date(),
         };
 
-        const proposal = await this.proposalCollection.insertOne(
+        const proposal = new this.proposalCollection(
             {
                 productCondition,
                 additionalInfo,
                 offeredItem,
                 desiredItem,
-                listingId: new ObjectId(listingId),
+                listingId: new Types.ObjectId(listingId),
                 imageUrls: [imageUrl],
                 senderId,
                 recipientId,
@@ -119,33 +116,33 @@ export class ProposalService {
             }
         );
 
-        return proposal;
+        return proposal.save();
 
     }
 
-    public async updateOne(queryObj: Partial<Proposal>, updateUserInput: UpdateProposalInput) {
-        const { value } = await this.proposalCollection.findOneAndUpdate(
+    public async updateOne(queryObj: FilterQuery<Proposal>, updateUserInput: UpdateProposalInput): Promise<Proposal> {
+        const result = await this.proposalCollection.findOneAndUpdate(
             { ...queryObj },
             {
                 $set: {
                     ...updateUserInput,
-                    updatedAt: new Date()
                 }
             },
             {
-                upsert: false,
-                returnDocument: 'after'
+                new: true,
+                includeResultMetadata: true
             }
         );
 
-        if (!value) {
-            throw new NotFoundException('Account not found');
+        if (result && result.lastErrorObject) {
+            throw new InternalServerErrorException('Unable to update proposal');
         }
-        return value;
+
+        return result.value;
     }
 
     public async updateProposalStatus(idStr: string, status: ProposalStatus, sender: User): Promise<Proposal> {
-        const _id = new ObjectId(idStr);
+        const _id = new Types.ObjectId(idStr);
 
         const proposal = await this.updateOne({ _id }, { status });
 
@@ -161,12 +158,16 @@ export class ProposalService {
             {
                 title: 'Your proposal status',
                 message: `${sender.firstName} ${sender.lastName} has ${messageDecision} your proposal request`,
-                recipientId: proposal.senderId.toString(),
+                recipientId: proposal.recipientId.toString(),
                 senderId: sender._id.toString(),
                 proposalId: proposal._id.toString(),
                 type,
             }
         );
         return updatedProposal;
+    }
+
+    public async getUserSentProposals(userId: Types.ObjectId): Promise<Proposal[]> {
+        return this.proposalCollection.find({ senderId: userId });
     }
 }

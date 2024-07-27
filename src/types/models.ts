@@ -90,3 +90,8 @@ export interface IBook {
     language: string;
     pdfLink: string;
 }
+
+export type DeleteResult = {
+    acknowledged?: boolean;
+    deletedCount?: number;
+}

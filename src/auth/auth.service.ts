@@ -4,10 +4,10 @@ import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { User } from 'src/users/entities/user.schema';
-import { ObjectId } from 'mongodb';
 import { ResetPasswordInput } from './dto/resetPassword.input';
 import { LoginInput } from 'src/users/dto/login.input';
 import { IUserLocation } from 'src/users/entities/user.entity';
+import { Types } from 'mongoose';
 
 @Injectable()
 export class AuthService {
@@ -26,7 +26,7 @@ export class AuthService {
         return null;
     }
 
-    public generateToken(email: string, sub: ObjectId) {
+    public generateToken(email: string, sub: Types.ObjectId) {
         const payload = { email, sub };
         return this.jwtService.signAsync(payload);
     }
@@ -47,7 +47,7 @@ export class AuthService {
                 updatedAttributes['isoCode'] = input.isoCountryCode;
             }
 
-            const updatedUser = await this.usersService.update(
+            const updatedUser = await this.usersService.updateOne(
                 {
                     email: user.email
                 },
@@ -68,7 +68,7 @@ export class AuthService {
     public async requestForgotPassword(email: string) {
         const user = await this.usersService.getUser({ email: email.toLowerCase() });
         const code = Math.floor(Math.random() * 90000) + 100000;
-        await this.usersService.update({ _id: user._id }, { forgotPasswordCode: code });
+        await this.usersService.updateOne({ _id: user._id }, { forgotPasswordCode: code });
         return {
             code,
             message: 'Password reset request has been sent to your email address.',
@@ -80,7 +80,7 @@ export class AuthService {
         const saltOrRounds = 10;
         const newPassword = await bcrypt.hash(input.password, saltOrRounds);
 
-        await this.usersService.update({ _id: user._id }, { forgotPasswordCode: null, password: newPassword });
+        await this.usersService.updateOne({ _id: user._id }, { forgotPasswordCode: null, password: newPassword });
 
         return { message: 'Password changed successfully!' };
     }

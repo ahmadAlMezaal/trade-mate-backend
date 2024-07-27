@@ -1,30 +1,26 @@
-import { HttpException, HttpStatus, Inject, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
-import { Collection, ObjectId } from 'mongodb';
-import { CreateUserInput, Role } from './dto/createUser.input';
+import { HttpException, HttpStatus, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { CreateUserInput } from './dto/createUser.input';
 import { FindUserInput } from './dto/findOne.input';
 import { DeleteUserInput, UpdateUserInput, UpdateUserProfileInput } from './dto/updateUser.input';
-import { User } from './entities/user.schema';
+import { User, UserDocument } from './entities/user.schema';
 import * as bcrypt from 'bcrypt';
-import { SharedService } from 'src/shared/shared.service';
-import { Proposal } from 'src/proposal/entities/proposal.schema';
 import { NotificationsService } from 'src/notifications/notifications.service';
 import { ConnectionStatus, NotificationType } from 'src/notifications/entities/notification.schema';
-import { DBCollectionTokens } from 'src/types/enums';
-import { IUserLocation } from './entities/user.entity';
+import { IUser, IUserLocation } from './entities/user.entity';
+import { FilterQuery, Model, Types, UpdateQuery } from 'mongoose';
+import { InjectModel } from '@nestjs/mongoose';
 
 @Injectable()
 export class UsersService {
 
     constructor(
-        @Inject(DBCollectionTokens.USERS_COLLECTION) private readonly userCollection: Collection<User>,
-        private readonly sharedService: SharedService,
+        @InjectModel(User.name) private readonly userCollection: Model<UserDocument>,
         private readonly notificationService: NotificationsService,
-    ) {
-
-    }
+    ) { }
 
     public async create(createUserInput: CreateUserInput): Promise<User> {
-        const user = await this.userCollection.findOne({ email: createUserInput.email.toLowerCase() });
+        const email = createUserInput.email.toLowerCase();
+        const user = await this.userCollection.findOne({ email });
         if (user) {
             throw new HttpException(
                 { message: 'Email already taken Error' },
@@ -36,20 +32,6 @@ export class UsersService {
         const password = createUserInput.password;
         createUserInput.password = await bcrypt.hash(password, saltOrRounds);
 
-        const defaults: Partial<User> = {
-            bookmarkedListingIds: [],
-            createdAt: new Date(),
-            updatedAt: new Date(),
-            isVerified: false,
-            role: Role.TRADER,
-            profilePhoto: 'https://spng.pngfind.com/pngs/s/676-6764065_default-profile-picture-transparent-hd-png-download.png',
-            sentProposalsIds: [],
-            connectionsIds: [],
-            reputation: 0,
-            pendingUserConnectionRequestsIds: [],
-            facebookId: null
-        };
-
         const location: IUserLocation = {
             city: createUserInput.city,
             country: createUserInput.country,
@@ -60,23 +42,17 @@ export class UsersService {
         delete createUserInput.country;
         delete createUserInput.isoCountryCode;
 
-        const userObj: User = {
-            ...defaults,
-            ...createUserInput,
-            location,
-            email: createUserInput.email.toLowerCase(),
-        };
+        const userObj = { ...createUserInput, location, email };
 
-        const { insertedId } = await this.userCollection.insertOne({ ...userObj });
-
-        if (!insertedId) {
+        const savedUser = new this.userCollection(userObj);
+        await savedUser.save();
+        if (!savedUser) {
             throw new InternalServerErrorException('Error creating account');
         }
-        const returnedUser = { ...userObj, _id: insertedId };
-        delete returnedUser.password;
+        delete savedUser.password;
+        const { password: _, ...userWithoutPassword } = savedUser.toObject();
 
-        return { ...returnedUser };
-
+        return userWithoutPassword as User;
     }
 
     //TODO Config this for pagination, follow this tutorial: https://javascript.plainenglish.io/graphql-nodejs-mongodb-made-easy-with-nestjs-and-mongoose-29f9c0ea7e1d
@@ -86,20 +62,20 @@ export class UsersService {
     // }
 
     public async findAll(): Promise<User[]> {
-        return await this.userCollection.find().toArray();
+        return this.userCollection.find({});
     }
 
     public async getConnections(userId: string): Promise<User[]> {
-        const user = await this.userCollection.findOne({ _id: new ObjectId(userId) });
+        const user = await this.userCollection.findOne({ _id: new Types.ObjectId(userId) });
         if (!user) {
             throw new NotFoundException('User not found!');
         }
 
-        return this.userCollection.find({ _id: { $in: user.connectionsIds } }).toArray();
+        return this.userCollection.find({ _id: { $in: user.connectionsIds } });
     }
 
     public findOne(query: FindUserInput): Promise<User> {
-        return this.userCollection.findOne({ ...query });
+        return this.userCollection.findOne({ ...query }).lean();
     }
 
     public async getUser(query: FindUserInput): Promise<User> {
@@ -110,27 +86,19 @@ export class UsersService {
         return user;
     }
 
-    public async update(queryObj: Partial<User>, updateUserInput: UpdateUserInput) {
+    public async updateOne(queryObj: FilterQuery<IUser>, updateUserInput: UpdateUserInput): Promise<User> {
         delete updateUserInput._id;
-        const { value } = await this.userCollection.findOneAndUpdate(
-            {
-                ...queryObj
-            },
-            {
-                $set: {
-                    ...updateUserInput,
-                    updatedAt: new Date()
-                }
-            },
-            {
-                upsert: false,
-                returnDocument: 'after'
-            }
-        );
-        if (!value) {
+        const updatedUser = await this.userCollection.findOneAndUpdate(
+            queryObj,
+            { $set: updateUserInput },
+            { new: true }
+        ).lean();
+
+        if (!updatedUser) {
             throw new NotFoundException('Account not found');
         }
-        return value;
+
+        return updatedUser;
     }
 
     public async updateUserProfile(email: string, input: UpdateUserProfileInput) {
@@ -148,37 +116,38 @@ export class UsersService {
             updatedUserParams['isoCode'] = input.isoCountryCode;
         }
 
-        const updatedUser = await this.update({ email: email?.toLowerCase() }, updatedUserParams);
+        const updatedUser = await this.updateOne({ email: email?.toLowerCase() }, updatedUserParams);
         return updatedUser;
     }
 
     public async addProposal(userId: string, proposalIdStr: string) {
-        const _id = new ObjectId(userId);
-        const proposalId = new ObjectId(proposalIdStr);
+        const _id = new Types.ObjectId(userId);
+        const proposalId = new Types.ObjectId(proposalIdStr);
 
         const result = await this.userCollection.findOneAndUpdate(
             { _id },
             {
                 $push: { sentProposalsIds: proposalId },
-                $currentDate: { updatedAt: true },
             },
-            { returnDocument: 'after' }
+            {
+                new: true,
+            }
         );
 
-        if (!result.value) {
+        if (!result) {
             throw new NotFoundException('Listing not found');
         }
-        return result.value;
+        return result;
     }
 
     public async remove(input: DeleteUserInput): Promise<boolean> {
         const { _id } = input;
-        const response = await this.userCollection.deleteOne({ _id: new ObjectId(_id) });
+        const response = await this.userCollection.deleteOne({ _id: new Types.ObjectId(_id) });
         return response.deletedCount === 1;
     }
 
     public async updateBookmarkedListings(user: User, listingIdStr: string) {
-        const listingId = new ObjectId(listingIdStr);
+        const listingId = new Types.ObjectId(listingIdStr);
 
         const bookmarkedListingIds = [...user.bookmarkedListingIds];
         const index = bookmarkedListingIds.findIndex((id) => id.equals(listingId));
@@ -189,19 +158,15 @@ export class UsersService {
             bookmarkedListingIds.push(listingId);
         }
 
-        const updatedUser = await this.update({ _id: user._id }, { bookmarkedListingIds: bookmarkedListingIds });
+        const updatedUser = await this.updateOne({ _id: user._id }, { bookmarkedListingIds: bookmarkedListingIds });
         return { bookmarkedListingIds: updatedUser.bookmarkedListingIds };
-    }
-
-    public getUserProposals(userId: string): Promise<Proposal[]> {
-        return this.sharedService.getUserProposals(userId);
     }
 
     public async sendConnectionRequest(user: User, connectionId: string) {
 
         try {
 
-            const connectionUser = await this.getUser({ _id: new ObjectId(connectionId) });
+            const connectionUser = await this.getUser({ _id: new Types.ObjectId(connectionId) });
 
             const pendingUserConnectionRequestsIds = [...connectionUser.pendingUserConnectionRequestsIds];
             const index = pendingUserConnectionRequestsIds.findIndex((id) => id.equals(user._id));
@@ -213,18 +178,12 @@ export class UsersService {
                 pendingUserConnectionRequestsIds.push(user._id);
             }
 
-            const updatedUser = await this.userCollection.findOneAndUpdate(
+            const updatedUser = await this.updateOne(
                 {
-                    _id: new ObjectId(connectionId)
+                    _id: new Types.ObjectId(connectionId)
                 },
                 {
-                    $set: {
-                        pendingUserConnectionRequestsIds
-                    }
-                },
-                {
-                    upsert: false,
-                    returnDocument: 'after'
+                    pendingUserConnectionRequestsIds
                 }
             );
 
@@ -255,7 +214,7 @@ export class UsersService {
                     }
                 );
             } else {
-                await this.notificationService.deleteOne(
+                await this.notificationService.deleteNotification(
                     {
                         type: NotificationType.CONNECTION_REQUEST,
                         senderId: user._id,
@@ -266,7 +225,7 @@ export class UsersService {
                 );
             }
 
-            return updatedUser.value;
+            return updatedUser;
 
         } catch (error) {
             console.log('error: ', error);
@@ -274,27 +233,45 @@ export class UsersService {
         }
     }
 
-    public async respondToConnectionRequest(connectionRecepient: User, connectionSenderId: string, connectionStatus: ConnectionStatus): Promise<boolean> {
+    async updateUser(userId: string, updateOperations: UpdateQuery<User>): Promise<boolean> {
+        const result = await this.userCollection.updateOne(
+            { _id: new Types.ObjectId(userId) },
+            updateOperations,
+            { new: true }
+        );
 
-        await this.notificationService.respondToConnection(connectionRecepient._id.toString(), connectionStatus);
+        return result.modifiedCount === 0;
+    }
+
+    public async respondToConnectionRequest(connectionRecipient: User, connectionSenderId: string, connectionStatus: ConnectionStatus): Promise<boolean> {
+
+        await this.notificationService.respondToConnection(connectionRecipient._id.toString(), connectionStatus);
         if (connectionStatus === ConnectionStatus.REJECTED) {
-            const response = await this.userCollection.findOneAndUpdate(
+            const result = await this.userCollection.findOneAndUpdate(
                 {
-                    _id: new ObjectId(connectionRecepient._id)
+                    _id: new Types.ObjectId(connectionRecipient._id)
                 },
                 {
                     $pull: {
-                        pendingUserConnectionRequestsIds: new ObjectId(connectionSenderId)
+                        pendingUserConnectionRequestsIds: new Types.ObjectId(connectionSenderId)
                     }
                 },
+                {
+                    new: true,
+                    includeResultMetadata: true
+                }
             );
-            return response.ok === 1;
+            if (result && result.lastErrorObject) {
+                return result.lastErrorObject.updatedExisting;
+            }
+
+            return false;
         }
 
         await this.notificationService.sendPushNotification(
             {
-                message: `${connectionRecepient.firstName} ${connectionRecepient.lastName} has accepted your connection request`,
-                senderId: connectionRecepient._id.toString(),
+                message: `${connectionRecipient.firstName} ${connectionRecipient.lastName} has accepted your connection request`,
+                senderId: connectionRecipient._id.toString(),
                 recipientId: connectionSenderId,
                 title: 'Connection Request',
                 type: NotificationType.CONNECTION_REQUEST_ACCEPTED,
@@ -303,29 +280,25 @@ export class UsersService {
 
         const responses = await Promise.all(
             [
-                this.userCollection.findOneAndUpdate(
-                    {
-                        _id: connectionRecepient._id
-                    },
+                this.updateUser(
+                    connectionRecipient._id.toString(),
                     {
                         $push: {
-                            connectionsIds: new ObjectId(connectionSenderId)
+                            connectionsIds: new Types.ObjectId(connectionSenderId)
                         }
                     },
                 ),
-                this.userCollection.findOneAndUpdate(
-                    {
-                        _id: new ObjectId(connectionSenderId)
-                    },
+                this.updateUser(
+                    connectionSenderId,
                     {
                         $push: {
-                            connectionsIds: connectionRecepient._id
+                            connectionsIds: connectionRecipient._id
                         }
-                    },
-                ),
+                    }
+                )
             ]
         );
 
-        return responses[0].ok === 1 && responses[1].ok === 1;
+        return responses.filter((response) => response === true).length >= 1;
     }
 }

@@ -3,28 +3,34 @@ import { CommonModule } from 'src/common/modules/common.module';
 
 import { UsersService } from './users.service';
 import { UsersResolver } from './users.resolver';
-import { userProviders } from './providers/user.providers';
 import { ConfigModule } from '@nestjs/config';
 import { ListingModule } from 'src/listing/listing.module';
-import { SharedModule } from 'src/shared/shared.module';
 import { NotificationsModule } from 'src/notifications/notifications.module';
+import { MongooseModule } from '@nestjs/mongoose';
+import { User, UserSchema } from './entities/user.schema';
 
 @Module(
     {
         //TODO: Try to make the ConfigModule in CommonModule
         imports: [
+            MongooseModule.forFeature(
+                [
+                    {
+                        name: User.name,
+                        schema: UserSchema
+                    }
+                ]
+            ),
             ConfigModule,
             CommonModule,
             ListingModule,
-            SharedModule,
-            NotificationsModule
+            NotificationsModule,
         ],
         providers: [
             UsersResolver,
             UsersService,
-            ...userProviders,
         ],
-        exports: [UsersService, ...userProviders]
+        exports: [UsersService]
     }
 )
 

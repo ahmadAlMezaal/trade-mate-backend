@@ -1,6 +1,6 @@
 import { ObjectType, Field, ID } from '@nestjs/graphql';
-import { ObjectId } from 'mongodb';
-import { Timestamps } from 'src/common/schemas/timestamps.schema';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Document, HydratedDocument, Types } from 'mongoose';
 
 export enum NotificationType {
     PROPOSAL_RECEIVED = 'proposal_received',
@@ -28,40 +28,54 @@ export class NotificationMetadata {
     status?: ConnectionStatus;
 
     @Field(() => ID, { nullable: true })
-    proposalId?: ObjectId;
+    proposalId?: Types.ObjectId;
 }
 
 @ObjectType()
-export class Notification extends Timestamps {
+@Schema({ timestamps: true })
+export class Notification extends Document {
 
     @Field(() => ID, { description: 'The unique identifier for the notification.' })
-    _id?: ObjectId;
+    _id?: Types.ObjectId;
 
     @Field(() => String, { description: 'The title of the message.' })
+    @Prop({ type: String })
     title: string;
 
     @Field(() => String, { description: 'The body of the message.' })
+    @Prop({ type: String })
     message: string;
 
     @Field(() => String, { description: 'The type of notification (e.g., "proposal_received", "item_traded", etc.)' })
+    @Prop({ type: String })
     type: NotificationType;
 
     @Field(() => ID, { description: 'The user who should receive the notification.' })
-    recipientId: ObjectId;
+    @Prop({ type: Types.ObjectId })
+    recipientId: Types.ObjectId;
 
     @Field(() => ID, { description: 'The user who initiated the action that triggered the notification (if applicable).', nullable: true })
-    senderId?: ObjectId;
+    @Prop({ type: Types.ObjectId, default: null })
+    senderId: Types.ObjectId;
 
     @Field(() => ID, { description: 'The identifier for the listing (if applicable)', nullable: true })
-    listingId?: ObjectId;
+    @Prop({ type: Types.ObjectId, default: null })
+    listingId: Types.ObjectId;
 
     @Field(() => ID, { description: 'The identifier for proposal (if applicable)', nullable: true })
-    proposalId?: ObjectId;
+    @Prop({ type: Types.ObjectId, default: null })
+    proposalId: Types.ObjectId;
 
     @Field(() => String, { description: 'The status of the notification (e.g., "unread", "read").' })
-    status?: NotificationStatus;
+    @Prop({ type: String, default: NotificationStatus.UNREAD })
+    status: NotificationStatus;
 
     @Field(() => NotificationMetadata, { description: "The metadata of the notification, it's different for each notification type" })
-    metadata?: NotificationMetadata;
+    @Prop({ type: NotificationMetadata, default: null })
+    metadata: NotificationMetadata;
 
 }
+
+export const NotificationSchema = SchemaFactory.createForClass(Notification);
+
+export type NotificationDocument = HydratedDocument<Notification>;

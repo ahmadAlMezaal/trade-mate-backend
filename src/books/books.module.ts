@@ -4,13 +4,25 @@ import { CommonModule } from 'src/common/modules/common.module';
 
 import { BooksService } from './books.service';
 import { BooksResolver } from './books.resolver';
-import { booksProviders } from './providers/books.provider';
+import { MongooseModule } from '@nestjs/mongoose';
+import { Book, BookSchema } from './entities/book.schema';
 
 @Module(
     {
-        imports: [ConfigModule, CommonModule],
-        providers: [BooksResolver, BooksService, ...booksProviders],
-        exports: [BooksService, ...booksProviders]
+        imports: [
+            ConfigModule,
+            CommonModule,
+            MongooseModule.forFeature(
+                [
+                    {
+                        name: Book.name,
+                        schema: BookSchema
+                    }
+                ]
+            )
+        ],
+        providers: [BooksResolver, BooksService],
+        exports: [BooksService]
     }
 )
 

@@ -1,3 +1,4 @@
+import { Types } from "mongoose";
 
 export type IUserLocation = {
     isoCode: string;
@@ -6,17 +7,18 @@ export type IUserLocation = {
 };
 
 export type IUser = {
-    _id: string;
+    _id: Types.ObjectId;
     email: string;
     password: string;
     isVerified: boolean;
     firstName: string;
     lastName: string;
-    location: string;
+    location: IUserLocation;
     bookmarkedListingIds: string[];
     role: string;
     verificationCode?: number;
     forgotPasswordCode?: number;
     connectionsIds: string[];
     reputation: number;
+    profilePhoto: string;
 };

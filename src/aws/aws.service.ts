@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { ConfigService } from '@nestjs/config';
 import { Stream } from 'stream';
+import { ConfigVariables } from 'src/types/enums';
 
 @Injectable()
 export class AwsService {
@@ -9,7 +10,12 @@ export class AwsService {
     private s3: S3Client;
 
     constructor(private readonly configService: ConfigService) {
-        this.s3 = new S3Client({ region: this.configService.get('aws.region') });
+        const region = this.configService.get(ConfigVariables.AWS_REGION);
+        const credentials = {
+            accessKeyId: this.configService.get<string>(ConfigVariables.AWS_KEY_ID),
+            secretAccessKey: this.configService.get<string>(ConfigVariables.AWS_SECRET),
+        };
+        this.s3 = new S3Client({ credentials, region });
     }
 
     private generateBuffer(stream: Stream) {
@@ -32,7 +38,7 @@ export class AwsService {
         const finalFileName = `${timestamp}-${randomIdentifier}-${fileName}`;
 
         const params = {
-            Bucket: this.configService.get('aws.bucketName'),
+            Bucket: this.configService.get<string>(ConfigVariables.AWS_BUCKET_NAME),
             Key: finalFileName,
             Body: buffer,
         };

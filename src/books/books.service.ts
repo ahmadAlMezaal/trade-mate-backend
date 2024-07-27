@@ -1,15 +1,17 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import axios from 'axios';
-import { Collection } from 'mongodb';
 import { IBook, IGoogleBook } from 'src/types/models';
 import { FindBookInput } from './dto/findBook.input';
-import { Book } from './entities/book.schema';
-import { DBCollectionTokens } from 'src/types/enums';
+import { Book, BookDocument } from './entities/book.schema';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class BooksService {
 
-    constructor(@Inject(DBCollectionTokens.BOOKS_COLLECTION) private readonly booksCollection: Collection<Book>) { }
+    constructor(
+        @InjectModel(Book.name) private readonly bookCollection: Model<BookDocument>,
+    ) { }
 
     // public async create(createBookInput: CreateBookInput, user: User): Promise<Book> {
     //     const book = await this.collection.insertOne({ ...createBookInput });
@@ -17,7 +19,7 @@ export class BooksService {
     // }
 
     findAll() {
-        return this.booksCollection.find({}).toArray();
+        return this.bookCollection.find({});
     }
 
     async queryBook({ name }: FindBookInput): Promise<IBook[]> {

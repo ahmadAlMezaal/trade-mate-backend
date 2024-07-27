@@ -127,9 +127,6 @@ scalar JSONObject
 type Listing {
   _id: ID!
 
-  """The date when the entity was created"""
-  createdAt: DateTime!
-
   """description of the listing"""
   description: String!
 
@@ -143,7 +140,7 @@ type Listing {
   """Contains information about the book that the user is offering."""
   offeredBookInfo: Book!
 
-  """The language of the book"""
+  """The condition of the book"""
   productCondition: String!
 
   """IDs of the proposals received"""
@@ -154,9 +151,6 @@ type Listing {
 
   """Title of the listing"""
   title: String!
-
-  """The last date when the entity was updated"""
-  updatedAt: DateTime!
 }
 
 input LoginInput {
@@ -197,9 +191,6 @@ type Notification {
   """The unique identifier for the notification."""
   _id: ID!
 
-  """The date when the entity was created"""
-  createdAt: DateTime!
-
   """The identifier for the listing (if applicable)"""
   listingId: ID
 
@@ -232,9 +223,6 @@ type Notification {
   The type of notification (e.g., "proposal_received", "item_traded", etc.)
   """
   type: String!
-
-  """The last date when the entity was updated"""
-  updatedAt: DateTime!
 }
 
 type NotificationMetadata {
@@ -300,10 +288,10 @@ type Query {
   notifications: [Notification!]!
   profile: User!
   proposal(_id: String!): Proposal!
-  proposals: [Proposal!]!
   searchBook(input: FindBookInput!): [Book!]!
   user(input: FindUserInput!): User!
   userListings(_id: String!): [Listing!]!
+  userSentProposals: [Proposal!]!
   users: [User!]!
 }
 
@@ -326,7 +314,7 @@ type User {
   bookmarkedListingIds: [ID!]!
 
   """Other users that connected with the user"""
-  connectionsIds: [ID!]
+  connectionsIds: [ID!]!
 
   """The date when the entity was created"""
   createdAt: DateTime!
@@ -341,7 +329,7 @@ type User {
   firstName: String!
 
   """Code used whenever the user wants to reset their password"""
-  forgotPasswordCode: String
+  forgotPasswordCode: String!
 
   """To show if the user veirifed their email or not"""
   isVerified: String!
@@ -356,7 +344,7 @@ type User {
   password: String!
 
   """Other users that connected with the user"""
-  pendingUserConnectionRequestsIds: [ID!]
+  pendingUserConnectionRequestsIds: [ID!]!
 
   """User's profile picture"""
   profilePhoto: String!
@@ -364,7 +352,7 @@ type User {
   """
   A number that is responsible for the reputation of the user. The higher the more trusted
   """
-  reputation: Float
+  reputation: Float!
 
   """User role"""
   role: String!
@@ -376,5 +364,5 @@ type User {
   updatedAt: DateTime!
 
   """Verification code on registration"""
-  verificationCode: String
+  verificationCode: String!
 }

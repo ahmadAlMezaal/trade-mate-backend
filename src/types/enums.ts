@@ -19,20 +19,10 @@ export enum ListingStatus {
     TRADED = 'Traded',
 }
 
-export enum DBCollectionTokens {
-    DATABASE_CONNECTION = 'DATABASE_CONNECTION',
-    BOOKS_COLLECTION = 'BOOKS_COLLECTION',
-    USERS_COLLECTION = 'USERS_COLLECTION',
-    LISTINGS_COLLECTION = 'LISTINGS_COLLECTION',
-    PROPOSALS_COLLECTION = 'PROPOSALS_COLLECTION',
-    NOTIFICATIONS_COLLECTION = 'NOTIFICATIONS_COLLECTION',
+export enum ConfigVariables {
+    MONGODB_URI = 'database.mongodbUri',
+    AWS_REGION = 'aws.region',
+    AWS_KEY_ID = 'aws.keyId',
+    AWS_SECRET = 'aws.secret',
+    AWS_BUCKET_NAME = 'aws.bucketName',
 }
-
-export enum DBCollections {
-    USERS = 'users',
-    LISTINGS = 'listings',
-    BOOKS = 'books',
-    PROPOSALS = 'proposals',
-    NOTIFICATIONS = 'notifications'
-}
-

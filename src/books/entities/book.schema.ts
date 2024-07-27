@@ -1,8 +1,11 @@
 import { Field, ObjectType } from "@nestjs/graphql";
 import { ImageUrls } from "./imageUrls.input";
+import { Document, HydratedDocument } from "mongoose";
+import { Schema, SchemaFactory } from "@nestjs/mongoose";
 
 @ObjectType()
-export class Book {
+@Schema({ timestamps: true })
+export class Book extends Document {
 
     @Field(() => String)
     providerId: string;
@@ -35,3 +38,7 @@ export class Book {
     pdfLink?: string;
 
 }
+
+export const BookSchema = SchemaFactory.createForClass(Book);
+
+export type BookDocument = HydratedDocument<Book>;
