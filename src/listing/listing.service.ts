@@ -97,11 +97,9 @@ export class ListingService {
             { _id },
             {
                 $push: { proposalsIds: proposalId },
-                // $currentDate: { updatedAt: true },
             },
             {
                 new: true,
-                rawResult: true,
                 includeResultMetadata: true
             }
         );

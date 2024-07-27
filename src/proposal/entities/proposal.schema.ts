@@ -36,11 +36,11 @@ export class Proposal extends Document {
     listingId: Types.ObjectId;
 
     @Field(() => Book, { description: 'Contains information about the item offered by the trader.' })
-    @Prop({ type: Book })
+    @Prop({ type: Object })
     offeredItem: Book;
 
     @Field(() => Book, { description: 'Contains information about the item that the trader wants to trade for.' })
-    @Prop({ type: Book })
+    @Prop({ type: Object })
     desiredItem: Book;
 
     @Field(() => String, { description: 'The language of the book' })

@@ -4,8 +4,6 @@ import { FindUserInput } from './dto/findOne.input';
 import { DeleteUserInput, UpdateUserInput, UpdateUserProfileInput } from './dto/updateUser.input';
 import { User, UserDocument } from './entities/user.schema';
 import * as bcrypt from 'bcrypt';
-import { SharedService } from 'src/shared/shared.service';
-import { Proposal } from 'src/proposal/entities/proposal.schema';
 import { NotificationsService } from 'src/notifications/notifications.service';
 import { ConnectionStatus, NotificationType } from 'src/notifications/entities/notification.schema';
 import { IUser, IUserLocation } from './entities/user.entity';
@@ -17,7 +15,6 @@ export class UsersService {
 
     constructor(
         @InjectModel(User.name) private readonly userCollection: Model<UserDocument>,
-        private readonly sharedService: SharedService,
         private readonly notificationService: NotificationsService,
     ) { }
 
@@ -132,7 +129,9 @@ export class UsersService {
             {
                 $push: { sentProposalsIds: proposalId },
             },
-            { returnDocument: 'after' }
+            {
+                new: true,
+            }
         );
 
         if (!result) {
@@ -161,10 +160,6 @@ export class UsersService {
 
         const updatedUser = await this.updateOne({ _id: user._id }, { bookmarkedListingIds: bookmarkedListingIds });
         return { bookmarkedListingIds: updatedUser.bookmarkedListingIds };
-    }
-
-    public getUserProposals(userId: string): Promise<Proposal[]> {
-        return this.sharedService.getUserProposals(userId);
     }
 
     public async sendConnectionRequest(user: User, connectionId: string) {

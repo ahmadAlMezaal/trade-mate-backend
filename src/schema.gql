@@ -288,10 +288,10 @@ type Query {
   notifications: [Notification!]!
   profile: User!
   proposal(_id: String!): Proposal!
-  proposals: [Proposal!]!
   searchBook(input: FindBookInput!): [Book!]!
   user(input: FindUserInput!): User!
   userListings(_id: String!): [Listing!]!
+  userSentProposals: [Proposal!]!
   users: [User!]!
 }
 
