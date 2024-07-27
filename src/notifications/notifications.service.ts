@@ -3,7 +3,7 @@ import { CreateNotificationInput } from './dto/createNotification.input';
 import { ConnectionStatus, Notification, NotificationDocument, NotificationStatus, NotificationType } from './entities/notification.schema';
 import { FilterQuery, Model, Types } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { DeleteResult } from 'mongodb';
+import { DeleteResult } from 'src/types/models';
 
 @Injectable()
 export class NotificationsService {

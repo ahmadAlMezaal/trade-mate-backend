@@ -1,8 +1,6 @@
 import * as dotenv from 'dotenv';
 dotenv.config();
 
-console.log('process.env.MONGODB_CONNECTION_STRING: ', process.env.MONGODB_CONNECTION_STRING);
-
 export const configuration = () => (
     {
         port: process.env.PORT,
