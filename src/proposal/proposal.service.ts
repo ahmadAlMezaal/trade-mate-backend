@@ -169,9 +169,6 @@ export class ProposalService {
     }
 
     public async getUserSentProposals(userId: Types.ObjectId): Promise<Proposal[]> {
-        const tst = await this.proposalCollection.find({ senderId: userId });
-        console.log('tst: ', tst);
-
-        return tst;
+        return this.proposalCollection.find({ senderId: userId });
     }
 }

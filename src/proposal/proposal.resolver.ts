@@ -46,7 +46,6 @@ export class ProposalResolver {
     @Query(() => [Proposal], { name: 'userSentProposals' })
     @UseGuards(JwtAuthGuard)
     public async fetchUserSentProposals(@CurrentUser() user: User): Promise<Proposal[]> {
-        console.log('user._id: ', user._id);
         return this.proposalService.getUserSentProposals(user._id);
     }
 
