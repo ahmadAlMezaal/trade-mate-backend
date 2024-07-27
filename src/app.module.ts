@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
 import { UsersModule } from './users/users.module';
 import { CommonModule } from './common/modules/common.module';
 import { NotificationsModule } from './notifications/notifications.module';
@@ -14,6 +14,8 @@ import { OauthModule } from './oauth/oauth.module';
 import { ConfigModule } from '@nestjs/config';
 import { configuration } from './config/configuration';
 import { DatabaseModule } from './common/modules/database.module';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { AppIdentifierMiddleware } from './common/middlewares/appIdentifier.middleware';
 
 @Module(
     {
@@ -36,9 +38,21 @@ import { DatabaseModule } from './common/modules/database.module';
             OauthModule,
         ],
 
-        providers: [AppService],
+        providers: [
+            AppService,
+            {
+                provide: APP_INTERCEPTOR,
+                useClass: AppIdentifierMiddleware,
+            },
+        ],
         controllers: [AppController],
     }
 )
 
-export class AppModule { }
+export class AppModule implements NestModule {
+    configure(consumer: MiddlewareConsumer) {
+        consumer
+            .apply(AppIdentifierMiddleware)
+            .forRoutes({ path: '*', method: RequestMethod.ALL });
+    }
+}
