@@ -56,7 +56,6 @@ export class ListingService {
 
             return this.createOne(newListingInfo, user._id);
         } catch (error) {
-            console.log('error creating a new listing: ', error);
             throw new InternalServerErrorException('Error uploading file');
         }
     }
