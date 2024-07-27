@@ -258,7 +258,6 @@ export class UsersService {
                 },
                 {
                     new: true,
-                    rawResult: true,
                     includeResultMetadata: true
                 }
             );

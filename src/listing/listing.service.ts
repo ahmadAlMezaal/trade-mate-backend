@@ -54,8 +54,6 @@ export class ListingService {
                 desiredBookId
             };
 
-            console.log('newListingInfo: ', newListingInfo);
-
             return this.createOne(newListingInfo, user._id);
         } catch (error) {
             console.log('error creating a new listing: ', error);
@@ -121,7 +119,6 @@ export class ListingService {
             },
             {
                 new: true,
-                rawResult: true,
                 includeResultMetadata: true
             }
         );

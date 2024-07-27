@@ -130,7 +130,6 @@ export class ProposalService {
             },
             {
                 new: true,
-                rawResult: true,
                 includeResultMetadata: true
             }
         );
