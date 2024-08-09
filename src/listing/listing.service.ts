@@ -76,8 +76,8 @@ export class ListingService {
         return await this.listingsCollection.find({}).sort({ createdAt: -1 });
     }
 
-    public async fetchFeed(_id: Types.ObjectId): Promise<any> {
-        const tst = await this.listingsCollection.find(
+    public async fetchFeed(_id: Types.ObjectId): Promise<Listing[]> {
+        return this.listingsCollection.find(
             {
                 listingOwnerId: { $ne: new Types.ObjectId(_id) },
                 status: { $in: [ListingStatus.OPEN, ListingStatus.APPROVED] },
@@ -85,19 +85,6 @@ export class ListingService {
         )
             .sort({ createdAt: -1 })
             .lean();
-
-        // const ja = tst.map(listing => {
-        //     const desiredBooksArray = Object.entries(listing.desiredBooks).map(([priority, book]) => ({
-        //         priority,
-        //         book,
-        //     }));
-
-        //     return { ...listing, desiredBooks: desiredBooksArray };
-        // });
-        // console.log('ja: ', ja)
-        // return ja;
-
-        return tst;
     }
 
     public async fetchUserListing(_id: string): Promise<Listing[]> {
