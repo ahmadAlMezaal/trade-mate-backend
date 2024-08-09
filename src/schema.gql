@@ -32,6 +32,14 @@ type Book {
   totalPageCount: Float!
 }
 
+input BookPriorityInput {
+  """ID of the book"""
+  bookId: String!
+
+  """Priority of the book"""
+  priority: Float!
+}
+
 input CreateProposalInput {
   """Description of the book"""
   additionalInfo: String!
@@ -120,6 +128,11 @@ input ImageUrlsInput {
 }
 
 """
+The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSON
+
+"""
 The `JSONObject` scalar type represents JSON objects as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
 """
 scalar JSONObject
@@ -130,8 +143,8 @@ type Listing {
   """description of the listing"""
   description: String!
 
-  """Contains information about the requested book."""
-  desiredBookInfo: Book!
+  """Contains information about the requested books, mapped by priority."""
+  desiredBooks: JSON!
 
   """Images of the book"""
   imageUrls: [String!]!
@@ -171,7 +184,7 @@ type LoginResponse {
 }
 
 type Mutation {
-  addListing(availableBookId: String!, description: String!, desiredBookId: String!, file: Upload!, productCondition: String!): String!
+  addListing(description: String!, file: Upload!, listingBooks: [BookPriorityInput!]!, productCondition: String!): String!
   authenticateWithFacebook(input: FacebookAuthDto!): LoginResponse!
   authenticateWithGoogle(input: OauthInput!): LoginResponse!
   deleteUser(input: DeleteUserInput!): Boolean!
@@ -355,7 +368,7 @@ type User {
   reputation: Float!
 
   """User role"""
-  role: String!
+  role: Float!
 
   """IDs of the proposals sent"""
   sentProposalsIds: [ID!]!

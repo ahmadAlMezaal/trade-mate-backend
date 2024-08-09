@@ -1,5 +1,6 @@
 import { InputType, Field } from '@nestjs/graphql';
-import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsArray, IsEnum, IsInt, IsNotEmpty, IsOptional, IsString, Min, ValidateNested } from 'class-validator';
 import { GraphQLUpload } from 'graphql-upload';
 import { ProductCondition } from 'src/types/enums';
 
@@ -18,15 +19,11 @@ export class CreateListingInput {
 
     imageUrls?: string[];
 
-    @Field(() => String, { description: 'ID of the available book' })
-    @IsString()
-    @IsNotEmpty()
-    availableBookId: string;
-
-    @Field(() => String, { description: 'ID of the desired book' })
-    @IsString()
-    @IsNotEmpty()
-    desiredBookId: string;
+    @Field(() => [BookPriorityInput], { description: 'Available book with the list of desired books with priorities' })
+    @ValidateNested({ each: true })
+    @Type(() => BookPriorityInput)
+    @IsArray()
+    books: BookPriorityInput[];
 
     @Field(() => String, { description: 'Condition of the product' })
     @IsEnum(ProductCondition)
@@ -44,4 +41,17 @@ export class FileUploadInput {
 
     @Field()
     description: string;
+}
+
+@InputType()
+export class BookPriorityInput {
+    @Field(() => String, { description: 'ID of the book' })
+    @IsString()
+    @IsNotEmpty()
+    bookId: string;
+
+    @Field(() => Number, { description: 'Priority of the book' })
+    @IsInt()
+    @Min(0)
+    priority: number;
 }

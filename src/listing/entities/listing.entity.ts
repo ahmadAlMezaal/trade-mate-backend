@@ -1,16 +1,15 @@
 import { Book } from 'src/books/entities/book.schema';
-import { ListingStatus } from 'src/types/enums';
+import { ListingStatus, ProductCondition } from 'src/types/enums';
 
 export class IListing {
     _id: string;
-    title: string;
+    title?: string;
     description: string;
     imageUrls: string[];
-    bookInfo: Book;
-    listingOwnerId: string;
-    status?: ListingStatus;
     offeredBookInfo: Book;
+    desiredBooks: Book[];
+    listingOwnerId: string;
+    productCondition: ProductCondition;
+    status?: ListingStatus;
     proposalsIds?: string[];
-    createdAt?: Date;
-    updatedAt?: Date;
 }
