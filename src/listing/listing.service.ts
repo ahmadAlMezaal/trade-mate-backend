@@ -1,13 +1,14 @@
 import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { BooksService } from 'src/books/books.service';
 import { User } from 'src/users/entities/user.schema';
-import { CreateListingInput } from './dto/createListing.input';
+import { BookPriorityInput, CreateListingInput } from './dto/createListing.input';
 import { Listing, ListingDocument } from './entities/listing.schema';
 import { AwsService } from 'src/aws/aws.service';
 import { FileUpload } from 'graphql-upload';
 import { ListingStatus, ProductCondition } from 'src/types/enums';
 import { FilterQuery, Model, Types } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
+import { IBook } from 'src/types/models';
 
 @Injectable()
 export class ListingService {
@@ -19,19 +20,32 @@ export class ListingService {
     ) { }
 
     private async createOne(createListingInput: CreateListingInput, userId: Types.ObjectId): Promise<Types.ObjectId> {
-        const { description, imageUrls, availableBookId, desiredBookId, productCondition } = createListingInput;
-        const [offeredBookInfo, desiredBookInfo] = await Promise.all(
-            [
-                this.bookService.getBookByProviderId(availableBookId),
-                this.bookService.getBookByProviderId(desiredBookId)
-            ]
-        );
+        const { description, imageUrls, books, productCondition } = createListingInput;
+
+        const promises = books.map((book) => this.bookService.getBookByProviderId(book.bookId));
+        const results = await Promise.allSettled(promises);
+
+        const booksInfo = results
+            .filter((result): result is PromiseFulfilledResult<IBook> => result.status === 'fulfilled')
+            .map(result => result.value);
+
+        const offeredBookInfo = booksInfo.splice(0, 1)[0];
+
+        const desiredBooksMap: { [priority: number]: IBook } = {};
+
+        books
+            .slice(1)
+            .forEach(
+                (book, index) => {
+                    desiredBooksMap[book.priority] = booksInfo[index];
+                }
+            );
 
         const listing = new this.listingsCollection(
             {
-                title: `Trade ${offeredBookInfo.title} for ${desiredBookInfo.title}`,
+                title: `Trade ${offeredBookInfo.title}`,
                 offeredBookInfo,
-                desiredBookInfo,
+                desiredBooks: desiredBooksMap,
                 description,
                 imageUrls,
                 listingOwnerId: userId,
@@ -43,17 +57,15 @@ export class ListingService {
         return newListing._id;
     }
 
-    public async addListing(user: User, availableBookId: string, desiredBookId: string, fileUpload: FileUpload, productCondition: ProductCondition, description: string) {
+    public async addListing(user: User, listingBooks: BookPriorityInput[], fileUpload: FileUpload, productCondition: ProductCondition, description: string) {
         try {
             const imageUrl = await this.awsService.uploadFile(fileUpload.createReadStream, fileUpload.filename);
             const newListingInfo: CreateListingInput = {
                 description,
                 imageUrls: [imageUrl],
                 productCondition,
-                availableBookId,
-                desiredBookId
+                books: listingBooks,
             };
-
             return this.createOne(newListingInfo, user._id);
         } catch (error) {
             throw new InternalServerErrorException('Error uploading file');
@@ -64,25 +76,41 @@ export class ListingService {
         return await this.listingsCollection.find({}).sort({ createdAt: -1 });
     }
 
-    public fetchFeed(_id: Types.ObjectId): Promise<Listing[]> {
-        return this.listingsCollection.find(
+    public async fetchFeed(_id: Types.ObjectId): Promise<any> {
+        const tst = await this.listingsCollection.find(
             {
                 listingOwnerId: { $ne: new Types.ObjectId(_id) },
                 status: { $in: [ListingStatus.OPEN, ListingStatus.APPROVED] },
             }
         )
-            .sort({ createdAt: -1 });
+            .sort({ createdAt: -1 })
+            .lean();
+
+        // const ja = tst.map(listing => {
+        //     const desiredBooksArray = Object.entries(listing.desiredBooks).map(([priority, book]) => ({
+        //         priority,
+        //         book,
+        //     }));
+
+        //     return { ...listing, desiredBooks: desiredBooksArray };
+        // });
+        // console.log('ja: ', ja)
+        // return ja;
+
+        return tst;
     }
 
     public async fetchUserListing(_id: string): Promise<Listing[]> {
-        return await this.listingsCollection.find({ listingOwnerId: new Types.ObjectId(_id) }).sort({ createdAt: -1 });
+        return this.listingsCollection
+            .find({ listingOwnerId: new Types.ObjectId(_id) })
+            .sort({ createdAt: -1 });
     }
 
     public async getListingsByIds(_ids: Types.ObjectId[]) {
-        return await this.listingsCollection.find({ _id: { $in: _ids } });
+        return this.listingsCollection.find({ _id: { $in: _ids } });
     }
 
-    public findOne(params: FilterQuery<Listing>) {
+    public async findOne(params: FilterQuery<Listing>) {
         return this.listingsCollection.findOne({ ...params });
     }
 

@@ -52,8 +52,8 @@ export class User extends Document {
   @Prop({ type: [Types.ObjectId], default: [] })
   sentProposalsIds: Types.ObjectId[];
 
-  @Field(() => String, { description: 'User role' })
-  @Prop({ type: String, default: Role.TRADER })
+  @Field(() => Number, { description: 'User role' })
+  @Prop({ type: Number, default: Role.TRADER })
   role?: Role;
 
   @Field(() => String, { description: 'Verification code on registration', defaultValue: null })

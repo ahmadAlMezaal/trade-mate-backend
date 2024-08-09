@@ -1,8 +1,19 @@
 import { ObjectType, Field, ID } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { GraphQLJSON } from 'graphql-type-json';
 import { Document, HydratedDocument, Types } from 'mongoose';
 import { Book } from 'src/books/entities/book.schema';
 import { ListingStatus, ProductCondition } from 'src/types/enums';
+
+@ObjectType()
+export class BookWithPriority {
+
+    @Field(() => String)
+    priority: string;
+
+    @Field(() => Book)
+    book: Book;
+}
 
 @ObjectType()
 @Schema({ timestamps: true })
@@ -27,9 +38,9 @@ export class Listing extends Document {
     @Prop({ type: Object })
     offeredBookInfo: Book;
 
-    @Field(() => Book, { description: 'Contains information about the requested book.' })
+    @Field(() => GraphQLJSON, { description: 'Contains information about the requested books, mapped by priority.' })
     @Prop({ type: Object })
-    desiredBookInfo: Book;
+    desiredBooks: { [priority: string]: Book };
 
     @Field(() => ID)
     @Prop({ type: Object })
