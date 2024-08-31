@@ -245,7 +245,8 @@ export class UsersService {
 
     public async respondToConnectionRequest(connectionRecipient: User, connectionSenderId: string, connectionStatus: ConnectionStatus): Promise<boolean> {
 
-        await this.notificationService.respondToConnection(connectionRecipient._id.toString(), connectionStatus);
+        await this.notificationService.sendConnectionResponseNotification(connectionRecipient._id.toString(), connectionStatus);
+
         if (connectionStatus === ConnectionStatus.REJECTED) {
             const result = await this.userCollection.findOneAndUpdate(
                 {
@@ -280,25 +281,22 @@ export class UsersService {
 
         const responses = await Promise.all(
             [
-                this.updateUser(
-                    connectionRecipient._id.toString(),
-                    {
-                        $push: {
-                            connectionsIds: new Types.ObjectId(connectionSenderId)
-                        }
-                    },
-                ),
-                this.updateUser(
-                    connectionSenderId,
-                    {
-                        $push: {
-                            connectionsIds: connectionRecipient._id
-                        }
-                    }
-                )
+                this.addUserToConnection(connectionRecipient._id.toString(), connectionSenderId),
+                this.addUserToConnection(connectionSenderId, connectionRecipient._id.toString()),
             ]
         );
 
         return responses.filter((response) => response === true).length >= 1;
+    }
+
+    private addUserToConnection(userId: string, connectionId: string) {
+        return this.updateUser(
+            userId,
+            {
+                $push: {
+                    connectionsIds: new Types.ObjectId(connectionId)
+                }
+            }
+        );
     }
 }

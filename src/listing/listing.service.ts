@@ -57,18 +57,28 @@ export class ListingService {
         return newListing._id;
     }
 
-    public async addListing(user: User, listingBooks: BookPriorityInput[], fileUpload: FileUpload, productCondition: ProductCondition, description: string) {
+    public async addListing(user: User, listingBooks: BookPriorityInput[], filesUpload: FileUpload[], productCondition: ProductCondition, description: string) {
+        const imageUrls = [];
         try {
-            const imageUrl = await this.awsService.uploadFile(fileUpload.createReadStream, fileUpload.filename);
+            const resolvedFiles = await Promise.all(filesUpload);
+            for (const fileUpload of resolvedFiles) {
+                const imageUrl = await this.awsService.uploadFile(
+                    fileUpload.createReadStream,
+                    fileUpload.filename
+                );
+                imageUrls.push(imageUrl);
+            }
+
             const newListingInfo: CreateListingInput = {
                 description,
-                imageUrls: [imageUrl],
+                imageUrls,
                 productCondition,
                 books: listingBooks,
             };
-            return this.createOne(newListingInfo, user._id);
+            await this.createOne(newListingInfo, user._id);
+            return { message: 'Your listing has been uploaded successfully and will be checked by an admin for approval.' };
         } catch (error) {
-            throw new InternalServerErrorException('Error uploading file');
+            throw new InternalServerErrorException('Error creating your listing file');
         }
     }
 
