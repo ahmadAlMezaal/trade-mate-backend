@@ -29,11 +29,6 @@ export class CreateNotificationInput {
     @IsString()
     listingId?: string;
 
-    @Field(() => String, { nullable: true })
-    @IsOptional()
-    @IsString()
-    proposalId?: string;
-
     @Field(() => NotificationMetadata, { nullable: true })
     @IsOptional()
     @IsObject()

@@ -2,6 +2,10 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type AddListingResponse {
+  message: String!
+}
+
 type Book {
   """Authors of the book"""
   authors: [String!]
@@ -184,7 +188,7 @@ type LoginResponse {
 }
 
 type Mutation {
-  addListing(description: String!, file: Upload!, listingBooks: [BookPriorityInput!]!, productCondition: String!): String!
+  addListing(description: String!, files: [Upload!]!, listingBooks: [BookPriorityInput!]!, productCondition: String!): AddListingResponse!
   authenticateWithFacebook(input: FacebookAuthDto!): LoginResponse!
   authenticateWithGoogle(input: OauthInput!): LoginResponse!
   deleteUser(input: DeleteUserInput!): Boolean!
@@ -204,6 +208,9 @@ type Notification {
   """The unique identifier for the notification."""
   _id: ID!
 
+  """The date when the entity was created"""
+  createdAt: DateTime!
+
   """The identifier for the listing (if applicable)"""
   listingId: ID
 
@@ -213,7 +220,7 @@ type Notification {
   """
   The metadata of the notification, it's different for each notification type
   """
-  metadata: NotificationMetadata!
+  metadata: JSON!
 
   """The identifier for proposal (if applicable)"""
   proposalId: ID
@@ -236,11 +243,9 @@ type Notification {
   The type of notification (e.g., "proposal_received", "item_traded", etc.)
   """
   type: String!
-}
 
-type NotificationMetadata {
-  proposalId: ID
-  status: String
+  """The last date when the entity was updated"""
+  updatedAt: DateTime!
 }
 
 input OauthInput {

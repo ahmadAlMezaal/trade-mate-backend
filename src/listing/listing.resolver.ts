@@ -9,6 +9,7 @@ import { GraphQLUpload, FileUpload } from 'graphql-upload';
 import { ProductCondition } from 'src/types/enums';
 import { Types } from 'mongoose';
 import { BookPriorityInput } from './dto/createListing.input';
+import { AddListingResponse } from './entities/listing.entity';
 
 @Resolver(() => Listing)
 export class ListingResolver {
@@ -17,15 +18,15 @@ export class ListingResolver {
     ) { }
 
     @UseGuards(JwtAuthGuard)
-    @Mutation(() => String, { name: 'addListing' })
+    @Mutation(() => AddListingResponse, { name: 'addListing' })
     async addListing(
         @Args('listingBooks', { type: () => [BookPriorityInput] }) listingBooks: BookPriorityInput[],
-        @Args('file', { type: () => GraphQLUpload }) fileUpload: FileUpload,
+        @Args('files', { type: () => [GraphQLUpload] }) files: FileUpload[],
         @Args('productCondition', { type: () => String }) productCondition: ProductCondition,
         @Args('description', { type: () => String }) description: string,
         @CurrentUser() user: User
-    ) {
-        return await this.listingService.addListing(user, listingBooks, fileUpload, productCondition, description);
+    ): Promise<{ message: string }> {
+        return this.listingService.addListing(user, listingBooks, files, productCondition, description);
     }
 
     @Query(() => [Listing], { name: 'listings' })

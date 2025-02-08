@@ -1,5 +1,6 @@
 import { ObjectType, Field, ID } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import GraphQLJSON from 'graphql-type-json';
 import { Document, HydratedDocument, Types } from 'mongoose';
 
 export enum NotificationType {
@@ -70,9 +71,17 @@ export class Notification extends Document {
     @Prop({ type: String, default: NotificationStatus.UNREAD })
     status: NotificationStatus;
 
-    @Field(() => NotificationMetadata, { description: "The metadata of the notification, it's different for each notification type" })
+    @Field(() => GraphQLJSON, { description: "The metadata of the notification, it's different for each notification type" })
     @Prop({ type: NotificationMetadata, default: null })
     metadata: NotificationMetadata;
+
+    @Field(() => Date, { description: 'The date when the entity was created' })
+    @Prop({ type: Date })
+    createdAt?: Date;
+
+    @Field(() => Date, { description: 'The last date when the entity was updated' })
+    @Prop({ type: Date })
+    updatedAt?: Date;
 
 }
 

@@ -11,7 +11,7 @@ export class NotificationsService {
     constructor(@InjectModel(Notification.name) private readonly notificationsCollection: Model<NotificationDocument>) { }
 
     public async createOne(createNotificationInput: CreateNotificationInput): Promise<Notification> {
-        const { senderId, recipientId, message, type, listingId, title, proposalId, metadata } = createNotificationInput;
+        const { senderId, recipientId, message, type, listingId, title, metadata } = createNotificationInput;
 
         const notification = new this.notificationsCollection(
             {
@@ -21,7 +21,6 @@ export class NotificationsService {
                 recipientId: new Types.ObjectId(recipientId),
                 listingId: listingId && new Types.ObjectId(listingId),
                 senderId: senderId && new Types.ObjectId(senderId),
-                proposalId: proposalId && new Types.ObjectId(proposalId),
                 metadata: metadata &&
                 {
                     proposalId: metadata.proposalId || null,
@@ -68,7 +67,7 @@ export class NotificationsService {
         return this.notificationsCollection.deleteOne({ ...params });
     }
 
-    public async respondToConnection(recipientId: string, status: ConnectionStatus) {
+    public async sendConnectionResponseNotification(recipientId: string, status: ConnectionStatus) {
         return await this.notificationsCollection.findOneAndUpdate(
             {
                 recipientId: new Types.ObjectId(recipientId),

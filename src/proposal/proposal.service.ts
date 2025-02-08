@@ -63,7 +63,9 @@ export class ProposalService {
                 recipientId: listing.listingOwnerId.toString(),
                 senderId: userId.toString(),
                 type: NotificationType.PROPOSAL_RECEIVED,
-                proposalId: proposal._id.toString(),
+                metadata: {
+                    proposalId: proposal._id
+                },
             }
         );
 
@@ -160,7 +162,9 @@ export class ProposalService {
                 message: `${sender.firstName} ${sender.lastName} has ${messageDecision} your proposal request`,
                 recipientId: proposal.recipientId.toString(),
                 senderId: sender._id.toString(),
-                proposalId: proposal._id.toString(),
+                metadata: {
+                    proposalId: proposal._id,
+                },
                 type,
             }
         );
